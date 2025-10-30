@@ -1,0 +1,65 @@
+{% load static %}
+<style>
+.filter-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.filter-form {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 2px solid #ccc;
+    border-radius: 25px;
+    padding: 5px 10px;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 800px; /* 👈 ancho máximo del buscador */
+}
+
+.filter-form:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+}
+
+.filter-input {
+    border: none;
+    outline: none;
+    padding: 8px 16px;
+    font-size: 16px;
+    flex-grow: 1;         /* 👈 ocupa todo el espacio disponible */
+    min-width: 0;         /* 👈 evita que el flex limite el tamaño del input */
+    border-radius: 25px;
+}
+
+.filter-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;       /* 👈 evita que el botón achique el input */
+}
+
+.filter-button:hover .filter-icon {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+}
+
+.filter-icon {
+    width: 24px;
+    height: 24px;
+}
+
+</style>
+<div class="filter-container">
+    <form method="get" action="" class="filter-form">
+        <input type="text" name="q" placeholder="{{ placeholder }}" class="filter-input">
+        <button type="submit" class="filter-button">
+            <img src="{% static 'img/buscar.png' %}" alt="Buscar" class="filter-icon">
+        </button>
+    </form>
+</div>

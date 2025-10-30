@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Clientes - Inicio{% endblock %}
+
+{% block content %}
+<section class="container index-cliente">
+    <h2>Gestión de Clientes</h2>
+    <div class="options">
+        <a href="{% url 'ver_clientes' %}" class="btn-home">Ver Clientes</a>
+        <a href="{% url 'agregar_cliente' %}" class="btn-home">Agregar Nuevo Cliente</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Mascotas Morelia{% endblock %}</title>
+    <!-- Global stylesheet for the site (static/styles/main.css) -->
+    <link rel="stylesheet" href="{% static 'styles/main.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar included directly in base (can be overridden via block 'header') -->
+    <header class="navbar">
+        <div class="brand">
+            <h1>{% block header %}Sistema para clínica veterinaria{% endblock %}</h1>
+        </div>
+        <nav>
+             <a href="/admin/login/" class="btn-home">Admin</a>
+
+            <a href="{% url 'index' %}" class="btn-home">Inicio</a>
+            <a href="{% url 'indexCliente' %}" class="btn-home">Clientes</a>
+            <a href="{% url 'indexMascota' %}" class="btn-home">Mascotas</a>
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
