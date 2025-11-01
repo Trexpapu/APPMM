@@ -23,6 +23,7 @@ urlpatterns = [
     
     # Keep app URL includes after the root index so other app paths still work
     path('', include('ClientesMascotas.urls')),
+    path('', include('ConsultasMedicas.urls')),
     
 ]
 

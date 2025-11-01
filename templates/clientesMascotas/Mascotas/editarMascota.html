@@ -5,27 +5,14 @@
 {% block content %}
 <section class="container">
     <h2>Editar Mascota</h2>
+
     <form method="post">
         {% csrf_token %}
-        {{ form.non_field_errors }}
-        <label for="id_nombre">Nombre de la Mascota:</label>
-        {{ form.nombre }}
-        <label for="id_especie">Especie:</label>
-        {{ form.especie }}
-        <label for="id_raza">Raza:</label>
-        {{ form.raza }}
-        <label for="id_fechaNacimiento">Fecha de Nacimiento:</label>
-        {{ form.fechaNacimiento }}
-        <label for="id_peso">Peso (GR):</label>
-        {{ form.peso }}
-        <label for="id_vacunas">Vacunas:</label>
-        {{ form.vacunas }}
-        <label for="id_alergias">Alergias:</label>
-        {{ form.alergias }}
-        <label for="id_vive">¿Vive?:</label>
-        {{ form.vive }}
+
+        <!-- Campo personalizado de cliente -->
         <label for="cliente">Seleccionar Cliente:</label>
         <input type="text" id="cliente-search" placeholder="Buscar cliente por nombre, correo o teléfono" class="search-input">
+
         <select id="cliente" name="cliente" class="searchable-dropdown">
             <option value="">Seleccione un cliente</option>
             {% for cliente in clientes %}
@@ -35,22 +22,27 @@
             {% endfor %}
         </select>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const searchInput = document.getElementById('cliente-search');
-                const dropdown = document.getElementById('cliente');
+        <!-- Campos del formulario (sin cliente, ya vienen con valores) -->
+        {{ form.as_p }}
 
-                searchInput.addEventListener('input', function() {
-                    const filter = searchInput.value.toLowerCase();
-                    const options = dropdown.querySelectorAll('option');
-                    options.forEach(option => {
-                        const text = option.textContent.toLowerCase();
-                        option.style.display = text.includes(filter) ? '' : 'none';
-                    });
-                });
-            });
-        </script>
         <button type="submit" class="btn-home">Guardar Cambios</button>
     </form>
 </section>
+
+<!-- Buscador dinámico -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('cliente-search');
+    const dropdown = document.getElementById('cliente');
+
+    searchInput.addEventListener('input', function() {
+        const filter = searchInput.value.toLowerCase().replace(/\s+/g, '');
+        const options = dropdown.querySelectorAll('option');
+        options.forEach(option => {
+            const text = option.textContent.toLowerCase().replace(/\s+/g, '');
+            option.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+});
+</script>
 {% endblock %}

@@ -1,0 +1,58 @@
+{% load static %}
+<style>
+.date-filter-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.date-filter-form {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 2px solid #ccc;
+    border-radius: 25px;
+    padding: 5px 10px;
+    transition: all 0.3s ease;
+    width: 100%;
+    max-width: 300px;
+}
+
+.date-filter-form:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.4);
+}
+
+.date-filter-input {
+    border: none;
+    outline: none;
+    font-size: 16px;
+    padding: 6px 12px;
+    border-radius: 25px;
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.date-filter-button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    border-radius: 25px;
+    padding: 6px 14px;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: background-color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.date-filter-button:hover {
+    background-color: #0056b3;
+}
+</style>
+
+<div class="date-filter-container">
+    <form method="get" action="" class="date-filter-form">
+        <input type="date" name="q" class="date-filter-input">
+        <button type="submit" class="date-filter-button">Filtrar</button>
+    </form>
+</div>

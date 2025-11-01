@@ -26,7 +26,7 @@ class ClienteUpdateForm(forms.ModelForm):
 class MascotaForm(forms.ModelForm):
     class Meta:
         model = Mascotas
-        fields = ['cliente', 'nombre', 'especie', 'raza', 'fechaNacimiento', 'peso', 'vacunas', 'alergias', 'vive']
+        fields = ['nombre', 'especie', 'raza', 'fechaNacimiento', 'peso', 'vacunas', 'alergias', 'vive']
         widgets = {
             'fechaNacimiento': forms.DateInput(attrs={'type': 'date'}),
             'vacunas': forms.Textarea(attrs={'rows': 3}),
@@ -35,10 +35,11 @@ class MascotaForm(forms.ModelForm):
         }
 
 
+
 class MascotaUpdateForm(forms.ModelForm):
     class Meta:
         model = Mascotas
-        fields = ['cliente', 'nombre', 'especie', 'raza', 'fechaNacimiento', 'peso', 'vacunas', 'alergias', 'vive']
+        fields = ['nombre', 'especie', 'raza', 'fechaNacimiento', 'peso', 'vacunas', 'alergias', 'vive']
         widgets = {
             'fechaNacimiento': forms.DateInput(attrs={'type': 'date'}),
             'vacunas': forms.Textarea(attrs={'rows': 3}),

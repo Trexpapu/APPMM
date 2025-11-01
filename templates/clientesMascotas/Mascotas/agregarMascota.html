@@ -7,6 +7,8 @@
     <h2>Agregar Nueva Mascota</h2>
     <form method="post">
         {% csrf_token %}
+        
+        <!-- Campo personalizado -->
         <label for="cliente">Seleccionar Cliente:</label>
         <input type="text" id="cliente-search" placeholder="Buscar cliente por nombre, correo o teléfono" class="search-input">
         <select id="cliente" name="cliente" class="searchable-dropdown">
@@ -18,25 +20,9 @@
             {% endfor %}
         </select>
 
-        
-        {{ form.non_field_errors }}
-        <label for="id_nombre">Nombre de la Mascota:</label>
-        {{ form.nombre }}
-        <label for="id_especie">Especie:</label>
-        {{ form.especie }}
-        <label for="id_raza">Raza:</label>
-        {{ form.raza }}
-        <label for="id_fechaNacimiento">Fecha de Nacimiento:</label>
-        {{ form.fechaNacimiento }}
-        <label for="id_peso">Peso (GR):</label>
-        {{ form.peso }}
-        <label for="id_vacunas">Vacunas:</label>
-        {{ form.vacunas }}
-        <label for="id_alergias">Alergias:</label>
-        {{ form.alergias }}
-        <label for="id_vive">¿Vive?:</label>
-        {{ form.vive }}
-        
+        <!-- Campos del formulario Django -->
+        {{ form.as_p }}
+
         <button type="submit" class="btn-home">Guardar</button>
     </form>
 </section>

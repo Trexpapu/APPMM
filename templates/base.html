@@ -16,11 +16,12 @@
             <h1>{% block header %}Sistema para clínica veterinaria{% endblock %}</h1>
         </div>
         <nav>
-             <a href="/admin/login/" class="btn-home">Admin</a>
-
+            <a href="{% url 'login' %}" class="btn-home">Sesión</a>
+            <a href="/admin/login/" class="btn-home">Admin</a>
             <a href="{% url 'index' %}" class="btn-home">Inicio</a>
             <a href="{% url 'indexCliente' %}" class="btn-home">Clientes</a>
             <a href="{% url 'indexMascota' %}" class="btn-home">Mascotas</a>
+            <a href="{% url 'index-consultas' %}" class="btn-home">Consultas</a>
         </nav>
     </header>
 

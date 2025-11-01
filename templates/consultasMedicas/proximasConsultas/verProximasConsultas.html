@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Ver Agenda de Consultas - Agenda de Consultas Mascotas Morelia{% endblock %}
+
+{% block content %}
+<section class="container">
+
+    <h2>Agenda de Consultas</h2>
+    {% include 'filtro.html' with placeholder='Buscar por nombre, correo electrónico o teléfono del dueño, nombre, raza o especie de la mascota, clínica veterinaria, veterinario o fecha de consulta' %}
+
+    {% include 'filtroFecha.html' %}
+
+    <a href="{% url 'ver-proximas-consultas' %}" class="btn-regresar">Regresar</a>
+<div class="custom-table-container">
+    <table class="custom-table">
+        <thead>
+            <tr>
+                <th>Nombre cliente</th>
+                <th>Email del cliente</th>
+                <th>Teléfono del cliente</th>
+                <th>Nombre mascota</th>
+                <th>Especie</th>
+                <th>Raza</th>
+                <th>Fecha-Hora consulta</th>
+                <th>Motivo de consulta</th>
+                <th>Médico veterinario</th>
+                <th>Veterinaria</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for siguientesConsulta in siguientesConsultas %}
+            <tr>
+                <td>{{ siguientesConsulta.mascota.cliente.nombre }}</td>
+                <td>{{ siguientesConsulta.mascota.cliente.email }}</td>
+                <td>{{ siguientesConsulta.mascota.cliente.telefono }}</td>
+                <td>{{ siguientesConsulta.mascota.nombre }}</td>
+                <td>{{ siguientesConsulta.mascota.especie }}</td>
+                <td>{{ siguientesConsulta.mascota.raza }}</td>
+                <td>{{ siguientesConsulta.fechaSiguienteConsulta }}</td>
+                <td>{{ siguientesConsulta.motivoSiguienteConsulta }}</td>
+                <td>{{ siguientesConsulta.veterinario }}</td>
+                <td>{{ siguientesConsulta.clinicaVeterinaria }}</td>
+              
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="11">No hay Consultas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</section>
+{% endblock %}

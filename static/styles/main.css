@@ -188,34 +188,50 @@ form button:hover {
   background: var(--btn-agr-hover);
 }
 
-/* Styles for indexCliente options */
+/* ==================== MEJORADO: INDEX CLIENTE ==================== */
 .index-cliente {
   text-align: center;
-  padding: 2rem 0;
+  padding: 3rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(180deg, #ffffff 0%, #f7f9fb 100%);
 }
 
 .index-cliente h2 {
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   font-size: 2rem;
   color: var(--brand-bg);
+  font-weight: 700;
 }
 
+/* ==================== MEJORADO: OPTIONS ==================== */
 .index-cliente .options {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 2rem;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  justify-items: center;
 }
 
 .index-cliente .btn-home {
-  padding: 1rem 2rem;
-  font-size: 1.2rem;
+  padding: 1.2rem 1.8rem;
+  font-size: 1.05rem;
+  font-weight: 500;
   text-transform: uppercase;
-  border-radius: 8px;
-  transition: transform 0.2s ease-in-out;
+  letter-spacing: 0.5px;
+  border-radius: 10px;
+  transition: all 0.25s ease;
+  width: 100%;
+  max-width: 260px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .index-cliente .btn-home:hover {
-  transform: scale(1.05);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 /* Responsive table - mantiene el mismo diseño pero más pequeño en móvil */
@@ -229,5 +245,19 @@ form button:hover {
   .custom-table td:nth-child(9),
   .custom-table td:nth-child(10) {
     min-width: 150px;
+  }
+
+  .index-cliente h2 {
+    font-size: 1.6rem;
+    margin-bottom: 2rem;
+  }
+
+  .index-cliente .options {
+    gap: 1.2rem;
+  }
+
+  .index-cliente .btn-home {
+    font-size: 0.95rem;
+    padding: 0.9rem 1.4rem;
   }
 }

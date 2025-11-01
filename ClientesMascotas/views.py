@@ -85,30 +85,53 @@ def borrar_cliente(request, pk):
 @login_required
 def agregar_mascota(request):
     """View to add a new pet, with a dropdown to select the client."""
+    clientes = Clientes.objects.all()  # obtenemos los clientes antes por claridad
+
     if request.method == 'POST':
         form = MascotaForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('indexMascota')
+            mascota = form.save(commit=False)  # no guarda todavía
+            cliente_id = request.POST.get('cliente')  # obtenemos el cliente seleccionado del select
+            if cliente_id:  # si el usuario eligió un cliente
+                mascota.cliente_id = cliente_id  # asignamos el cliente manualmente
+                mascota.save()  # guardamos ahora sí
+                return redirect('indexMascota')
+            else:
+                form.add_error(None, "Debe seleccionar un cliente antes de guardar.")
     else:
         form = MascotaForm()
-    clientes = Clientes.objects.all()
-    return render(request, 'clientesMascotas/Mascotas/agregarMascota.html', {'form': form, 'clientes': clientes})
+
+    return render(
+        request,
+        'clientesMascotas/Mascotas/agregarMascota.html',
+        {'form': form, 'clientes': clientes}
+    )
 
 
 @login_required
 def editar_mascota(request, pk):
-    """View to edit an existing pet."""
+    """Editar mascota con selector personalizado de cliente."""
     mascota = get_object_or_404(Mascotas, pk=pk)
+    clientes = Clientes.objects.all()
+
     if request.method == 'POST':
         form = MascotaUpdateForm(request.POST, instance=mascota)
         if form.is_valid():
-            form.save()
+            mascota_editada = form.save(commit=False)
+            cliente_id = request.POST.get('cliente')
+            if cliente_id:
+                mascota_editada.cliente_id = cliente_id
+            mascota_editada.save()
             return redirect('ver_mascotas')
     else:
         form = MascotaUpdateForm(instance=mascota)
-    clientes = Clientes.objects.all()  # Fetch all clients for the dropdown
-    return render(request, 'clientesMascotas/Mascotas/editarMascota.html', {'form': form, 'clientes': clientes})
+
+    return render(request, 'clientesMascotas/Mascotas/editarMascota.html', {
+        'form': form,
+        'clientes': clientes
+    })
+
+
 
 
 @login_required

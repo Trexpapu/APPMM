@@ -4,9 +4,9 @@ from django.contrib.auth.models import User
 # Create your models here.
 class ConsultasMedicas(models.Model):
     CLINICAS = [
-        ('m1', 'Mascotas Morelia Centro'),
-        ('m2', 'Mascotas Morelia Salida Apatzingán'),
-        ('m3', 'Mascotas Morelia Mano Huevona'),
+        ('Mascotas Morelia Centro', 'Mascotas Morelia Centro'),
+        ('Mascotas Morelia Salida Apatzingán', 'Mascotas Morelia Salida Apatzingán'),
+        ('Mascotas Morelia Mano Huevona', 'Mascotas Morelia Mano Huevona'),
     ] 
     mascota = models.ForeignKey(Mascotas, on_delete=models.CASCADE)
     motivoConsulta = models.TextField(blank=True)
@@ -14,26 +14,45 @@ class ConsultasMedicas(models.Model):
     pulso = models.TextField(blank=True)
     frecuenciaCardiaca = models.TextField( blank=True)
     puntuacionCorporal = models.TextField(blank=True)
+    peso = models.FloatField()
+    vacunas = models.TextField(blank=True)  
+    alergias = models.TextField(blank=True)
     parasitos = models.TextField(blank=True)
     agua = models.TextField(blank=True)
     alimento = models.TextField(blank=True)
     condicionesDeHogar = models.TextField(blank=True)
     ectoparasitos = models.TextField(blank=True)
+    pronosticoSignos = models.TextField(blank=True)
     sintomas = models.TextField(blank=True) 
     observaciones = models.TextField(blank=True)
+    diagnosticoDiferencial = models.TextField(blank=True) 
     diagnostico = models.TextField(blank=True) 
-    recetaMedica = models.TextField(blank=True) 
+    tratamiento = models.TextField(blank=True) 
+    estudiosHechos = models.TextField(blank=True) 
+    estudiosRecomendados = models.TextField(blank=True) 
     fechaConsulta = models.DateField(auto_now_add=True)
     veterinario =  models.ForeignKey(User, on_delete=models.CASCADE)
     clinicaVeterinaria = models.CharField(
         max_length=255,
         choices=CLINICAS,
-        default='m1'  # puedes poner un valor por defecto si quieres
+        default='Mascotas Morelia Centro'  # puedes poner un valor por defecto si quieres
     )
 
 class SiguientesConsultas(models.Model):
-    fechaSiguienteConsulta = models.DateField()
+    CLINICAS = [
+        ('Mascotas Morelia Centro', 'Mascotas Morelia Centro'),
+        ('Mascotas Morelia Salida Apatzingán', 'Mascotas Morelia Salida Apatzingán'),
+        ('Mascotas Morelia Mano Huevona', 'Mascotas Morelia Mano Huevona'),
+    ] 
+    fechaSiguienteConsulta = models.DateTimeField()
     motivoSiguienteConsulta = models.TextField(blank=True)
+    veterinario =  models.ForeignKey(User, on_delete=models.CASCADE)
+    mascota = models.ForeignKey(Mascotas, on_delete=models.CASCADE)
+    clinicaVeterinaria = models.CharField(
+        max_length=255,
+        choices=CLINICAS,
+        default='Mascotas Morelia Centro'  # puedes poner un valor por defecto si quieres
+    )
 
 class Desparasitaciones(models.Model):
     mascota = models.ForeignKey(Mascotas, on_delete=models.CASCADE)
