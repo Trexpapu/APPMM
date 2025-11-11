@@ -69,4 +69,58 @@ def agendar_proxima_consulta(request):
     return render(request, 'consultasMedicas/proximasConsultas/agendarConsulta.html', {'form': form, 'mascotas': mascotas})
 
 
+@login_required
+def borrar_proxima_consulta(request, pk):
+    """View to delete an existing pet."""
+    proxConsulta = get_object_or_404(SiguientesConsultas, pk=pk)
+    proxConsulta.delete()
+    return redirect('ver-proximas-consultas')
+
+
+@login_required
+def editar_proxima_consulta(request, pk):
+    """Editar mascota con selector personalizado de cliente."""
+    proxConsulta = get_object_or_404(SiguientesConsultas, pk=pk)
+    mascota = Mascotas.objects.all()
+
+    if request.method == 'POST':
+        form = UpdateSiguienteConsultaForm(request.POST, instance=proxConsulta)
+        if form.is_valid():
+            proxConsultaEditada = form.save(commit=False)
+            mascota_id = request.POST.get('mascota')
+            if mascota_id:
+                proxConsultaEditada.mascota_id = mascota_id
+            proxConsultaEditada.save()
+            return redirect('ver-proximas-consultas')
+    else:
+        form = UpdateSiguienteConsultaForm(instance=proxConsulta)
+
+    return render(request, 'consultasMedicas/proximasConsultas/editarProximaConsulta.html', {
+        'form': form,
+        'mascotas': mascota
+    })
+
+
+
+
+@login_required
+def nueva_consulta(request):
+    """View to add a next consultation."""
+    mascotas = Mascotas.objects.all()
+
+    if request.method == 'POST':
+        form = ConsultaMedicaForm(request.POST)
+        if form.is_valid():
+            nConsulta = form.save(commit=False)
+            mascota_id = request.POST.get('mascota')
+            if mascota_id:
+                nConsulta.mascota_id = mascota_id
+                nConsulta.save()
+                return redirect('index-consultas')
+            else:
+                form.add_error(None, "Debe seleccionar una mascota antes de guardar.")
+    else:
+        form = ConsultaMedicaForm()
+ 
+    return render(request, 'consultasMedicas/consultasMedicasBase/nuevaConsulta.html', {'form': form, 'mascotas': mascotas})
 

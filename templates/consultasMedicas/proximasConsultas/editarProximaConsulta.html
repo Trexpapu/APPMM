@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Cita{% endblock %}
+
+{% block content %}
+<section class="container">
+    <h2>Editar Cita</h2>
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Campo personalizado -->
+        <label for="mascota">Seleccionar mascota:</label>
+        <input type="text" id="mascota-search" placeholder="Buscar mascota por nombre, raza, especie, nombre del cliente, email o teléfono" class="search-input">
+
+        <select id="mascota" name="mascota" class="searchable-dropdown">
+            <option value="">Seleccione una mascota</option>
+            {% for mascota in mascotas %}
+            <option value="{{ mascota.id }}" {% if mascota.id == form.instance.mascota.id %}selected{% endif %}>
+                {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - {{ mascota.cliente.nombre }} - {{ mascota.cliente.email }} - {{ mascota.cliente.telefono }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <!-- Campos del formulario -->
+        {{ form.as_p }}
+
+        <button type="submit" class="btn-home">Guardar</button>
+    </form>
+</section>
+
+<!-- Buscador dinámico -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('mascota-search');
+        const dropdown = document.getElementById('mascota');
+
+        searchInput.addEventListener('input', function() {
+            const filter = searchInput.value.toLowerCase().replace(/\s+/g, '');
+            const options = dropdown.querySelectorAll('option');
+            options.forEach(option => {
+                const text = option.textContent.toLowerCase().replace(/\s+/g, '');
+                option.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+    });
+</script>
+{% endblock %}

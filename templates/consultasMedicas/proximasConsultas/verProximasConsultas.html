@@ -27,6 +27,8 @@
                 <th>Motivo de consulta</th>
                 <th>Médico veterinario</th>
                 <th>Veterinaria</th>
+                <th>Editar</th>
+                <th>Borrar</th>
             </tr>
         </thead>
         <tbody>
@@ -42,6 +44,20 @@
                 <td>{{ siguientesConsulta.motivoSiguienteConsulta }}</td>
                 <td>{{ siguientesConsulta.veterinario }}</td>
                 <td>{{ siguientesConsulta.clinicaVeterinaria }}</td>
+
+                <td>
+                    <a href="{% url 'editar-proximas-consultas' siguientesConsulta.pk %}">
+                        <img src="{% static 'img/editar.png' %}" alt="Editar" style="width: 20px; height: 20px;">
+                    </a>
+                </td>
+                <td>
+                    <a href="{% url 'borrar-proximas-consultas' siguientesConsulta.pk %}" onclick="return confirm('¿Seguro que quieres borrar a {{ siguientesConsulta.mascota.nombre }}?');">
+
+                        <img src="{% static 'img/borrar.png' %}" alt="Borrar" style="width: 20px; height: 20px;">
+                    </a>
+                </td>
+                
+               
               
             </tr>
             {% empty %}
