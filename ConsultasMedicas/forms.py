@@ -94,7 +94,7 @@ class ConsultaMedicaForm(forms.ModelForm):
             'agua': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Hábitos de consumo de agua'}),
             'alimento': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Tipo de alimento'}),
             'condicionesDeHogar': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Condiciones del hogar'}),
-            'ectoparasitos': forms.Textarea(attrs={'rows': 2, 'placeholder': '¿Ha tenido resencia de pulgas o garrapatas?'}),
+            'ectoparasitos': forms.Textarea(attrs={'rows': 2, 'placeholder': '¿Ha tenido presencia de pulgas o garrapatas?'}),
             'pronosticoSignos': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Pronóstico y signos clínicos'}),
             'sintomas': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Síntomas observados'}),
             'observaciones': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Observaciones del veterinario'}),

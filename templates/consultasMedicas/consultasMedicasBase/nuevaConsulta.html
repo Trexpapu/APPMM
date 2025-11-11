@@ -7,36 +7,78 @@
     <h2>Nueva Consulta</h2>
     <form method="post">
         {% csrf_token %}
-         <!-- Campo personalizado -->
+        
+        <!-- Campo de búsqueda -->
         <label for="mascota">Seleccionar mascota:</label>
-        <input type="text" id="mascota-search" placeholder="Buscar mascota por nombre, raza , especie, nombre del cliente, email o teléfono" class="search-input">
+        <input 
+            type="text" 
+            id="mascota-search" 
+            placeholder="Buscar mascota por nombre, raza, especie, cliente, email o teléfono" 
+            class="search-input"
+        >
+
+        <!-- Menú desplegable de mascotas -->
         <select id="mascota" name="mascota" class="searchable-dropdown">
-            <option value="">Seleccione un mascota</option>
+            <option value="">Seleccione una mascota</option>
             {% for mascota in mascotas %}
-            <option value="{{ mascota.id }}">
-                {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - {{ mascota.cliente.nombre }} - {{ mascota.cliente.email }} - {{ mascota.cliente.telefono }}
+            <option 
+                value="{{ mascota.id }}"
+                data-vacunas="{{ mascota.vacunas|escapejs }}"
+                data-alergias="{{ mascota.alergias|escapejs }}"
+                data-peso="{{ mascota.peso }}"
+            >
+                {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - 
+                {{ mascota.cliente.nombre }} - {{ mascota.cliente.email }} - {{ mascota.cliente.telefono }}
             </option>
             {% endfor %}
         </select>
+
+        <!-- Formulario de consulta médica -->
         {{ form.as_p }}
+
         <button type="submit" class="btn-home">Guardar</button>
     </form>
 </section>
 
-
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('mascota-search');
-        const dropdown = document.getElementById('mascota');
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('mascota-search');
+    const dropdown = document.getElementById('mascota');
+    const vacunasField = document.getElementById('id_vacunas');
+    const alergiasField = document.getElementById('id_alergias');
+    const pesoField = document.getElementById('id_peso');
 
-        searchInput.addEventListener('input', function() {
-            const filter = searchInput.value.toLowerCase().replace(/\s+/g, '');
-            const options = dropdown.querySelectorAll('option');
-            options.forEach(option => {
-                const text = option.textContent.toLowerCase().replace(/\s+/g, '');
-                option.style.display = text.includes(filter) ? '' : 'none';
-            });
+    // 🔍 Filtro de búsqueda en el dropdown
+    searchInput.addEventListener('input', function() {
+        const filter = searchInput.value.toLowerCase().replace(/\s+/g, '');
+        const options = dropdown.querySelectorAll('option');
+        options.forEach(option => {
+            const text = option.textContent.toLowerCase().replace(/\s+/g, '');
+            option.style.display = text.includes(filter) ? '' : 'none';
         });
     });
+
+    // 🧩 Cuando se selecciona una mascota
+    dropdown.addEventListener('change', function() {
+        const selectedOption = dropdown.options[dropdown.selectedIndex];
+        if (!selectedOption.value) {
+            // Si no hay mascota seleccionada, limpiar los campos
+            vacunasField.value = '';
+            alergiasField.value = '';
+            pesoField.value = '';
+            return;
+        }
+
+        // Obtener los datos del option seleccionado
+        const vacunas = selectedOption.getAttribute('data-vacunas') || '';
+        const alergias = selectedOption.getAttribute('data-alergias') || '';
+        const peso = selectedOption.getAttribute('data-peso') || '';
+
+        // Asignar valores a los campos del formulario
+        vacunasField.value = vacunas;
+        alergiasField.value = alergias;
+        pesoField.value = peso;
+    });
+});
 </script>
 {% endblock %}

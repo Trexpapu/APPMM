@@ -102,10 +102,9 @@ def editar_proxima_consulta(request, pk):
 
 
 
-
 @login_required
 def nueva_consulta(request):
-    """View to add a next consultation."""
+    """View to add a new medical consultation and update pet data."""
     mascotas = Mascotas.objects.all()
 
     if request.method == 'POST':
@@ -113,14 +112,27 @@ def nueva_consulta(request):
         if form.is_valid():
             nConsulta = form.save(commit=False)
             mascota_id = request.POST.get('mascota')
+
             if mascota_id:
+                # Guardar la consulta con la mascota seleccionada
                 nConsulta.mascota_id = mascota_id
                 nConsulta.save()
+
+                # 🔹 Actualizar datos de la mascota (peso, vacunas, alergias)
+                mascota = Mascotas.objects.get(pk=mascota_id)
+                mascota.peso = form.cleaned_data.get('peso') or mascota.peso
+                mascota.vacunas = form.cleaned_data.get('vacunas') or mascota.vacunas
+                mascota.alergias = form.cleaned_data.get('alergias') or mascota.alergias
+                mascota.save()
+
                 return redirect('index-consultas')
             else:
                 form.add_error(None, "Debe seleccionar una mascota antes de guardar.")
     else:
         form = ConsultaMedicaForm()
  
-    return render(request, 'consultasMedicas/consultasMedicasBase/nuevaConsulta.html', {'form': form, 'mascotas': mascotas})
-
+    return render(
+        request, 
+        'consultasMedicas/consultasMedicasBase/nuevaConsulta.html', 
+        {'form': form, 'mascotas': mascotas}
+    )
