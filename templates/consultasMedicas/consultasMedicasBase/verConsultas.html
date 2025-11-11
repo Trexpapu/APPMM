@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Ver Consultas - Mascotas Morelia{% endblock %}
+
+{% block content %}
+<section class="container">
+
+    <h2>Consultas Médicas</h2>
+    {% include 'filtro.html' with placeholder='Buscar por nombre, correo electrónico, número de cliente, nombre de mascota, especie o raza' %}
+
+    {% include 'filtroFecha.html' %}
+
+    <a href="{% url 'ver-consultas' %}" class="btn-regresar">Regresar</a>
+<div class="custom-table-container">
+    <table class="custom-table">
+        <thead>
+            <tr>
+                <th>Nombre cliente</th>
+                <th>Email del cliente</th>
+                <th>Teléfono del cliente</th>
+                <th>Nombre mascota</th>
+                <th>Especie</th>
+                <th>Raza</th>
+                <th>Motivo de consulta</th>
+                <th>Fecha de consulta</th>
+                <th>Médico veterinario</th>
+                <th>Veterinaria</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for consulta in consultas %}
+            <tr>
+                <td>{{ consulta.mascota.cliente.nombre }}</td>
+                <td>{{ consulta.mascota.cliente.email }}</td>
+                <td>{{ consulta.mascota.cliente.telefono }}</td>
+                <td>{{ consulta.mascota.nombre }}</td>
+                <td>{{ consulta.mascota.especie }}</td>
+                <td>{{ consulta.mascota.raza }}</td>
+                <td>{{ consulta.motivoConsulta }}</td>
+                <td>{{ consulta.fechaConsulta }}</td>
+                <td>{{ consulta.veterinario }}</td>
+                <td>{{ consulta.clinicaVeterinaria }}</td>
+                
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="11">No hay consultas registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</section>
+{% endblock %}

@@ -30,6 +30,7 @@ class ConsultasMedicas(models.Model):
     tratamiento = models.TextField(blank=True) 
     estudiosHechos = models.TextField(blank=True) 
     estudiosRecomendados = models.TextField(blank=True) 
+    evolucion = models.TextField(blank=True)
     fechaConsulta = models.DateTimeField(auto_now_add=True)
     veterinario =  models.ForeignKey(User, on_delete=models.CASCADE)
     clinicaVeterinaria = models.CharField(

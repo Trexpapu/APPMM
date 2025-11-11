@@ -5,6 +5,7 @@
 {% block content %}
 <section class="container">
     <h2>Nueva Consulta</h2>
+
     <form method="post">
         {% csrf_token %}
         
@@ -18,7 +19,7 @@
         >
 
         <!-- Menú desplegable de mascotas -->
-        <select id="mascota" name="mascota" class="searchable-dropdown">
+        <select id="mascota" name="mascota" class="searchable-dropdown" onchange="this.form.submit()">
             <option value="">Seleccione una mascota</option>
             {% for mascota in mascotas %}
             <option 
@@ -26,12 +27,26 @@
                 data-vacunas="{{ mascota.vacunas|escapejs }}"
                 data-alergias="{{ mascota.alergias|escapejs }}"
                 data-peso="{{ mascota.peso }}"
+                {% if mascota.id|stringformat:"s" == mascota_id|stringformat:"s" %}selected{% endif %}
             >
                 {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - 
                 {{ mascota.cliente.nombre }} - {{ mascota.cliente.email }} - {{ mascota.cliente.telefono }}
             </option>
             {% endfor %}
         </select>
+
+        <!-- 💡 Pregunta para cargar consulta previa -->
+        {% if mostrar_pregunta %}
+        <div class="alert alert-info" style="margin-top: 15px; padding: 15px; border-radius: 8px; background: #eef6ff;">
+            <p style="margin-bottom: 10px;">Esta mascota tiene una consulta previa. ¿Deseas cargar los datos de la última consulta?</p>
+            <div style="display: flex; gap: 10px;">
+                <!-- ✅ Opción SÍ -->
+                <a href="?mascota={{ mascota_id }}&cargar_prev=1" class="btn-home" style="background: #2e8b57;">Sí, cargar</a>
+                <!-- ❌ Opción NO -->
+                <a href="?mascota={{ mascota_id }}&cargar_prev=0" class="btn-home" style="background: #b22222;">No, empezar nueva</a>
+            </div>
+        </div>
+        {% endif %}
 
         <!-- Formulario de consulta médica -->
         {{ form.as_p }}
@@ -62,19 +77,16 @@ document.addEventListener('DOMContentLoaded', function() {
     dropdown.addEventListener('change', function() {
         const selectedOption = dropdown.options[dropdown.selectedIndex];
         if (!selectedOption.value) {
-            // Si no hay mascota seleccionada, limpiar los campos
             vacunasField.value = '';
             alergiasField.value = '';
             pesoField.value = '';
             return;
         }
 
-        // Obtener los datos del option seleccionado
         const vacunas = selectedOption.getAttribute('data-vacunas') || '';
         const alergias = selectedOption.getAttribute('data-alergias') || '';
         const peso = selectedOption.getAttribute('data-peso') || '';
 
-        // Asignar valores a los campos del formulario
         vacunasField.value = vacunas;
         alergiasField.value = alergias;
         pesoField.value = peso;

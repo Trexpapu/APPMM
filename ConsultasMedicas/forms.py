@@ -1,5 +1,14 @@
 from django import forms
 from .models import *
+from django import forms
+from django.core.exceptions import ValidationError
+from .models import SiguientesConsultas
+
+from django import forms
+from django.core.exceptions import ValidationError
+from .models import SiguientesConsultas
+
+
 class SiguienteConsultaForm(forms.ModelForm):
     class Meta:
         model = SiguientesConsultas
@@ -24,6 +33,23 @@ class SiguienteConsultaForm(forms.ModelForm):
             'clinicaVeterinaria': 'Clínica veterinaria',
             'veterinario': 'Veterinario responsable',
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        fecha = cleaned_data.get('fechaSiguienteConsulta')
+        veterinario = cleaned_data.get('veterinario')
+
+        if fecha and veterinario:
+            # Verificar si ya hay una cita con el mismo veterinario en esa fecha y hora exacta
+            existe = SiguientesConsultas.objects.filter(
+                fechaSiguienteConsulta=fecha,
+                veterinario=veterinario
+            ).exists()
+
+            if existe:
+                raise ValidationError("⚠️ El veterinario ya tiene una cita agendada en esa fecha y hora.")
+
+        return cleaned_data
 
 
 class UpdateSiguienteConsultaForm(forms.ModelForm):
@@ -51,6 +77,23 @@ class UpdateSiguienteConsultaForm(forms.ModelForm):
             'veterinario': 'Veterinario responsable',
         }
 
+    def clean(self):
+        cleaned_data = super().clean()
+        fecha = cleaned_data.get('fechaSiguienteConsulta')
+        veterinario = cleaned_data.get('veterinario')
+
+        if fecha and veterinario:
+            existe = SiguientesConsultas.objects.filter(
+                fechaSiguienteConsulta=fecha,
+                veterinario=veterinario
+            ).exclude(id=self.instance.id).exists()
+
+            if existe:
+                raise ValidationError("⚠️ El veterinario ya tiene otra cita agendada en esa fecha y hora.")
+
+        return cleaned_data
+
+
 
 class ConsultaMedicaForm(forms.ModelForm):
     class Meta:
@@ -77,6 +120,7 @@ class ConsultaMedicaForm(forms.ModelForm):
             'diagnostico',
             'tratamiento',
             'estudiosRecomendados',
+            'evolucion',
             'clinicaVeterinaria',
             'veterinario',
         ]
@@ -102,6 +146,7 @@ class ConsultaMedicaForm(forms.ModelForm):
             'diagnostico': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Diagnóstico final'}),
             'tratamiento': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Tratamiento prescrito'}),
             'estudiosHechos': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Estudios realizados'}),
+            'evolucion': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Evolución del paciente'}),
             'estudiosRecomendados': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Estudios recomendados'}),
             'clinicaVeterinaria': forms.Select(),
             'veterinario': forms.Select(),
@@ -129,6 +174,7 @@ class ConsultaMedicaForm(forms.ModelForm):
             'tratamiento': 'Tratamiento',
             'estudiosHechos': 'Estudios realizados',
             'estudiosRecomendados': 'Estudios recomendados',
+            'evolucion': 'Evolución del paciente',
             'clinicaVeterinaria': 'Clínica veterinaria',
             'veterinario': 'Médico veterinario',
         }

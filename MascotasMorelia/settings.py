@@ -102,42 +102,39 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
+# 🌎 Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+LANGUAGE_CODE = 'es-mx'              # Idioma en español (México)
+TIME_ZONE = 'America/Mexico_City'    # Zona horaria de México
 USE_I18N = True
-
 USE_TZ = True
+USE_L10N = False                     # Desactivar localización automática para usar nuestros formatos
+
+# 📅 Formatos personalizados de fecha y hora
+DATETIME_FORMAT = 'd/m/Y H:i'        # Ejemplo: 11/11/2025 14:30
+DATE_FORMAT = 'd/m/Y'                # Ejemplo: 11/11/2025
+TIME_FORMAT = 'H:i'                  # Ejemplo: 14:30
 
 
-# Static files (CSS, JavaScript, Images)
+# 📁 Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-# URL to use when referring to static files (where they will be served from)
 STATIC_URL = '/static/'
 
-# During development, tell Django where to find the project's `static/` folder
-# so {% load static %} and {% static '...' %} resolve files under BASE_DIR/static
+# Durante desarrollo, busca la carpeta 'static/' del proyecto
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-# Optional: directory for `collectstatic` when preparing for production
+# Directorio para collectstatic (en producción)
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
+# 🔑 Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Redirect to index after login
+# 🔒 Login/Logout redirects
 LOGIN_REDIRECT_URL = 'index'
-
-# Optional: Redirect to login page if not authenticated
 LOGIN_URL = 'login'
-
 LOGOUT_REDIRECT_URL = 'login'
