@@ -51,7 +51,7 @@
                     </a>
                 </td>
                 <td>
-                    <a href="{% url 'borrar-proximas-consultas' siguientesConsulta.pk %}" onclick="return confirm('¿Seguro que quieres borrar a {{ siguientesConsulta.mascota.nombre }}?');">
+                    <a href="{% url 'borrar-proximas-consultas' siguientesConsulta.pk %}" onclick="return confirm('¿Seguro que quieres borrar la consulta de {{ siguientesConsulta.mascota.nombre }}?');">
 
                         <img src="{% static 'img/borrar.png' %}" alt="Borrar" style="width: 20px; height: 20px;">
                     </a>

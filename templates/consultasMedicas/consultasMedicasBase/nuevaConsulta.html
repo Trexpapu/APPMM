@@ -6,7 +6,7 @@
 <section class="container">
     <h2>Nueva Consulta</h2>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         
         <!-- Campo de búsqueda -->
@@ -40,9 +40,7 @@
         <div class="alert alert-info" style="margin-top: 15px; padding: 15px; border-radius: 8px; background: #eef6ff;">
             <p style="margin-bottom: 10px;">Esta mascota tiene una consulta previa. ¿Deseas cargar los datos de la última consulta?</p>
             <div style="display: flex; gap: 10px;">
-                <!-- ✅ Opción SÍ -->
                 <a href="?mascota={{ mascota_id }}&cargar_prev=1" class="btn-home" style="background: #2e8b57;">Sí, cargar</a>
-                <!-- ❌ Opción NO -->
                 <a href="?mascota={{ mascota_id }}&cargar_prev=0" class="btn-home" style="background: #b22222;">No, empezar nueva</a>
             </div>
         </div>
@@ -51,7 +49,19 @@
         <!-- Formulario de consulta médica -->
         {{ form.as_p }}
 
-        <button type="submit" class="btn-home">Guardar</button>
+        <hr>
+
+        <!-- Formulario de documentos -->
+        <h3>Agregar documentos o imágenes</h3>
+        <div id="documentos-container">
+            <div class="documento-input">
+                <input type="file" name="imagen" accept="image/*">
+                <textarea name="descripcion" rows="2" placeholder="Describe brevemente el documento"></textarea>
+            </div>
+        </div>
+        <button type="button" id="add-doc-btn" class="btn-home" style="background:#007bff;margin-top:10px;">+ Añadir otro archivo</button>
+
+        <button type="submit" class="btn-home" style="margin-top: 15px;">Guardar</button>
     </form>
 </section>
 
@@ -63,17 +73,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const alergiasField = document.getElementById('id_alergias');
     const pesoField = document.getElementById('id_peso');
 
-    // 🔍 Filtro de búsqueda en el dropdown
+    // 🔍 Filtro de búsqueda
     searchInput.addEventListener('input', function() {
         const filter = searchInput.value.toLowerCase().replace(/\s+/g, '');
-        const options = dropdown.querySelectorAll('option');
-        options.forEach(option => {
+        dropdown.querySelectorAll('option').forEach(option => {
             const text = option.textContent.toLowerCase().replace(/\s+/g, '');
             option.style.display = text.includes(filter) ? '' : 'none';
         });
     });
 
-    // 🧩 Cuando se selecciona una mascota
+    // 🧩 Actualizar campos con los datos de la mascota
     dropdown.addEventListener('change', function() {
         const selectedOption = dropdown.options[dropdown.selectedIndex];
         if (!selectedOption.value) {
@@ -82,14 +91,22 @@ document.addEventListener('DOMContentLoaded', function() {
             pesoField.value = '';
             return;
         }
+        vacunasField.value = selectedOption.getAttribute('data-vacunas') || '';
+        alergiasField.value = selectedOption.getAttribute('data-alergias') || '';
+        pesoField.value = selectedOption.getAttribute('data-peso') || '';
+    });
 
-        const vacunas = selectedOption.getAttribute('data-vacunas') || '';
-        const alergias = selectedOption.getAttribute('data-alergias') || '';
-        const peso = selectedOption.getAttribute('data-peso') || '';
-
-        vacunasField.value = vacunas;
-        alergiasField.value = alergias;
-        pesoField.value = peso;
+    // ➕ Añadir más campos de archivos
+    const addDocBtn = document.getElementById('add-doc-btn');
+    const container = document.getElementById('documentos-container');
+    addDocBtn.addEventListener('click', () => {
+        const newDoc = document.createElement('div');
+        newDoc.classList.add('documento-input');
+        newDoc.innerHTML = `
+            <input type="file" name="imagen" accept="image/*">
+            <textarea name="descripcion" rows="2" placeholder="Describe brevemente el documento"></textarea>
+        `;
+        container.appendChild(newDoc);
     });
 });
 </script>

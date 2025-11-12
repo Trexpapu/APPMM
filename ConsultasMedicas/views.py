@@ -100,7 +100,7 @@ def editar_proxima_consulta(request, pk):
         'mascotas': mascota
     })
 
-
+ 
 @login_required
 def nueva_consulta(request):
     """View to add a new medical consultation and optionally load last consultation data."""
@@ -108,8 +108,8 @@ def nueva_consulta(request):
     mascota_id = request.GET.get('mascota') or request.POST.get('mascota')
     cargar_prev = request.GET.get('cargar_prev')  # bandera para cargar la última consulta
 
-    # 🔹 Datos iniciales del formulario
     initial_data = {}
+    mascota = None
 
     # 🔹 Si se seleccionó una mascota
     if mascota_id:
@@ -127,20 +127,21 @@ def nueva_consulta(request):
                     .first()
                 )
                 if ultima_consulta:
+                    print(mascota_id)
                     exclude_fields = ['id', 'fechaConsulta', 'peso', 'vacunas', 'alergias', 'mascota']
                     for field in ConsultasMedicas._meta.get_fields():
                         if field.name not in exclude_fields and hasattr(ultima_consulta, field.name):
                             initial_data[field.name] = getattr(ultima_consulta, field.name)
                     messages.info(request, "Se cargaron los datos de la última consulta.")
-                
-                # ✅ Aun así, llenar peso, vacunas y alergias desde la mascota
+
+                # ✅ También llenar los datos actuales de la mascota
                 initial_data.update({
                     'peso': mascota.peso,
                     'vacunas': mascota.vacunas,
                     'alergias': mascota.alergias,
                 })
             else:
-                # ❌ No se cargaron datos previos, solo llenar los de la mascota
+                # ❌ No se cargaron datos previos, llenar con los datos actuales de la mascota
                 initial_data.update({
                     'peso': mascota.peso,
                     'vacunas': mascota.vacunas,
@@ -150,6 +151,8 @@ def nueva_consulta(request):
     # 🔹 POST: Guardar nueva consulta
     if request.method == 'POST':
         form = ConsultaMedicaForm(request.POST, initial=initial_data)
+        documentos_form = DocumentosConsultaForm(request.POST, request.FILES)
+
         if form.is_valid():
             nConsulta = form.save(commit=False)
             mascota_id = request.POST.get('mascota')
@@ -158,23 +161,35 @@ def nueva_consulta(request):
                 nConsulta.mascota_id = mascota_id
                 nConsulta.save()
 
-                # 🔹 Actualizar datos de la mascota (si cambiaron en el form)
+                # 🐾 Actualizar datos de la mascota
                 mascota = Mascotas.objects.get(pk=mascota_id)
                 mascota.peso = form.cleaned_data.get('peso') or mascota.peso
                 mascota.vacunas = form.cleaned_data.get('vacunas') or mascota.vacunas
                 mascota.alergias = form.cleaned_data.get('alergias') or mascota.alergias
                 mascota.save()
 
-                messages.success(request, "Consulta médica guardada correctamente.")
+                # 📎 Guardar múltiples imágenes
+                archivos = request.FILES.getlist('archivo')
+                descripcion = request.POST.get('descripcion', '')
+                for arch in archivos:
+                    DocumentosConsulta.objects.create(
+                        consulta=nConsulta,
+                        archivo=arch,
+                        descripcion=descripcion
+                    )
+
+                messages.success(request, "Consulta médica y documentos guardados correctamente.")
                 return redirect('index-consultas')
             else:
                 form.add_error(None, "Debe seleccionar una mascota antes de guardar.")
     else:
         form = ConsultaMedicaForm(initial=initial_data)
+        documentos_form = DocumentosConsultaForm()
 
     # 🔹 Mostrar pregunta si hay consultas previas
     mostrar_pregunta = False
     if mascota_id:
+        print(cargar_prev)
         hay_consulta_previa = ConsultasMedicas.objects.filter(mascota_id=mascota_id).exists()
         mostrar_pregunta = hay_consulta_previa and not cargar_prev
 
@@ -183,12 +198,12 @@ def nueva_consulta(request):
         'consultasMedicas/consultasMedicasBase/nuevaConsulta.html',
         {
             'form': form,
+            'documentos_form': documentos_form,
             'mascotas': mascotas,
             'mostrar_pregunta': mostrar_pregunta,
             'mascota_id': mascota_id,
         }
     )
-
 
 
 
