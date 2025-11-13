@@ -6,15 +6,21 @@ from django.core.exceptions import ValidationError
 class DocumentosConsultaForm(forms.ModelForm):
     class Meta:
         model = DocumentosConsulta
-        fields = ['descripcion']
+        fields = ['archivo', 'descripcion']  # ✅ Agregar archivo aquí
         widgets = {
+            'archivo': forms.FileInput(attrs={
+                'accept': 'image/*, .pdf, .doc, .docx, .txt'
+            }),
             'descripcion': forms.Textarea(attrs={
                 'rows': 3,
-                'placeholder': 'Describe brevemente el documento'
+                'placeholder': 'Describe brevemente el documento',
+                'class': 'form-control'
             }),
         }
-
-
+    labels = {
+        'archivo': 'Documento o imagen',
+        'descripcion': 'Descripción'
+    }
 
 class SiguienteConsultaForm(forms.ModelForm):
     class Meta:
@@ -64,9 +70,16 @@ class UpdateSiguienteConsultaForm(forms.ModelForm):
         model = SiguientesConsultas
         fields = ['fechaSiguienteConsulta', 'motivoSiguienteConsulta', 'clinicaVeterinaria', 'veterinario']
         widgets = {
+
             'fechaSiguienteConsulta': forms.DateTimeInput(
-                attrs={'type': 'datetime-local', 'placeholder': 'Selecciona la nueva fecha y hora de la consulta'}
+                attrs={
+                    'type': 'datetime-local', 
+                    'placeholder': 'Selecciona la nueva fecha y hora de la consulta',
+                    'class': 'form-control'
+                },
+                format='%Y-%m-%dT%H:%M'  # 🔥 Formato específico para datetime-local
             ),
+
             'motivoSiguienteConsulta': forms.Textarea(
                 attrs={'rows': 3, 'placeholder': 'Actualiza el motivo o notas de la próxima consulta'}
             ),

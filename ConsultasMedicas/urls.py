@@ -10,4 +10,11 @@ urlpatterns = [
     path('editarProximasConsultas/<int:pk>/', views.editar_proxima_consulta, name='editar-proximas-consultas'),
     path('CrearNuevaConsulta/', views.nueva_consulta, name='nueva-consulta'),
     path('VerConsultas/', views.ver_consultas, name='ver-consultas'),
+    # Detalle de consulta
+    path('consulta/<int:consulta_id>/', views.detalle_consulta, name='detalle-consulta'),
+    # Descargar documento
+    path('documento/<int:documento_id>/descargar/', views.descargar_documento, name='descargar_documento'),
+    # Generar PDF
+    path('consulta/<int:consulta_id>/pdf/', views.generar_pdf_consulta, name='generar_pdf_consulta'),
+
 ]

@@ -4,11 +4,51 @@
 
 {% block content %}
 <section class="container">
-    <h2>Editar Cliente: {{ cliente.nombre }}</h2>
+    <div class="header-actions">
+        <h2>Editar Cliente: {{ cliente.nombre }}</h2>
+        
+    </div>
+
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn-home">Actualizar</button>
+        <div class="form-section">
+            <div class="form-header">
+                <h3>✏️ Editar Información del Cliente</h3>
+            </div>
+            
+            {% if form.errors %}
+            <div class="alert alert-error">
+                <strong>Por favor corrige los siguientes errores:</strong>
+                {{ form.errors }}
+            </div>
+            {% endif %}
+            
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="form-group {% if field.field.widget.input_type == 'textarea' %}full-width{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                    <div class="field-errors">
+                        {{ field.errors }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn-home" style="background: var(--btn-agr); padding: 12px 24px;">
+                💾 Actualizar Cliente
+            </button>
+            <a href="{% url 'ver_clientes' %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
+                ❌ Cancelar
+            </a>
+        </div>
     </form>
 </section>
 {% endblock %}

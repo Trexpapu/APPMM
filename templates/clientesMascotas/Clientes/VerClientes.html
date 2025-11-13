@@ -6,47 +6,54 @@
 
 {% block content %}
 <section class="container">
+    <div class="header-actions">
+        <h2>📋 Listado de Clientes</h2>
 
-    <h2>Listado de Clientes</h2>
+    </div>
+
     {% include 'filtro.html' with placeholder='Buscar por nombre, correo o número' %}
+
+    
     <a href="{% url 'ver_clientes' %}" class="btn-regresar">Regresar</a>
+
     <div class="custom-table-container">
-    <table class="custom-table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Email</th>
-                <th>Teléfono</th>
-                <th>Dirección</th>
-                <th>Editar</th>
-                <th>Borrar</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for cliente in clientes %}
-            <tr>
-                <td>{{ cliente.nombre }}</td>
-                <td>{{ cliente.email }}</td>
-                <td>{{ cliente.telefono }}</td>
-                <td>{{ cliente.direccion|linebreaksbr }}</td>
-                <td>
-                    <a href="{% url 'editar_cliente' cliente.pk %}">
-                        <img src="{% static 'img/editar.png' %}" alt="Editar" style="width: 20px; height: 20px;">
-                    </a>
-                </td>
-                <td>
-                    <a href="{% url 'borrar_cliente' cliente.pk %}" onclick="return confirm('¿Seguro que quieres borrar a {{ cliente.nombre }}?');">
-                        <img src="{% static 'img/borrar.png' %}" alt="Borrar" style="width: 20px; height: 20px;">
-                    </a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6">No hay clientes registrados.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>👤 Nombre</th>
+                    <th>📧 Email</th>
+                    <th>📞 Teléfono</th>
+                    <th>🏠 Dirección</th>
+                    <th>⚡ Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in clientes %}
+                <tr>
+                    <td><strong>{{ cliente.nombre }}</strong></td>
+                    <td>{{ cliente.email|default:"-" }}</td>
+                    <td>{{ cliente.telefono|default:"-" }}</td>
+                    <td>{{ cliente.direccion|linebreaksbr|default:"-" }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'editar_cliente' cliente.pk %}" class="btn-home" style="background: #ffc107; color: black; padding: 5px 10px;">
+                                ✏️ Editar
+                            </a>
+                            <a href="{% url 'borrar_cliente' cliente.pk %}" class="btn-home" style="background: #dc3545; padding: 5px 10px;" onclick="return confirm('¿Seguro que quieres borrar a {{ cliente.nombre }}?');">
+                                🗑️ Borrar
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="no-data">
+                        No hay clientes registrados.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </section>
 {% endblock %}

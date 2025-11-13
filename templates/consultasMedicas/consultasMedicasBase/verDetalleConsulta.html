@@ -1,0 +1,363 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Consulta Médica - {{ consulta.mascota.nombre }}{% endblock %}
+
+{% block content %}
+<section class="container">
+    <!-- Header con acciones -->
+    <div class="header-actions">
+        <h2>Consulta Médica - {{ consulta.mascota.nombre }}</h2>
+        <div class="action-buttons">
+            <a href="{% url 'generar_pdf_consulta' consulta.id %}" class="btn-home" style="background: #dc3545;">
+                📄 Descargar PDF
+            </a>
+        </div>
+    </div>
+
+    <!-- Información general -->
+    <div class="form-section">
+        <h3>📋 Información General</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <strong>Mascota:</strong> {{ consulta.mascota.nombre }}
+            </div>
+            <div class="info-item">
+                <strong>Especie:</strong> {{ consulta.mascota.especie }}
+            </div>
+            <div class="info-item">
+                <strong>Raza:</strong> {{ consulta.mascota.raza }}
+            </div>
+            <div class="info-item">
+                <strong>Propietario:</strong> {{ consulta.mascota.cliente.nombre }}
+            </div>
+            <div class="info-item">
+                <strong>Fecha de consulta:</strong> {{ consulta.fechaConsulta|date:"d/m/Y H:i" }}
+            </div>
+            <div class="info-item">
+                <strong>Veterinario:</strong> {{ consulta.veterinario.get_full_name|default:consulta.veterinario.username }}
+            </div>
+            <div class="info-item">
+                <strong>Clínica:</strong> {{ consulta.clinicaVeterinaria }}
+            </div>
+        </div>
+    </div>
+
+    <!-- Motivo de consulta -->
+    {% if consulta.motivoConsulta %}
+    <div class="form-section">
+        <h3>🎯 Motivo de Consulta</h3>
+        <div class="content-box">
+            {{ consulta.motivoConsulta|linebreaks }}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Signos vitales -->
+    <div class="form-section">
+        <h3>❤️ Signos Vitales y Examen Físico</h3>
+        <div class="info-grid compact">
+            {% if consulta.temperatura %}
+            <div class="info-item">
+                <strong>Temperatura:</strong> {{ consulta.temperatura }}
+            </div>
+            {% endif %}
+            {% if consulta.pulso %}
+            <div class="info-item">
+                <strong>Pulso:</strong> {{ consulta.pulso }}
+            </div>
+            {% endif %}
+            {% if consulta.frecuenciaCardiaca %}
+            <div class="info-item">
+                <strong>Frecuencia cardíaca:</strong> {{ consulta.frecuenciaCardiaca }}
+            </div>
+            {% endif %}
+            {% if consulta.puntuacionCorporal %}
+            <div class="info-item">
+                <strong>Puntuación corporal:</strong> {{ consulta.puntuacionCorporal }}
+            </div>
+            {% endif %}
+            <div class="info-item">
+                <strong>Peso:</strong> {{ consulta.peso }} gr
+            </div>
+        </div>
+    </div>
+
+    <!-- Historial médico -->
+    {% if consulta.vacunas or consulta.alergias or consulta.parasitos %}
+    <div class="form-section">
+        <h3>📊 Historial Médico</h3>
+        <div class="info-grid">
+            {% if consulta.vacunas %}
+            <div class="info-item full-width">
+                <strong>Vacunas:</strong><br>
+                {{ consulta.vacunas|linebreaks }}
+            </div>
+            {% endif %}
+            {% if consulta.alergias %}
+            <div class="info-item full-width">
+                <strong>Alergias:</strong><br>
+                {{ consulta.alergias|linebreaks }}
+            </div>
+            {% endif %}
+            {% if consulta.parasitos %}
+            <div class="info-item full-width">
+                <strong>Parásitos:</strong><br>
+                {{ consulta.parasitos|linebreaks }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Condiciones y hábitos -->
+    {% if consulta.agua or consulta.alimento or consulta.condicionesDeHogar or consulta.ectoparasitos %}
+    <div class="form-section">
+        <h3>🏠 Condiciones y Hábitos</h3>
+        <div class="info-grid">
+            {% if consulta.agua %}
+            <div class="info-item">
+                <strong>Consumo de agua:</strong> {{ consulta.agua }}
+            </div>
+            {% endif %}
+            {% if consulta.alimento %}
+            <div class="info-item">
+                <strong>Alimento:</strong> {{ consulta.alimento }}
+            </div>
+            {% endif %}
+            {% if consulta.condicionesDeHogar %}
+            <div class="info-item full-width">
+                <strong>Condiciones del hogar:</strong><br>
+                {{ consulta.condicionesDeHogar|linebreaks }}
+            </div>
+            {% endif %}
+            {% if consulta.ectoparasitos %}
+            <div class="info-item full-width">
+                <strong>Ectoparásitos:</strong><br>
+                {{ consulta.ectoparasitos|linebreaks }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Diagnóstico y tratamiento -->
+    {% if consulta.sintomas or consulta.diagnostico or consulta.tratamiento %}
+    <div class="form-section">
+        <h3>🩺 Diagnóstico y Tratamiento</h3>
+        <div class="info-grid">
+            {% if consulta.sintomas %}
+            <div class="info-item full-width">
+                <strong>Síntomas:</strong><br>
+                {{ consulta.sintomas|linebreaks }}
+            </div>
+            {% endif %}
+            {% if consulta.diagnostico %}
+            <div class="info-item full-width">
+                <strong>Diagnóstico:</strong><br>
+                {{ consulta.diagnostico|linebreaks }}
+            </div>
+            {% endif %}
+            {% if consulta.tratamiento %}
+            <div class="info-item full-width">
+                <strong>Tratamiento:</strong><br>
+                {{ consulta.tratamiento|linebreaks }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Estudios -->
+    {% if consulta.estudiosHechos or consulta.estudiosRecomendados %}
+    <div class="form-section">
+        <h3>🔬 Estudios</h3>
+        <div class="info-grid">
+            {% if consulta.estudiosHechos %}
+            <div class="info-item full-width">
+                <strong>Estudios realizados:</strong><br>
+                {{ consulta.estudiosHechos|linebreaks }}
+            </div>
+            {% endif %}
+            {% if consulta.estudiosRecomendados %}
+            <div class="info-item full-width">
+                <strong>Estudios recomendados:</strong><br>
+                {{ consulta.estudiosRecomendados|linebreaks }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Observaciones y evolución -->
+    {% if consulta.observaciones or consulta.evolucion %}
+    <div class="form-section">
+        <h3>📝 Observaciones y Evolución</h3>
+        <div class="info-grid">
+            {% if consulta.observaciones %}
+            <div class="info-item full-width">
+                <strong>Observaciones:</strong><br>
+                {{ consulta.observaciones|linebreaks }}
+            </div>
+            {% endif %}
+            {% if consulta.evolucion %}
+            <div class="info-item full-width">
+                <strong>Evolución:</strong><br>
+                {{ consulta.evolucion|linebreaks }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Documentos adjuntos -->
+    <div class="form-section">
+        <h3>📎 Documentos Adjuntos</h3>
+        {% if documentos %}
+            <div class="documentos-list">
+                {% for documento in documentos %}
+                <div class="documento-item">
+                    <div class="documento-info">
+                        <strong>{{ documento.descripcion|default:"Documento sin descripción" }}</strong>
+                        <small>Subido el: {{ documento.fecha|date:"d/m/Y H:i" }}</small>
+                    </div>
+                    <div class="documento-actions">
+                        <a href="{% url 'descargar_documento' documento.id %}" class="btn-home" style="background: #28a745;">
+                            ⬇️ Descargar
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="no-data">No hay documentos adjuntos para esta consulta.</p>
+        {% endif %}
+    </div>
+
+    <!-- Botones de acción al final -->
+    <div class="action-buttons" style="margin-top: 30px; text-align: center;">
+        <a href="{% url 'generar_pdf_consulta' consulta.id %}" class="btn-home" style="background: #dc3545; padding: 12px 24px;">
+            📄 Descargar PDF Completo
+        </a>
+        
+    </div>
+</section>
+
+<style>
+.header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.info-grid.compact {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.info-item {
+    padding: 12px;
+    background: white;
+    border-radius: 6px;
+    border-left: 4px solid #3498db;
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.content-box {
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    line-height: 1.6;
+}
+
+.documentos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.documento-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.documento-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.documento-info {
+    flex: 1;
+}
+
+.documento-info strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.documento-info small {
+    color: #666;
+}
+
+.documento-actions {
+    margin-left: 15px;
+}
+
+.no-data {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .action-buttons {
+        justify-content: center;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .documento-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .documento-actions {
+        margin-left: 0;
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}

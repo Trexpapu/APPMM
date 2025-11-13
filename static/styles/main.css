@@ -8,6 +8,10 @@
   --btn-agr-hover: #0fda15;
   --btn-regresar: #e67e22;
   --btn-regresar-hover: #a85904;
+  --form-bg: #fafafa;
+  --form-border: #e0e0e0;
+  --error-color: #d9534f;
+  --success-color: #28a745;
 }
 
 body {
@@ -25,7 +29,7 @@ body {
   padding: 0.8rem 1rem;
   background: var(--brand-bg);
   color: var(--text-on-brand);
-  flex-wrap: wrap; /* Permite que los items bajen de línea si es necesario */
+  flex-wrap: wrap;
 }
 
 .brand h1 {
@@ -43,7 +47,10 @@ body {
   color: white;
   text-decoration: none;
   border-radius: 4px;
-  margin: 0.2rem; /* pequeño espacio entre botones */
+  margin: 0.2rem;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
 }
 
 /* Hover */
@@ -64,94 +71,117 @@ body {
   cursor: pointer;
 }
 
-/* Navbar móvil */
-@media (max-width: 600px) {
-  .navbar {
-    flex-direction: column; /* Poner todo en columna */
-    align-items: stretch;   /* Botones ocupan todo el ancho disponible */
-    gap: 0.5rem;            /* Espacio vertical entre botones */
-  }
-
-  .navbar a {
-    text-align: center;
-    width: 100%;            /* Cada botón ocupa toda la fila */
-    padding: 0.6rem 0;      /* Ajuste vertical para comodidad táctil */
-    font-size: 0.95rem;     /* Fuente ligeramente más pequeña */
-  }
-
-  .brand h1 {
-    text-align: center;
-    width: 100%;
-    margin-bottom: 0.5rem; /* Separación del título con los botones */
-  }
+/* ==================== ESTILOS DE FORMULARIO ==================== */
+.form-group {
+  margin-bottom: 1.5rem;
 }
 
-/* Table container */
-.custom-table-container {
-  overflow-x: auto; /* Mantener scroll horizontal en móvil */
-  border: 1px solid #ddd;
+.form-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--form-border);
+  border-radius: 8px;
+  background: var(--form-bg);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
   border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--btn-bg);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.search-input, 
+.searchable-dropdown {
+  width: 100%;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.searchable-dropdown {
+  background: white;
+  cursor: pointer;
+}
+
+.help-text {
+  color: #666;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.field-errors {
+  color: var(--error-color);
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 8px;
+  background: #eef6ff;
+  margin: 1rem 0;
+  border-left: 4px solid var(--btn-bg);
+}
+
+.alert-error {
+  background: #f8d7da;
+  color: #721c24;
+  border-left-color: var(--error-color);
+}
+
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  border-left-color: var(--success-color);
+}
+
+.btn-group {
+  display: flex;
+  gap: 1rem;
   margin-top: 1rem;
 }
 
-/* Table styles - Escalable */
-.custom-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: auto;
+/* Estilos para documentos */
+.documento-group {
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #ddd;
 }
 
-/* Header */
-.custom-table thead th {
-  text-align: left;
-  padding: 1rem 1rem; /* Más espacio */
-  background: var(--brand-bg);
-  color: var(--text-on-brand);
-  font-weight: 300;
-  border-bottom: 2px solid #ddd;
-  white-space: normal;
-  word-wrap: break-word;
-  word-break: break-word;
+.documento-group .form-group {
+  margin-bottom: 1rem;
 }
 
-/* Body cells */
-.custom-table tbody td {
-  padding: 1rem 1rem;
-  border-bottom: 1px solid #e6e6e6;
-  vertical-align: top;
-  word-wrap: break-word;
-  word-break: break-word;
-  line-height: 1.5;
-  min-width: 150px;
-}
-
-/* Columnas específicas más anchas */
-.custom-table td:nth-child(9),
-.custom-table td:nth-child(10) {
-  min-width: 200px;
-}
-
-/* Alternating rows */
-.custom-table tbody tr:nth-child(even) {
-  background: #fbfbfb;
-}
-
-.custom-table tbody tr:hover {
-  background: #f2f7ff;
-}
-
-/* Container adjustments */
-.container {
-  padding: 1rem;
-  max-width: 100%;
-  margin: 0 auto;
-}
-
-/* Form styles for adding clients */
+/* ==================== MEJORAS ESPECÍFICAS PARA FORMULARIOS ==================== */
 form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
   background: #f9f9f9;
   padding: 1.5rem;
   border: 1px solid #ddd;
@@ -162,33 +192,96 @@ form {
 form label {
   font-weight: bold;
   color: #333;
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
 form input,
-form textarea {
-  padding: 0.5rem;
+form textarea,
+form select {
+  padding: 0.75rem;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 1rem;
   width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
 }
 
-form button {
+form input:focus,
+form textarea:focus,
+form select:focus {
+  outline: none;
+  border-color: var(--btn-bg);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+form button[type="submit"] {
   align-self: flex-start;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.5rem;
   background: var(--btn-agr);
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
   font-size: 1rem;
+  font-weight: bold;
 }
 
-form button:hover {
+form button[type="submit"]:hover {
   background: var(--btn-agr-hover);
 }
 
-/* ==================== MEJORADO: INDEX CLIENTE ==================== */
+/* ==================== TABLE STYLES ==================== */
+.custom-table-container {
+  overflow-x: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 1rem;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+.custom-table thead th {
+  text-align: left;
+  padding: 1rem 1rem;
+  background: var(--brand-bg);
+  color: var(--text-on-brand);
+  font-weight: 300;
+  border-bottom: 2px solid #ddd;
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.custom-table tbody td {
+  padding: 1rem 1rem;
+  border-bottom: 1px solid #e6e6e6;
+  vertical-align: top;
+  word-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.5;
+  min-width: 150px;
+}
+
+.custom-table td:nth-child(9),
+.custom-table td:nth-child(10) {
+  min-width: 200px;
+}
+
+.custom-table tbody tr:nth-child(even) {
+  background: #fbfbfb;
+}
+
+.custom-table tbody tr:hover {
+  background: #f2f7ff;
+}
+
+/* ==================== INDEX CLIENTE ==================== */
 .index-cliente {
   text-align: center;
   padding: 3rem 1.5rem;
@@ -205,7 +298,6 @@ form button:hover {
   font-weight: 700;
 }
 
-/* ==================== MEJORADO: OPTIONS ==================== */
 .index-cliente .options {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -234,8 +326,201 @@ form button:hover {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* Responsive table - mantiene el mismo diseño pero más pequeño en móvil */
+
+/* ==================== ESTILOS MEJORADOS ==================== */
+
+/* Header con acciones */
+.header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Info grids para datos */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.info-grid.compact {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.info-item {
+    padding: 12px;
+    background: white;
+    border-radius: 6px;
+    border-left: 4px solid var(--btn-bg);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Content boxes */
+.content-box {
+    background: white;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid var(--form-border);
+    line-height: 1.6;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Documentos list */
+.documentos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.documento-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid var(--form-border);
+    transition: all 0.3s ease;
+}
+
+.documento-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.documento-info {
+    flex: 1;
+}
+
+.documento-info strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.documento-info small {
+    color: #666;
+}
+
+.documento-actions {
+    margin-left: 15px;
+}
+
+.no-data {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+    background: white;
+    border-radius: 6px;
+    border: 1px dashed #ddd;
+}
+
+/* Mejoras para formularios existentes */
+.form-header {
+    background: var(--brand-bg);
+    color: white;
+    padding: 15px;
+    border-radius: 8px 8px 0 0;
+    margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+}
+
+.form-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+/* Badges para estados */
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.badge-success {
+    background: var(--success-color);
+    color: white;
+}
+
+.badge-danger {
+    background: var(--error-color);
+    color: white;
+}
+
+.badge-warning {
+    background: var(--btn-regresar);
+    color: white;
+}
+
+/* Mejoras responsive adicionales */
 @media (max-width: 768px) {
+    .header-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .action-buttons {
+        justify-content: center;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .documento-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .documento-actions {
+        margin-left: 0;
+        text-align: center;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
+
+
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .navbar a {
+    text-align: center;
+    width: 100%;
+    padding: 0.6rem 0;
+    font-size: 0.95rem;
+  }
+
+  .brand h1 {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
   .custom-table thead th,
   .custom-table tbody td {
     padding: 0.4rem 0.6rem;
@@ -259,5 +544,41 @@ form button:hover {
   .index-cliente .btn-home {
     font-size: 0.95rem;
     padding: 0.9rem 1.4rem;
+  }
+
+  /* Form responsive */
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .form-section {
+    padding: 1rem;
+  }
+  
+  .documento-group {
+    padding: 1rem;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .btn-group .btn-home {
+    text-align: center;
+  }
+}
+
+/* Container adjustments */
+.container {
+  padding: 1rem;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
   }
 }

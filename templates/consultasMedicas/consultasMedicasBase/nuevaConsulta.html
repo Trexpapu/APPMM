@@ -4,64 +4,126 @@
 
 {% block content %}
 <section class="container">
-    <h2>Nueva Consulta</h2>
+    <h2>Nueva Consulta Médica</h2>
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         
-        <!-- Campo de búsqueda -->
-        <label for="mascota">Seleccionar mascota:</label>
-        <input 
-            type="text" 
-            id="mascota-search" 
-            placeholder="Buscar mascota por nombre, raza, especie, cliente, email o teléfono" 
-            class="search-input"
-        >
+        <!-- 🔍 Búsqueda y selección de mascota - Mejorado como en el ejemplo -->
+        <div class="form-section">
+            <h3>Selección de Mascota</h3>
+            
+            <div class="form-group">
+                <label for="mascota-search">Buscar mascota:</label>
+                <input 
+                    type="text" 
+                    id="mascota-search" 
+                    placeholder="Buscar mascota por nombre, raza, especie, nombre del cliente, email o teléfono" 
+                    class="search-input"
+                >
+            </div>
 
-        <!-- Menú desplegable de mascotas -->
-        <select id="mascota" name="mascota" class="searchable-dropdown" onchange="this.form.submit()">
-            <option value="">Seleccione una mascota</option>
-            {% for mascota in mascotas %}
-            <option 
-                value="{{ mascota.id }}"
-                data-vacunas="{{ mascota.vacunas|escapejs }}"
-                data-alergias="{{ mascota.alergias|escapejs }}"
-                data-peso="{{ mascota.peso }}"
-                {% if mascota.id|stringformat:"s" == mascota_id|stringformat:"s" %}selected{% endif %}
-            >
-                {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - 
-                {{ mascota.cliente.nombre }} - {{ mascota.cliente.email }} - {{ mascota.cliente.telefono }}
-            </option>
-            {% endfor %}
-        </select>
+            <div class="form-group">
+                <label for="mascota">Seleccionar mascota:</label>
+                <select id="mascota" name="mascota" class="searchable-dropdown">
+                    <option value="">Seleccione una mascota</option>
+                    {% for mascota in mascotas %}
+                    <option 
+                        value="{{ mascota.id }}"
+                        data-vacunas="{{ mascota.vacunas|escapejs }}"
+                        data-alergias="{{ mascota.alergias|escapejs }}"
+                        data-peso="{{ mascota.peso }}"
+                        {% if mascota.id|stringformat:"s" == mascota_id|stringformat:"s" %}selected{% endif %}
+                    >
+                        {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - 
+                        {{ mascota.cliente.nombre }} - {{ mascota.cliente.email }} - {{ mascota.cliente.telefono }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
 
-        <!-- 💡 Pregunta para cargar consulta previa -->
+            <!-- 🔄 Botón para cargar datos de la mascota seleccionada -->
+            <button type="button" id="cargar-mascota-btn" class="btn-home">
+                Cargar Datos de Mascota
+            </button>
+        </div>
+
+        <!-- 💡 PREGUNTA PARA CARGAR CONSULTA PREVIA -->
         {% if mostrar_pregunta %}
-        <div class="alert alert-info" style="margin-top: 15px; padding: 15px; border-radius: 8px; background: #eef6ff;">
-            <p style="margin-bottom: 10px;">Esta mascota tiene una consulta previa. ¿Deseas cargar los datos de la última consulta?</p>
-            <div style="display: flex; gap: 10px;">
-                <a href="?mascota={{ mascota_id }}&cargar_prev=1" class="btn-home" style="background: #2e8b57;">Sí, cargar</a>
-                <a href="?mascota={{ mascota_id }}&cargar_prev=0" class="btn-home" style="background: #b22222;">No, empezar nueva</a>
+        <div class="alert alert-info">
+            <p><strong>📋 Consulta anterior encontrada</strong></p>
+            <p>Esta mascota tiene una consulta previa. ¿Deseas cargar los datos de la última consulta?</p>
+            <div class="btn-group">
+                <a href="?mascota={{ mascota_id }}&cargar_prev=1" class="btn-home" style="background: #2e8b57;">
+                    ✅ Sí, cargar consulta anterior
+                </a>
+                <a href="?mascota={{ mascota_id }}&cargar_prev=0" class="btn-home" style="background: #b22222;">
+                    ❌ No, empezar nueva
+                </a>
             </div>
         </div>
         {% endif %}
 
-        <!-- Formulario de consulta médica -->
-        {{ form.as_p }}
-
-        <hr>
-
-        <!-- Formulario de documentos -->
-        <h3>Agregar documentos o imágenes</h3>
-        <div id="documentos-container">
-            <div class="documento-input">
-                <input type="file" name="imagen" accept="image/*">
-                <textarea name="descripcion" rows="2" placeholder="Describe brevemente el documento"></textarea>
+        <!-- 📝 FORMULARIO DE CONSULTA MÉDICA - Mejorado visualmente -->
+        <div class="form-section">
+            <h3>Datos de la Consulta</h3>
+            
+            <!-- Mostrar errores del formulario -->
+            {% if form.errors %}
+            <div class="alert alert-error">
+                <strong>Por favor corrige los siguientes errores:</strong>
+                {{ form.errors }}
+            </div>
+            {% endif %}
+            
+            <!-- Renderizar campos del formulario en grid -->
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="form-group {% if field.field.widget.input_type == 'textarea' %}full-width{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                    <div class="field-errors">
+                        {{ field.errors }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
             </div>
         </div>
-        <button type="button" id="add-doc-btn" class="btn-home" style="background:#007bff;margin-top:10px;">+ Añadir otro archivo</button>
 
-        <button type="submit" class="btn-home" style="margin-top: 15px;">Guardar</button>
+        <!-- 📎 SECCIÓN DE DOCUMENTOS - Mejorada -->
+        <div class="form-section">
+            <h3>📎 Documentos e Imágenes</h3>
+            <p class="help-text">Los archivos se guardarán automáticamente en: <code>media/consultas/documentos/</code></p>
+            
+            <div id="documentos-container">
+                <!-- 📄 PRIMER DOCUMENTO -->
+                <div class="documento-group">
+                    <div class="form-group">
+                        <label>Archivo:</label>
+                        <input type="file" name="archivo" accept="image/*, .pdf, .doc, .docx, .txt" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción:</label>
+                        <textarea name="descripcion" rows="2" placeholder="Describe brevemente el documento" class="form-control"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ➕ Botón para añadir más campos de documento -->
+            <button type="button" id="add-doc-btn" class="btn-home" style="background: #007bff;">
+                ➕ Añadir otro archivo
+            </button>
+        </div>
+
+        <!-- 📤 BOTÓN PARA ENVIAR TODO EL FORMULARIO -->
+        <button type="submit" class="btn-home" style="background: #28a745; padding: 1rem 2rem; font-size: 1.1rem;">
+            💾 Guardar Consulta y Documentos
+        </button>
     </form>
 </section>
 
@@ -69,11 +131,14 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('mascota-search');
     const dropdown = document.getElementById('mascota');
+    const cargarBtn = document.getElementById('cargar-mascota-btn');
     const vacunasField = document.getElementById('id_vacunas');
     const alergiasField = document.getElementById('id_alergias');
     const pesoField = document.getElementById('id_peso');
+    const addDocBtn = document.getElementById('add-doc-btn');
+    const container = document.getElementById('documentos-container');
 
-    // 🔍 Filtro de búsqueda
+    // 🔍 FILTRO DE BÚSQUEDA - Mejorado como en el ejemplo
     searchInput.addEventListener('input', function() {
         const filter = searchInput.value.toLowerCase().replace(/\s+/g, '');
         dropdown.querySelectorAll('option').forEach(option => {
@@ -82,32 +147,50 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // 🧩 Actualizar campos con los datos de la mascota
-    dropdown.addEventListener('change', function() {
+    // 🐾 CARGAR DATOS DE MASCOTA
+    cargarBtn.addEventListener('click', function() {
         const selectedOption = dropdown.options[dropdown.selectedIndex];
         if (!selectedOption.value) {
-            vacunasField.value = '';
-            alergiasField.value = '';
-            pesoField.value = '';
+            alert('Por favor, selecciona una mascota primero.');
             return;
         }
-        vacunasField.value = selectedOption.getAttribute('data-vacunas') || '';
-        alergiasField.value = selectedOption.getAttribute('data-alergias') || '';
-        pesoField.value = selectedOption.getAttribute('data-peso') || '';
+        
+        // Actualizar campos con datos de la mascota
+        if (vacunasField) vacunasField.value = selectedOption.getAttribute('data-vacunas') || '';
+        if (alergiasField) alergiasField.value = selectedOption.getAttribute('data-alergias') || '';
+        if (pesoField) pesoField.value = selectedOption.getAttribute('data-peso') || '';
+        
+        // Recargar página con la mascota seleccionada
+        window.location.href = `?mascota=${selectedOption.value}`;
     });
 
-    // ➕ Añadir más campos de archivos
-    const addDocBtn = document.getElementById('add-doc-btn');
-    const container = document.getElementById('documentos-container');
-    addDocBtn.addEventListener('click', () => {
+    // ➕ AÑADIR MÁS CAMPOS DE DOCUMENTOS
+    addDocBtn.addEventListener('click', function() {
         const newDoc = document.createElement('div');
-        newDoc.classList.add('documento-input');
+        newDoc.classList.add('documento-group');
         newDoc.innerHTML = `
-            <input type="file" name="imagen" accept="image/*">
-            <textarea name="descripcion" rows="2" placeholder="Describe brevemente el documento"></textarea>
+            <div class="form-group">
+                <label>Archivo adicional:</label>
+                <input type="file" name="archivo" accept="image/*, .pdf, .doc, .docx, .txt" class="form-control">
+            </div>
+            <div class="form-group">
+                <label>Descripción:</label>
+                <textarea name="descripcion" rows="2" placeholder="Describe brevemente el documento" class="form-control"></textarea>
+            </div>
+            <button type="button" class="btn-home" onclick="this.parentElement.remove()" style="background: #dc3545;">
+                🗑️ Eliminar este archivo
+            </button>
         `;
         container.appendChild(newDoc);
     });
+
+    // 🎯 CARGAR DATOS AUTOMÁTICAMENTE SI YA HAY MASCOTA SELECCIONADA
+    if (dropdown.value) {
+        const selectedOption = dropdown.options[dropdown.selectedIndex];
+        if (vacunasField) vacunasField.value = selectedOption.getAttribute('data-vacunas') || '';
+        if (alergiasField) alergiasField.value = selectedOption.getAttribute('data-alergias') || '';
+        if (pesoField) pesoField.value = selectedOption.getAttribute('data-peso') || '';
+    }
 });
 </script>
 {% endblock %}

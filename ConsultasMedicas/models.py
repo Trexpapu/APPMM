@@ -45,12 +45,6 @@ class DocumentosConsulta(models.Model):
     descripcion = models.TextField(blank= True)
     fecha = models.DateTimeField(auto_now_add=True)
 
-class FotosConsulta(models.Model):
-    consulta = models.ForeignKey(ConsultasMedicas, on_delete=models.CASCADE)
-    imagen = models.ImageField(upload_to= 'consultas/fotos')
-    descripcion = models.TextField(blank= True)
-    fecha = models.DateTimeField(auto_now_add=True)
-
 
 
 class SiguientesConsultas(models.Model):

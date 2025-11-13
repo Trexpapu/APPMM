@@ -4,32 +4,72 @@
 
 {% block content %}
 <section class="container">
-    <h2>Editar Mascota</h2>
+    <div class="header-actions">
+        <h2>Editar Mascota: {{ form.instance.nombre }}</h2>
+    </div>
 
     <form method="post">
         {% csrf_token %}
 
-        <!-- Campo personalizado de cliente -->
-        <label for="cliente">Seleccionar Cliente:</label>
-        <input type="text" id="cliente-search" placeholder="Buscar cliente por nombre, correo o teléfono" class="search-input">
+        <div class="form-section">
+            <div class="form-header">
+                <h3>👤 Selección de Cliente</h3>
+            </div>
+            <div class="form-group">
+                <label for="cliente">Seleccionar Cliente:</label>
+                <input type="text" id="cliente-search" placeholder="Buscar cliente por nombre, correo o teléfono" class="search-input">
+                <select id="cliente" name="cliente" class="searchable-dropdown">
+                    <option value="">Seleccione un cliente</option>
+                    {% for cliente in clientes %}
+                    <option value="{{ cliente.id }}" {% if cliente.id == form.instance.cliente.id %}selected{% endif %}>
+                        {{ cliente.nombre }} - {{ cliente.email }} - {{ cliente.telefono }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
 
-        <select id="cliente" name="cliente" class="searchable-dropdown">
-            <option value="">Seleccione un cliente</option>
-            {% for cliente in clientes %}
-            <option value="{{ cliente.id }}" {% if cliente.id == form.instance.cliente.id %}selected{% endif %}>
-                {{ cliente.nombre }} - {{ cliente.email }} - {{ cliente.telefono }}
-            </option>
-            {% endfor %}
-        </select>
+        <div class="form-section">
+            <div class="form-header">
+                <h3>🐾 Datos de la Mascota</h3>
+            </div>
+            
+            {% if form.errors %}
+            <div class="alert alert-error">
+                <strong>Por favor corrige los siguientes errores:</strong>
+                {{ form.errors }}
+            </div>
+            {% endif %}
+            
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="form-group {% if field.field.widget.input_type == 'textarea' %}full-width{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                    <div class="field-errors">
+                        {{ field.errors }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
 
-        <!-- Campos del formulario (sin cliente, ya vienen con valores) -->
-        {{ form.as_p }}
-
-        <button type="submit" class="btn-home">Guardar Cambios</button>
+        <div class="action-buttons">
+            <button type="submit" class="btn-home" style="background: var(--btn-agr); padding: 12px 24px;">
+                💾 Actualizar Mascota
+            </button>
+            <a href="{% url 'ver_mascotas' %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
+                ❌ Cancelar
+            </a>
+        </div>
     </form>
 </section>
 
-<!-- Buscador dinámico -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('cliente-search');

@@ -4,25 +4,71 @@
 
 {% block content %}
 <section class="container">
-    <h2>Agendar Nueva Consulta</h2>
+    <div class="header-actions">
+        <h2>Agendar Nueva Consulta</h2>
+    </div>
+
     <form method="post">
         {% csrf_token %}
-         <!-- Campo personalizado -->
-        <label for="mascota">Seleccionar mascota:</label>
-        <input type="text" id="mascota-search" placeholder="Buscar mascota por nombre, raza , especie, nombre del cliente, email o teléfono" class="search-input">
-        <select id="mascota" name="mascota" class="searchable-dropdown">
-            <option value="">Seleccione un mascota</option>
-            {% for mascota in mascotas %}
-            <option value="{{ mascota.id }}">
-                {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - {{ mascota.cliente.nombre }} - {{ mascota.cliente.email }} - {{ mascota.cliente.telefono }}
-            </option>
-            {% endfor %}
-        </select>
-        {{ form.as_p }}
-        <button type="submit" class="btn-home">Guardar</button>
+        
+        <div class="form-section">
+            <div class="form-header">
+                <h3>🐾 Selección de Mascota</h3>
+            </div>
+            <div class="form-group">
+                <label for="mascota">Seleccionar mascota:</label>
+                <input type="text" id="mascota-search" placeholder="Buscar mascota por nombre, raza, especie, nombre del cliente, email o teléfono" class="search-input">
+                <select id="mascota" name="mascota" class="searchable-dropdown">
+                    <option value="">Seleccione una mascota</option>
+                    {% for mascota in mascotas %}
+                    <option value="{{ mascota.id }}">
+                        {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - {{ mascota.cliente.nombre }} - {{ mascota.cliente.email }} - {{ mascota.cliente.telefono }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-header">
+                <h3>📅 Datos de la Consulta</h3>
+            </div>
+            
+            {% if form.errors %}
+            <div class="alert alert-error">
+                <strong>Por favor corrige los siguientes errores:</strong>
+                {{ form.errors }}
+            </div>
+            {% endif %}
+            
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="form-group {% if field.field.widget.input_type == 'textarea' %}full-width{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                    <div class="field-errors">
+                        {{ field.errors }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn-home" style="background: var(--btn-agr); padding: 12px 24px;">
+                💾 Agendar Consulta
+            </button>
+            <a href="{% url 'ver-proximas-consultas' %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
+                ❌ Cancelar
+            </a>
+        </div>
     </form>
 </section>
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

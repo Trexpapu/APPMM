@@ -6,67 +6,63 @@
 
 {% block content %}
 <section class="container">
+    <div class="header-actions">
+        <h2>📅 Agenda de Consultas</h2>
+    </div>
 
-    <h2>Ver Agenda de Consultas</h2>
     {% include 'filtro.html' with placeholder='Buscar por nombre, correo electrónico o teléfono del dueño, nombre, raza o especie de la mascota, clínica veterinaria, veterinario o fecha de consulta' %}
-
     {% include 'filtroFecha.html' %}
-
     <a href="{% url 'ver-proximas-consultas' %}" class="btn-regresar">Regresar</a>
-<div class="custom-table-container">
-    <table class="custom-table">
-        <thead>
-            <tr>
-                <th>Nombre cliente</th>
-                <th>Email del cliente</th>
-                <th>Teléfono del cliente</th>
-                <th>Nombre mascota</th>
-                <th>Especie</th>
-                <th>Raza</th>
-                <th>Fecha-Hora consulta</th>
-                <th>Motivo de consulta</th>
-                <th>Médico veterinario</th>
-                <th>Veterinaria</th>
-                <th>Editar</th>
-                <th>Borrar</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for siguientesConsulta in siguientesConsultas %}
-            <tr>
-                <td>{{ siguientesConsulta.mascota.cliente.nombre }}</td>
-                <td>{{ siguientesConsulta.mascota.cliente.email }}</td>
-                <td>{{ siguientesConsulta.mascota.cliente.telefono }}</td>
-                <td>{{ siguientesConsulta.mascota.nombre }}</td>
-                <td>{{ siguientesConsulta.mascota.especie }}</td>
-                <td>{{ siguientesConsulta.mascota.raza }}</td>
-                <td>{{ siguientesConsulta.fechaSiguienteConsulta }}</td>
-                <td>{{ siguientesConsulta.motivoSiguienteConsulta }}</td>
-                <td>{{ siguientesConsulta.veterinario }}</td>
-                <td>{{ siguientesConsulta.clinicaVeterinaria }}</td>
-
-                <td>
-                    <a href="{% url 'editar-proximas-consultas' siguientesConsulta.pk %}">
-                        <img src="{% static 'img/editar.png' %}" alt="Editar" style="width: 20px; height: 20px;">
-                    </a>
-                </td>
-                <td>
-                    <a href="{% url 'borrar-proximas-consultas' siguientesConsulta.pk %}" onclick="return confirm('¿Seguro que quieres borrar la consulta de {{ siguientesConsulta.mascota.nombre }}?');">
-
-                        <img src="{% static 'img/borrar.png' %}" alt="Borrar" style="width: 20px; height: 20px;">
-                    </a>
-                </td>
-                
-               
-              
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="11">No hay consultas agendadas.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+    <div class="custom-table-container">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>👤 Cliente</th>
+                    <th>📧 Email</th>
+                    <th>📞 Teléfono</th>
+                    <th>🐕 Mascota</th>
+                    <th>🔬 Especie</th>
+                    <th>🎯 Raza</th>
+                    <th>📅 Fecha-Hora</th>
+                    <th>📝 Motivo</th>
+                    <th>👨‍⚕️ Veterinario</th>
+                    <th>🏥 Veterinaria</th>
+                    <th>⚡ Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for siguientesConsulta in siguientesConsultas %}
+                <tr>
+                    <td><strong>{{ siguientesConsulta.mascota.cliente.nombre }}</strong></td>
+                    <td>{{ siguientesConsulta.mascota.cliente.email|default:"-" }}</td>
+                    <td>{{ siguientesConsulta.mascota.cliente.telefono|default:"-" }}</td>
+                    <td><strong>{{ siguientesConsulta.mascota.nombre }}</strong></td>
+                    <td>{{ siguientesConsulta.mascota.especie|default:"-" }}</td>
+                    <td>{{ siguientesConsulta.mascota.raza|default:"-" }}</td>
+                    <td>{{ siguientesConsulta.fechaSiguienteConsulta }}</td>
+                    <td>{{ siguientesConsulta.motivoSiguienteConsulta|truncatewords:8|default:"-" }}</td>
+                    <td>{{ siguientesConsulta.veterinario.get_full_name|default:siguientesConsulta.veterinario.username }}</td>
+                    <td>{{ siguientesConsulta.clinicaVeterinaria|default:"-" }}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{% url 'editar-proximas-consultas' siguientesConsulta.pk %}" class="btn-home" style="background: #ffc107; color: black; padding: 5px 10px;">
+                                ✏️
+                            </a>
+                            <a href="{% url 'borrar-proximas-consultas' siguientesConsulta.pk %}" class="btn-home" style="background: #dc3545; padding: 5px 10px;" onclick="return confirm('¿Seguro que quieres borrar la consulta de {{ siguientesConsulta.mascota.nombre }}?');">
+                                🗑️
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="11" class="no-data">
+                        No hay consultas agendadas.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </section>
 {% endblock %}
