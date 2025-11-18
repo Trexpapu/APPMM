@@ -148,10 +148,10 @@ class ConsultaMedicaForm(forms.ModelForm):
         widgets = {
             'motivoConsulta': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Motivo de la consulta'}),
             'temperatura': forms.TextInput(attrs={'placeholder': 'Ej. 38.5 °C'}),
-            'pulso': forms.TextInput(attrs={'placeholder': 'Ej. 90 bpm'}),
+            'pulso': forms.TextInput(attrs={'placeholder': 'Ej. 100'}),
             'frecuenciaCardiaca': forms.TextInput(attrs={'placeholder': 'Ej. 100 bpm'}),
             'puntuacionCorporal': forms.TextInput(attrs={'placeholder': 'Ej. 5/9'}),
-            'peso': forms.NumberInput(attrs={'step': '0.01', 'placeholder': 'Peso en gr'}),
+            'peso': forms.NumberInput(attrs={'step': '1', 'placeholder': 'Peso en kg'}),
             'vacunas': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Vacunas aplicadas'}),
             'alergias': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Alergias conocidas'}),
             'parasitos': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Parásitos detectados'}),
@@ -175,10 +175,10 @@ class ConsultaMedicaForm(forms.ModelForm):
         labels = {
             'motivoConsulta': 'Motivo de la consulta',
             'temperatura': 'Temperatura',
-            'pulso': 'Pulso',
+            'pulso': 'Pulso (LPM)',
             'frecuenciaCardiaca': 'Frecuencia cardíaca',
             'puntuacionCorporal': 'Puntuación corporal',
-            'peso': 'Peso (gr)',
+            'peso': 'Peso (kg)',
             'vacunas': 'Vacunas',
             'alergias': 'Alergias',
             'parasitos': 'Parásitos',
@@ -197,4 +197,106 @@ class ConsultaMedicaForm(forms.ModelForm):
             'evolucion': 'Evolución del paciente',
             'clinicaVeterinaria': 'Clínica veterinaria',
             'veterinario': 'Médico veterinario',
+        }
+
+
+
+class ConsultaMedicaUpdateForm(forms.ModelForm):
+    class Meta:
+        model = ConsultasMedicas
+        fields = [
+            'motivoConsulta',
+            'temperatura',
+            'pulso',
+            'frecuenciaCardiaca',
+            'puntuacionCorporal',
+            'peso',
+            'vacunas',
+            'alergias',
+            'parasitos',
+            'agua',
+            'alimento',
+            'condicionesDeHogar',
+            'ectoparasitos',
+            'estudiosHechos',
+            'pronosticoSignos',
+            'sintomas',
+            'observaciones',
+            'diagnosticoDiferencial',
+            'diagnostico',
+            'tratamiento',
+            'estudiosRecomendados',
+            'evolucion',
+            'clinicaVeterinaria',
+            'veterinario',
+        ]
+
+        widgets = {
+            'motivoConsulta': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Motivo de la consulta', 'class': 'form-control'}),
+            'temperatura': forms.TextInput(attrs={'placeholder': 'Ej. 38.5 °C', 'class': 'form-control'}),
+            'pulso': forms.TextInput(attrs={'placeholder': 'Ej. 100', 'class': 'form-control'}),
+            'frecuenciaCardiaca': forms.TextInput(attrs={'placeholder': 'Ej. 100 bpm', 'class': 'form-control'}),
+            'puntuacionCorporal': forms.TextInput(attrs={'placeholder': 'Ej. 5/9', 'class': 'form-control'}),
+            'peso': forms.NumberInput(attrs={'step': '0.01', 'placeholder': 'Peso en kg', 'class': 'form-control'}),
+            'vacunas': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Vacunas aplicadas', 'class': 'form-control'}),
+            'alergias': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Alergias conocidas', 'class': 'form-control'}),
+            'parasitos': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Parásitos detectados', 'class': 'form-control'}),
+            'agua': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Hábitos de consumo de agua', 'class': 'form-control'}),
+            'alimento': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Tipo de alimento', 'class': 'form-control'}),
+            'condicionesDeHogar': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Condiciones del hogar', 'class': 'form-control'}),
+            'ectoparasitos': forms.Textarea(attrs={'rows': 2, 'placeholder': '¿Ha tenido presencia de pulgas o garrapatas?', 'class': 'form-control'}),
+            'pronosticoSignos': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Pronóstico y signos clínicos', 'class': 'form-control'}),
+            'sintomas': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Síntomas observados', 'class': 'form-control'}),
+            'observaciones': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Observaciones del veterinario', 'class': 'form-control'}),
+            'diagnosticoDiferencial': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Diagnóstico diferencial', 'class': 'form-control'}),
+            'diagnostico': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Diagnóstico final', 'class': 'form-control'}),
+            'tratamiento': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Tratamiento prescrito', 'class': 'form-control'}),
+            'estudiosHechos': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Estudios realizados', 'class': 'form-control'}),
+            'evolucion': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Evolución del paciente', 'class': 'form-control'}),
+            'estudiosRecomendados': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Estudios recomendados', 'class': 'form-control'}),
+            'clinicaVeterinaria': forms.Select(attrs={'class': 'form-control'}),
+            'veterinario': forms.Select(attrs={'class': 'form-control'}),
+        }
+
+        labels = {
+            'motivoConsulta': 'Motivo de la consulta',
+            'temperatura': 'Temperatura',
+            'pulso': 'Pulso (LPM)',
+            'frecuenciaCardiaca': 'Frecuencia cardíaca',
+            'puntuacionCorporal': 'Puntuación corporal',
+            'peso': 'Peso (kg)',
+            'vacunas': 'Vacunas',
+            'alergias': 'Alergias',
+            'parasitos': 'Parásitos',
+            'agua': 'Consumo de agua',
+            'alimento': 'Alimento',
+            'condicionesDeHogar': 'Condiciones del hogar',
+            'ectoparasitos': 'Ectoparásitos',
+            'pronosticoSignos': 'Pronóstico y signos clínicos',
+            'sintomas': 'Síntomas',
+            'observaciones': 'Observaciones',
+            'diagnosticoDiferencial': 'Diagnóstico diferencial',
+            'diagnostico': 'Diagnóstico final',
+            'tratamiento': 'Tratamiento',
+            'estudiosHechos': 'Estudios realizados',
+            'estudiosRecomendados': 'Estudios recomendados',
+            'evolucion': 'Evolución del paciente',
+            'clinicaVeterinaria': 'Clínica veterinaria',
+            'veterinario': 'Médico veterinario',
+        }
+
+
+class DocumentoConsultaUpdateForm(forms.ModelForm):
+    class Meta:
+        model = DocumentosConsulta
+        fields = ['descripcion']
+        widgets = {
+            'descripcion': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Descripción del documento',
+                'class': 'form-control'
+            }),
+        }
+        labels = {
+            'descripcion': 'Descripción'
         }

@@ -32,22 +32,43 @@ def ver_clientes(request):
     return render(request, 'clientesMascotas/Clientes/VerClientes.html', {'clientes': clientes})
 
 
+
+
+
 @login_required
 def ver_mascotas(request):
     """View that renders a table with all pets and their associated client information."""
-    query = request.GET.get('q', '').strip().lower()  # Remove replace to keep spaces intact
-    if query:
-        mascotas = Mascotas.objects.select_related('cliente').filter(
-            Q(cliente__nombre__icontains=query) |
-            Q(cliente__email__icontains=query) |
-            Q(cliente__telefono__icontains=query) |
-            Q(nombre__icontains=query) |
-            Q(raza__icontains=query) |
-            Q(especie__icontains=query)
+    query_cliente = request.GET.get('q_cliente', '').strip().lower()
+    query_mascota = request.GET.get('q_mascota', '').strip().lower()
+    
+    mascotas = Mascotas.objects.select_related('cliente').all()
+    
+    # Aplicar filtros combinados
+    if query_cliente:
+        mascotas = mascotas.filter(
+            Q(cliente__nombre__icontains=query_cliente) |
+            Q(cliente__email__icontains=query_cliente) |
+            Q(cliente__telefono__icontains=query_cliente)
         )
-    else:
-        mascotas = Mascotas.objects.select_related('cliente').all()
-    return render(request, 'clientesMascotas/Mascotas/verMascotas.html', {'mascotas': mascotas})
+    
+    if query_mascota:
+        mascotas = mascotas.filter(
+            Q(nombre__icontains=query_mascota) |
+            Q(raza__icontains=query_mascota) |
+            Q(especie__icontains=query_mascota) |
+            Q(vacunas__icontains=query_mascota) |
+            Q(alergias__icontains=query_mascota)
+        )
+    
+    # Determinar si hay filtros activos
+    filtros_activos = query_cliente or query_mascota
+    
+    return render(request, 'clientesMascotas/Mascotas/verMascotas.html', {
+        'mascotas': mascotas,
+        'query_cliente': query_cliente,
+        'query_mascota': query_mascota,
+        'filtros_activos': filtros_activos
+    })
 
 
 @login_required

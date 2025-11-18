@@ -2,20 +2,105 @@
 
 {% load static %}
 
-{% block title %}Ver Mascotas - Mascotas Morelia{% endblock %}
+{% block title %}🐕 Ver Mascotas - Mascotas Morelia{% endblock %}
 
 {% block content %}
 <section class="container">
     <div class="header-actions">
-        <h2>🐾 Listado de Mascotas</h2>
-        <div class="action-buttons">
-        </div>
+        <h2>🐕 Listado de Mascotas</h2>
     </div>
 
-    {% include 'filtro.html' with placeholder='Buscar por nombre, correo electrónico, número de cliente, nombre de mascota, especie o raza' %}
+    <!-- Filtros Combinados -->
+    <div class="filtros-combinados">
+        <form method="get" action="" class="filtros-form">
+            <div class="filtros-grid">
+                <!-- Filtro por Cliente -->
+                <div class="filtro-group">
+                    <label for="q_cliente" class="filtro-label">
+                        👤 Buscar por Cliente
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q_cliente" 
+                            name="q_cliente" 
+                            placeholder="Nombre, email o teléfono del cliente..." 
+                            class="filtro-input"
+                            value="{{ query_cliente }}"
+                        >
+                        {% if query_cliente %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_cliente').value = ''; this.form.submit();"
+                            title="Limpiar filtro de cliente"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
 
-    
-    <a href="{% url 'ver_mascotas' %}" class="btn-regresar">Regresar</a>
+                <!-- Filtro por Mascota -->
+                <div class="filtro-group">
+                    <label for="q_mascota" class="filtro-label">
+                        🐕 Buscar por Mascota
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q_mascota" 
+                            name="q_mascota" 
+                            placeholder="Nombre, raza o especie" 
+                            class="filtro-input"
+                            value="{{ query_mascota }}"
+                        >
+                        {% if query_mascota %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_mascota').value = ''; this.form.submit();"
+                            title="Limpiar filtro de mascota"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="filtro-actions">
+                    <button type="submit" class="btn-home filtro-submit">
+                        🔍 Buscar
+                    </button>
+                    {% if filtros_activos %}
+                    <a href="{% url 'ver_mascotas' %}" class="btn-home filtro-reset">
+                        🗑️ Limpiar Filtros
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Información de resultados -->
+    {% if filtros_activos %}
+    <div class="results-info">
+        <p>
+            📊 Mostrando <strong>{{ mascotas|length }}</strong> mascota(s)
+            {% if query_cliente %}
+                para cliente: "<strong>{{ query_cliente }}</strong>"
+            {% endif %}
+            {% if query_mascota %}
+                {% if query_cliente %}y {% endif %}mascota: "<strong>{{ query_mascota }}</strong>"
+            {% endif %}
+        </p>
+    </div>
+    {% else %}
+    <div class="results-info">
+        <p>📊 Total de mascotas: <strong>{{ mascotas|length }}</strong></p>
+    </div>
+    {% endif %}
 
     <div class="custom-table-container">
         <table class="custom-table">
@@ -28,7 +113,7 @@
                     <th>🔬 Especie</th>
                     <th>🎯 Raza</th>
                     <th>📅 Nacimiento</th>
-                    <th>⚖️ Peso (GR)</th>
+                    <th>⚖️ Peso (KG)</th>
                     <th>💉 Vacunas</th>
                     <th>⚠️ Alergias</th>
                     <th>❤️ Vive</th>
@@ -38,29 +123,74 @@
             <tbody>
                 {% for mascota in mascotas %}
                 <tr>
-                    <td><strong>{{ mascota.cliente.nombre }}</strong></td>
+                    <td>
+                        <div class="client-info">
+                            <strong>{{ mascota.cliente.nombre }}</strong>
+                            <div class="client-details">
+                                {% if mascota.cliente.email %}
+                                <small>📧 {{ mascota.cliente.email }}</small>
+                                {% endif %}
+                                {% if mascota.cliente.telefono %}
+                                <small>📞 {{ mascota.cliente.telefono }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
                     <td>{{ mascota.cliente.email|default:"-" }}</td>
                     <td>{{ mascota.cliente.telefono|default:"-" }}</td>
-                    <td><strong>{{ mascota.nombre }}</strong></td>
+                    <td>
+                        <div class="pet-info">
+                            <strong>{{ mascota.nombre }}</strong>
+                            <div class="pet-details">
+                                <small>🎯 {{ mascota.raza|default:"Sin raza" }}</small>
+                                <small>🔬 {{ mascota.especie|default:"Sin especie" }}</small>
+                            </div>
+                        </div>
+                    </td>
                     <td>{{ mascota.especie|default:"-" }}</td>
                     <td>{{ mascota.raza|default:"-" }}</td>
-                    <td>{{ mascota.fechaNacimiento|default:"-" }}</td>
-                    <td>{{ mascota.peso|default:"-" }}</td>
-                    <td>{{ mascota.vacunas|truncatewords:5|default:"-" }}</td>
-                    <td>{{ mascota.alergias|truncatewords:5|default:"-" }}</td>
+                    <td>{{ mascota.fechaNacimiento }}</td>
                     <td>
-                        {% if mascota.vive %}
-                            <span class="badge badge-success">Sí</span>
+                        <span class="weight-value">{{ mascota.peso|default:"0" }}</span> kg
+                    </td>
+                    <td>
+                        {% if mascota.vacunas %}
+                            <div class="truncate-text" title="{{ mascota.vacunas }}">
+                                {{ mascota.vacunas|truncatewords:8 }}
+                            </div>
                         {% else %}
-                            <span class="badge badge-danger">No</span>
+                            -
                         {% endif %}
                     </td>
                     <td>
-                        <div class="action-buttons">
-                            <a href="{% url 'editar_mascota' mascota.pk %}" class="btn-home" style="background: #ffc107; color: black; padding: 5px 10px;">
+                        {% if mascota.alergias %}
+                            <div class="truncate-text" title="{{ mascota.alergias }}">
+                                {{ mascota.alergias|truncatewords:8 }}
+                            </div>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if mascota.vive %}
+                            <span class="badge badge-success" title="Mascota viva">✅ Sí</span>
+                        {% else %}
+                            <span class="badge badge-danger" title="Mascota fallecida">❌ No</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-buttons compact">
+                            <a href="{% url 'editar_mascota' mascota.pk %}" 
+                               class="btn-home" 
+                               style="background: #ffc107; color: black; padding: 5px 10px;"
+                               title="Editar mascota">
                                 ✏️
                             </a>
-                            <a href="{% url 'borrar_mascota' mascota.pk %}" class="btn-home" style="background: #dc3545; padding: 5px 10px;" onclick="return confirm('¿Seguro que quieres borrar a {{ mascota.nombre }}?');">
+                            <a href="{% url 'borrar_mascota' mascota.pk %}" 
+                               class="btn-home" 
+                               style="background: #dc3545; padding: 5px 10px;" 
+                               onclick="return confirm('¿Estás seguro de que quieres eliminar a {{ mascota.nombre }}?');"
+                               title="Eliminar mascota">
                                 🗑️
                             </a>
                         </div>
@@ -69,7 +199,13 @@
                 {% empty %}
                 <tr>
                     <td colspan="12" class="no-data">
-                        No hay mascotas registradas.
+                        {% if filtros_activos %}
+                            🔍 No se encontraron mascotas que coincidan con los filtros aplicados.
+                            
+                        {% else %}
+                            📝 No hay mascotas registradas. 
+                            
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}
@@ -77,4 +213,6 @@
         </table>
     </div>
 </section>
+
+
 {% endblock %}

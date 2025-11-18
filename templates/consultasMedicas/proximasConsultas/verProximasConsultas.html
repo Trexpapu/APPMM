@@ -10,9 +10,195 @@
         <h2>📅 Agenda de Consultas</h2>
     </div>
 
-    {% include 'filtro.html' with placeholder='Buscar por nombre, correo electrónico o teléfono del dueño, nombre, raza o especie de la mascota, clínica veterinaria, veterinario o fecha de consulta' %}
-    {% include 'filtroFecha.html' %}
-    <a href="{% url 'ver-proximas-consultas' %}" class="btn-regresar">Regresar</a>
+    <!-- Filtros Combinados -->
+    <div class="filtros-combinados">
+        <form method="get" action="" class="filtros-form">
+            <div class="filtros-grid">
+                <!-- Filtro por Cliente -->
+                <div class="filtro-group">
+                    <label for="q_cliente" class="filtro-label">
+                        👤 Buscar por Cliente
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q_cliente" 
+                            name="q_cliente" 
+                            placeholder="Nombre, email o teléfono del cliente..." 
+                            class="filtro-input"
+                            value="{{ query_cliente }}"
+                        >
+                        {% if query_cliente %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_cliente').value = ''; this.form.submit();"
+                            title="Limpiar filtro de cliente"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Mascota -->
+                <div class="filtro-group">
+                    <label for="q_mascota" class="filtro-label">
+                        🐕 Buscar por Mascota
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q_mascota" 
+                            name="q_mascota" 
+                            placeholder="Nombre, raza o especie" 
+                            class="filtro-input"
+                            value="{{ query_mascota }}"
+                        >
+                        {% if query_mascota %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_mascota').value = ''; this.form.submit();"
+                            title="Limpiar filtro de mascota"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Fecha -->
+                <div class="filtro-group">
+                    <label for="q_fecha" class="filtro-label">
+                        📅 Buscar por Fecha
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="date" 
+                            id="q_fecha" 
+                            name="q_fecha" 
+                            class="filtro-input"
+                            value="{{ query_fecha }}"
+                        >
+                        {% if query_fecha %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_fecha').value = ''; this.form.submit();"
+                            title="Limpiar filtro de fecha"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Veterinario -->
+                <div class="filtro-group">
+                    <label for="q_veterinario" class="filtro-label">
+                        👨‍⚕️ Veterinario
+                    </label>
+                    <div class="filtro-input-container">
+                        <select 
+                            id="q_veterinario" 
+                            name="q_veterinario" 
+                            class="filtro-input"
+                        >
+                            <option value="">Todos los veterinarios</option>
+                            {% for vet in veterinarios %}
+                            <option value="{{ vet.id }}" {% if query_veterinario == vet.id|stringformat:"s" %}selected{% endif %}>
+                                {{ vet.get_full_name|default:vet.username }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if query_veterinario %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_veterinario').value = ''; this.form.submit();"
+                            title="Limpiar filtro de veterinario"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Veterinaria -->
+                <div class="filtro-group">
+                    <label for="q_veterinaria" class="filtro-label">
+                        🏥 Clínica Veterinaria
+                    </label>
+                    <div class="filtro-input-container">
+                        <select 
+                            id="q_veterinaria" 
+                            name="q_veterinaria" 
+                            class="filtro-input"
+                        >
+                            <option value="">Todas las clínicas</option>
+                            {% for clinica in clinicas %}
+                            <option value="{{ clinica.0 }}" {% if query_veterinaria == clinica.0 %}selected{% endif %}>
+                                {{ clinica.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if query_veterinaria %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_veterinaria').value = ''; this.form.submit();"
+                            title="Limpiar filtro de veterinaria"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="filtro-actions">
+                    <button type="submit" class="btn-home filtro-submit">
+                        🔍 Buscar
+                    </button>
+                    {% if filtros_activos %}
+                    <a href="{% url 'ver-proximas-consultas' %}" class="btn-home filtro-reset">
+                        🗑️ Limpiar Filtros
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Información de resultados -->
+    {% if filtros_activos %}
+    <div class="results-info">
+        <p>
+            📊 Mostrando <strong>{{ siguientesConsultas|length }}</strong> consulta(s)
+            {% if query_cliente %}
+                para cliente: "<strong>{{ query_cliente }}</strong>"
+            {% endif %}
+            {% if query_mascota %}
+                {% if query_cliente %}y {% endif %}mascota: "<strong>{{ query_mascota }}</strong>"
+            {% endif %}
+            {% if query_fecha %}
+                {% if query_cliente or query_mascota %}y {% endif %}fecha: "<strong>{{ query_fecha }}</strong>"
+            {% endif %}
+            {% if query_veterinario %}
+                {% if query_cliente or query_mascota or query_fecha %}y {% endif %}veterinario: "<strong>{{ veterinario_seleccionado.get_full_name|default:veterinario_seleccionado.username }}</strong>"
+            {% endif %}
+            {% if query_veterinaria %}
+                {% if query_cliente or query_mascota or query_fecha or query_veterinario %}y {% endif %}clínica: "<strong>{{ veterinaria_seleccionada }}</strong>"
+            {% endif %}
+        </p>
+    </div>
+    {% else %}
+    <div class="results-info">
+        <p>📊 Total de consultas: <strong>{{ siguientesConsultas|length }}</strong></p>
+    </div>
+    {% endif %}
+
     <div class="custom-table-container">
         <table class="custom-table">
             <thead>
@@ -33,22 +219,57 @@
             <tbody>
                 {% for siguientesConsulta in siguientesConsultas %}
                 <tr>
-                    <td><strong>{{ siguientesConsulta.mascota.cliente.nombre }}</strong></td>
+                    <td>
+                        <div class="client-info">
+                            <strong>{{ siguientesConsulta.mascota.cliente.nombre }}</strong>
+                            <div class="client-details">
+                                {% if siguientesConsulta.mascota.cliente.email %}
+                                <small>📧 {{ siguientesConsulta.mascota.cliente.email }}</small>
+                                {% endif %}
+                                {% if siguientesConsulta.mascota.cliente.telefono %}
+                                <small>📞 {{ siguientesConsulta.mascota.cliente.telefono }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
                     <td>{{ siguientesConsulta.mascota.cliente.email|default:"-" }}</td>
                     <td>{{ siguientesConsulta.mascota.cliente.telefono|default:"-" }}</td>
-                    <td><strong>{{ siguientesConsulta.mascota.nombre }}</strong></td>
+                    <td>
+                        <div class="pet-info">
+                            <strong>{{ siguientesConsulta.mascota.nombre }}</strong>
+                            <div class="pet-details">
+                                <small>🎯 {{ siguientesConsulta.mascota.raza|default:"Sin raza" }}</small>
+                                <small>🔬 {{ siguientesConsulta.mascota.especie|default:"Sin especie" }}</small>
+                            </div>
+                        </div>
+                    </td>
                     <td>{{ siguientesConsulta.mascota.especie|default:"-" }}</td>
                     <td>{{ siguientesConsulta.mascota.raza|default:"-" }}</td>
                     <td>{{ siguientesConsulta.fechaSiguienteConsulta }}</td>
-                    <td>{{ siguientesConsulta.motivoSiguienteConsulta|truncatewords:8|default:"-" }}</td>
+                    <td>
+                        {% if siguientesConsulta.motivoSiguienteConsulta %}
+                            <div class="truncate-text" title="{{ siguientesConsulta.motivoSiguienteConsulta }}">
+                                {{ siguientesConsulta.motivoSiguienteConsulta|truncatewords:8 }}
+                            </div>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
                     <td>{{ siguientesConsulta.veterinario.get_full_name|default:siguientesConsulta.veterinario.username }}</td>
                     <td>{{ siguientesConsulta.clinicaVeterinaria|default:"-" }}</td>
                     <td>
-                        <div class="action-buttons">
-                            <a href="{% url 'editar-proximas-consultas' siguientesConsulta.pk %}" class="btn-home" style="background: #ffc107; color: black; padding: 5px 10px;">
+                        <div class="action-buttons compact">
+                            <a href="{% url 'editar-proximas-consultas' siguientesConsulta.pk %}" 
+                               class="btn-home" 
+                               style="background: #ffc107; color: black; padding: 5px 10px;"
+                               title="Editar consulta">
                                 ✏️
                             </a>
-                            <a href="{% url 'borrar-proximas-consultas' siguientesConsulta.pk %}" class="btn-home" style="background: #dc3545; padding: 5px 10px;" onclick="return confirm('¿Seguro que quieres borrar la consulta de {{ siguientesConsulta.mascota.nombre }}?');">
+                            <a href="{% url 'borrar-proximas-consultas' siguientesConsulta.pk %}" 
+                               class="btn-home" 
+                               style="background: #dc3545; padding: 5px 10px;" 
+                               onclick="return confirm('¿Estás seguro de que quieres eliminar la consulta de {{ siguientesConsulta.mascota.nombre }}?');"
+                               title="Eliminar consulta">
                                 🗑️
                             </a>
                         </div>
@@ -57,7 +278,13 @@
                 {% empty %}
                 <tr>
                     <td colspan="11" class="no-data">
-                        No hay consultas agendadas.
+                        {% if filtros_activos %}
+                            🔍 No se encontraron consultas que coincidan con los filtros aplicados.
+
+                        {% else %}
+                            📝 No hay consultas agendadas. 
+                        
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

@@ -14,7 +14,9 @@
     {% include 'filtro.html' with placeholder='Buscar por nombre, correo o número' %}
 
     
-    <a href="{% url 'ver_clientes' %}" class="btn-regresar">Regresar</a>
+    <a href="{% url 'ver_clientes' %}" class="btn-home filtro-reset">
+                        🗑️ Limpiar Filtros
+    </a>
 
     <div class="custom-table-container">
         <table class="custom-table">

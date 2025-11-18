@@ -17,4 +17,10 @@ urlpatterns = [
     # Generar PDF
     path('consulta/<int:consulta_id>/pdf/', views.generar_pdf_consulta, name='generar_pdf_consulta'),
 
+    path('consulta/<int:consulta_id>/editar/', views.editar_consulta, name='editar_consulta'),
+    
+    # Eliminar documento
+    path('documento/<int:documento_id>/eliminar/', views.eliminar_documento, name='eliminar_documento'),
+ 
+    path('borrarConsultas/<int:pk>/', views.borrar_consulta, name='borrar-consultas'),
 ]

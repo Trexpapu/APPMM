@@ -329,6 +329,186 @@ form button[type="submit"]:hover {
 
 /* ==================== ESTILOS MEJORADOS ==================== */
 
+/* ==================== FILTROS COMBINADOS ==================== */
+
+.filtros-combinados {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    border: 1px solid var(--form-border);
+}
+
+.filtros-form {
+    width: 100%;
+}
+
+.filtros-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 15px;
+    align-items: end;
+}
+
+.filtro-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.filtro-label {
+    font-weight: bold;
+    color: var(--brand-bg);
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.filtro-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.filtro-input {
+    width: 100%;
+    padding: 10px 40px 10px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.filtro-input:focus {
+    outline: none;
+    border-color: var(--btn-bg);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.filtro-clear {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    transition: background 0.3s ease;
+    font-size: 12px;
+}
+
+.filtro-clear:hover {
+    background: #f8f9fa;
+}
+
+.filtro-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.filtro-submit {
+    background: var(--btn-bg);
+    padding: 10px 20px;
+    white-space: nowrap;
+}
+
+.filtro-reset {
+    background: #6c757d;
+    padding: 10px 15px;
+    white-space: nowrap;
+}
+
+/* Información de resultados */
+.results-info {
+    background: #f8f9fa;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border-left: 4px solid var(--btn-bg);
+}
+
+.results-info p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Mejoras para la tabla */
+.client-info, .pet-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.client-details, .pet-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.client-details small, .pet-details small {
+    color: #666;
+    font-size: 0.8em;
+}
+
+.truncate-text {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.weight-value {
+    font-weight: bold;
+    color: var(--brand-bg);
+}
+
+/* Responsive para filtros */
+@media (max-width: 1024px) {
+    .filtros-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .filtro-actions {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .filtros-combinados {
+        padding: 15px;
+    }
+    
+    .results-info p {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+    
+    .client-details, .pet-details {
+        flex-direction: row;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .filtro-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .filtro-submit, .filtro-reset {
+        width: 100%;
+        text-align: center;
+    }
+}
+
 /* Header con acciones */
 .header-actions {
     display: flex;

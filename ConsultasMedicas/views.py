@@ -27,37 +27,86 @@ def indexInicioConsultas(request):
 
 
 
-@login_required
+
+
+
 def ver_proximas_consultas(request):
-    """View that renders a table with all upcoming consultations and related client/pet info."""
-    query = request.GET.get('q', '').strip().lower()
-    siguientesConsultas = SiguientesConsultas.objects.select_related('mascota', 'mascota__cliente', 'veterinario')
-
-    if query:
-        # Intentar parsear la fecha si el usuario busca por fecha
-        fecha_busqueda = None
-        try:
-            fecha_busqueda = datetime.strptime(query, "%Y-%m-%d").date()
-        except ValueError:
-            pass
-
-        siguientesConsultas = siguientesConsultas.filter(
-            Q(mascota__cliente__nombre__icontains=query) |
-            Q(mascota__cliente__email__icontains=query) |
-            Q(mascota__cliente__telefono__icontains=query) |
-            Q(mascota__nombre__icontains=query) |
-            Q(mascota__raza__icontains=query) |
-            Q(mascota__especie__icontains=query) |
-            Q(veterinario__username__icontains=query) |       # buscar por username del veterinario
-            Q(clinicaVeterinaria__icontains=query) |
-            (Q(fechaSiguienteConsulta__date=fecha_busqueda) if fecha_busqueda else Q())
+    # Obtener todos los registros inicialmente
+    consultas = SiguientesConsultas.objects.all().select_related(
+        'mascota', 'mascota__cliente', 'veterinario'
+    ).order_by('fechaSiguienteConsulta')
+    
+    # Inicializar variables de filtro
+    query_cliente = request.GET.get('q_cliente', '')
+    query_mascota = request.GET.get('q_mascota', '')
+    query_fecha = request.GET.get('q_fecha', '')
+    query_veterinario = request.GET.get('q_veterinario', '')
+    query_veterinaria = request.GET.get('q_veterinaria', '')
+    
+    # Aplicar filtros
+    if query_cliente:
+        consultas = consultas.filter(
+            Q(mascota__cliente__nombre__icontains=query_cliente) |
+            Q(mascota__cliente__email__icontains=query_cliente) |
+            Q(mascota__cliente__telefono__icontains=query_cliente)
         )
+    
+    if query_mascota:
+        consultas = consultas.filter(
+            Q(mascota__nombre__icontains=query_mascota) |
+            Q(mascota__raza__icontains=query_mascota) |
+            Q(mascota__especie__icontains=query_mascota)
+        )
+    
+    if query_fecha:
+        try:
+            fecha_filtro = datetime.strptime(query_fecha, '%Y-%m-%d').date()
+            consultas = consultas.filter(fechaSiguienteConsulta__date=fecha_filtro)
+        except ValueError:
+            # Si la fecha no es válida, ignorar el filtro
+            pass
+    
+    if query_veterinario:
+        consultas = consultas.filter(veterinario_id=query_veterinario)
+    
+    if query_veterinaria:
+        consultas = consultas.filter(clinicaVeterinaria=query_veterinaria)
+    
+    # Obtener datos para los dropdowns
+    veterinarios = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
+    
+    # Obtener las opciones de clínicas del modelo
+    clinicas = SiguientesConsultas.CLINICAS
+    
+    # Verificar si hay filtros activos
+    filtros_activos = any([query_cliente, query_mascota, query_fecha, query_veterinario, query_veterinaria])
+    
+    # Obtener objetos para mostrar en los resultados
+    veterinario_seleccionado = None
+    if query_veterinario:
+        try:
+            veterinario_seleccionado = User.objects.get(id=query_veterinario)
+        except User.DoesNotExist:
+            pass
+    
+    veterinaria_seleccionada = query_veterinaria
+    
+    context = {
+        'siguientesConsultas': consultas,
+        'query_cliente': query_cliente,
+        'query_mascota': query_mascota,
+        'query_fecha': query_fecha,
+        'query_veterinario': query_veterinario,
+        'query_veterinaria': query_veterinaria,
+        'veterinarios': veterinarios,
+        'clinicas': clinicas,
+        'filtros_activos': filtros_activos,
+        'veterinario_seleccionado': veterinario_seleccionado,
+        'veterinaria_seleccionada': veterinaria_seleccionada,
+    }
+    
+    return render(request, 'consultasMedicas/proximasConsultas/verProximasConsultas.html', context)
 
-    return render(
-        request,
-        'consultasMedicas/proximasConsultas/verProximasConsultas.html',
-        {'siguientesConsultas': siguientesConsultas}
-    )
 
 @login_required
 def agendar_proxima_consulta(request):
@@ -218,49 +267,92 @@ def nueva_consulta(request):
         }
     )
 
+
+
+
 @login_required
 def ver_consultas(request):
     """View that renders a table with all consultations and related info."""
-    query = request.GET.get('q', '').strip().lower()
-    consultas = ConsultasMedicas.objects.select_related('mascota', 'mascota__cliente', 'veterinario')
-
-    if query:
-        fecha_busqueda = None
-        try:
-            # Intenta parsear la fecha ingresada (formato YYYY-MM-DD)
-            fecha_busqueda = datetime.strptime(query, "%Y-%m-%d").date()
-        except ValueError:
-            pass
-
-        filtros = (
-            Q(mascota__cliente__nombre__icontains=query) |
-            Q(mascota__cliente__email__icontains=query) |
-            Q(mascota__cliente__telefono__icontains=query) |
-            Q(mascota__nombre__icontains=query) |
-            Q(mascota__raza__icontains=query) |
-            Q(mascota__especie__icontains=query) |
-            Q(veterinario__username__icontains=query) |
-            Q(clinicaVeterinaria__icontains=query)
+    # Obtener todos los registros inicialmente
+    consultas = ConsultasMedicas.objects.select_related(
+        'mascota', 'mascota__cliente', 'veterinario'
+    ).all()
+    
+    # Obtener parámetros de filtro
+    query_cliente = request.GET.get('q_cliente', '').strip()
+    query_mascota = request.GET.get('q_mascota', '').strip()
+    query_fecha = request.GET.get('q_fecha', '').strip()
+    query_veterinario = request.GET.get('q_veterinario', '').strip()
+    query_veterinaria = request.GET.get('q_veterinaria', '').strip()
+    
+    # Aplicar filtros
+    if query_cliente:
+        consultas = consultas.filter(
+            Q(mascota__cliente__nombre__icontains=query_cliente) |
+            Q(mascota__cliente__email__icontains=query_cliente) |
+            Q(mascota__cliente__telefono__icontains=query_cliente)
         )
-
-        # 🔹 Si se detectó una fecha, agregar un rango (todo ese día)
-        if fecha_busqueda:
-            inicio_dia = datetime.combine(fecha_busqueda, datetime.min.time())
-            fin_dia = datetime.combine(fecha_busqueda, datetime.max.time())
-            filtros |= Q(fechaConsulta__range=(inicio_dia, fin_dia))
-
-        consultas = consultas.filter(filtros)
-
-    # 🔹 Ordenar de la más nueva a la más vieja
+    
+    if query_mascota:
+        consultas = consultas.filter(
+            Q(mascota__nombre__icontains=query_mascota) |
+            Q(mascota__raza__icontains=query_mascota) |
+            Q(mascota__especie__icontains=query_mascota)
+        )
+    
+    if query_fecha:
+        try:
+            fecha_filtro = datetime.strptime(query_fecha, '%Y-%m-%d').date()
+            consultas = consultas.filter(fechaConsulta__date=fecha_filtro)
+        except ValueError:
+            # Si la fecha no es válida, ignorar el filtro
+            pass
+    
+    if query_veterinario:
+        consultas = consultas.filter(veterinario_id=query_veterinario)
+    
+    if query_veterinaria:
+        consultas = consultas.filter(clinicaVeterinaria=query_veterinaria)
+    
+    # Obtener datos para los dropdowns
+    veterinarios = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
+    clinicas = ConsultasMedicas.CLINICAS
+    
+    # Verificar si hay filtros activos
+    filtros_activos = any([query_cliente, query_mascota, query_fecha, query_veterinario, query_veterinaria])
+    
+    # Obtener objetos para mostrar en los resultados
+    veterinario_seleccionado = None
+    if query_veterinario:
+        try:
+            veterinario_seleccionado = User.objects.get(id=query_veterinario)
+        except User.DoesNotExist:
+            pass
+    
+    veterinaria_seleccionada = query_veterinaria
+    
+    # Ordenar de la más nueva a la más vieja
     consultas = consultas.order_by('-fechaConsulta')
-
+    
+    context = {
+        'consultas': consultas,
+        'query_cliente': query_cliente,
+        'query_mascota': query_mascota,
+        'query_fecha': query_fecha,
+        'query_veterinario': query_veterinario,
+        'query_veterinaria': query_veterinaria,
+        'veterinarios': veterinarios,
+        'clinicas': clinicas,
+        'filtros_activos': filtros_activos,
+        'veterinario_seleccionado': veterinario_seleccionado,
+        'veterinaria_seleccionada': veterinaria_seleccionada,
+    }
+    
     return render(
         request,
         'consultasMedicas/consultasMedicasBase/verConsultas.html',
-        {'consultas': consultas}
+        context
     )
-
-
 
 
 
@@ -376,7 +468,7 @@ def generar_pdf_consulta(request, consulta_id):
         signos_data.append(['Frecuencia cardíaca:', consulta.frecuenciaCardiaca])
     if consulta.puntuacionCorporal:
         signos_data.append(['Puntuación corporal:', consulta.puntuacionCorporal])
-    signos_data.append(['Peso:', f"{consulta.peso} gr"])
+    signos_data.append(['Peso:', f"{consulta.peso} kg"])
     
     if signos_data:
         signos_table = Table(signos_data, colWidths=[2*inch, 4*inch])
@@ -498,3 +590,104 @@ def generar_pdf_consulta(request, consulta_id):
     response['Content-Disposition'] = f'attachment; filename="consulta_{consulta.mascota.nombre}_{consulta.fechaConsulta.strftime("%Y%m%d")}.pdf"'
     
     return response
+
+
+
+
+@login_required
+def editar_consulta(request, consulta_id):
+    """Vista para editar una consulta médica existente"""
+    consulta = get_object_or_404(ConsultasMedicas, id=consulta_id)
+    documentos_existentes = DocumentosConsulta.objects.filter(consulta=consulta)
+    
+    # Si la consulta ya tiene una mascota, la pre-seleccionamos
+    mascota_seleccionada = consulta.mascota
+    mascotas = Mascotas.objects.all()
+
+    if request.method == 'POST':
+        form = ConsultaMedicaUpdateForm(request.POST, instance=consulta)
+        
+        # Procesar documentos existentes
+        documentos_a_eliminar = request.POST.getlist('eliminar_documento')
+        
+        if form.is_valid():
+            # Guardar la consulta
+            consulta_editada = form.save(commit=False)
+            # Actualizar la mascota si se cambió en el select
+            mascota_id = request.POST.get('mascota')
+            if mascota_id:
+                consulta_editada.mascota_id = mascota_id
+            consulta_editada.save()
+
+            # 🐾 Actualizar datos de la mascota
+            mascota = consulta_editada.mascota
+            mascota.peso = form.cleaned_data.get('peso') or mascota.peso
+            mascota.vacunas = form.cleaned_data.get('vacunas') or mascota.vacunas
+            mascota.alergias = form.cleaned_data.get('alergias') or mascota.alergias
+            mascota.save()
+
+            # 🗑️ Eliminar documentos marcados para eliminar
+            if documentos_a_eliminar:
+                DocumentosConsulta.objects.filter(id__in=documentos_a_eliminar).delete()
+
+            # ✏️ Actualizar descripciones de documentos existentes
+            for documento in documentos_existentes:
+                if str(documento.id) not in documentos_a_eliminar:
+                    nueva_descripcion = request.POST.get(f'descripcion_existente_{documento.id}')
+                    if nueva_descripcion is not None:
+                        documento.descripcion = nueva_descripcion
+                        documento.save()
+
+            # 📎 Guardar nuevos documentos
+            archivos = request.FILES.getlist('archivo')
+            descripciones = request.POST.getlist('descripcion')
+            
+            for i, archivo in enumerate(archivos):
+                if archivo:  # Solo si se subió un archivo
+                    descripcion = descripciones[i] if i < len(descripciones) else ''
+                    DocumentosConsulta.objects.create(
+                        consulta=consulta_editada,
+                        archivo=archivo,
+                        descripcion=descripcion
+                    )
+
+            messages.success(request, "Consulta médica y documentos actualizados correctamente.")
+            return redirect('detalle-consulta', consulta_id=consulta.id)
+    else:
+        form = ConsultaMedicaUpdateForm(instance=consulta)
+
+    return render(
+        request,
+        'consultasMedicas/consultasMedicasBase/editarConsulta.html',
+        {
+            'form': form,
+            'consulta': consulta,
+            'documentos_existentes': documentos_existentes,
+            'mascotas': mascotas,
+            'mascota_seleccionada': mascota_seleccionada,
+        }
+    )
+
+
+@login_required
+def eliminar_documento(request, documento_id):
+    """Vista para eliminar un documento específico"""
+    documento = get_object_or_404(DocumentosConsulta, id=documento_id)
+    consulta_id = documento.consulta.id
+    
+    if request.method == 'POST':
+        documento.delete()
+        messages.success(request, "Documento eliminado correctamente.")
+        return redirect('editar_consulta', consulta_id=consulta_id)
+    
+    return redirect('editar_consulta', consulta_id=consulta_id)
+
+
+
+
+@login_required
+def borrar_consulta(request, pk):
+    """View to delete an existing pet."""
+    consulta = get_object_or_404(ConsultasMedicas, pk=pk)
+    consulta.delete()
+    return redirect('ver-consultas')
