@@ -421,7 +421,7 @@ def generar_pdf_consulta(request, consulta_id):
     story = []
     
     # Título
-    story.append(Paragraph("CONSULTA MÉDICA VETERINARIA", title_style))
+    story.append(Paragraph("CONSULTA MÉDICA VETERINARIA MASCOTAS MORELIA", title_style))
     story.append(Spacer(1, 20))
     
     # Información básica
@@ -430,6 +430,7 @@ def generar_pdf_consulta(request, consulta_id):
         ['Mascota:', consulta.mascota.nombre],
         ['Especie:', consulta.mascota.especie],
         ['Raza:', consulta.mascota.raza],
+        ['Sexo:', consulta.mascota.sexo],
         ['Propietario:', consulta.mascota.cliente.nombre],
         ['Fecha de consulta:', consulta.fechaConsulta.strftime('%d/%m/%Y %H:%M')],
         ['Veterinario:', consulta.veterinario.get_full_name() or consulta.veterinario.username],

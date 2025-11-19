@@ -9,6 +9,10 @@ class Clientes(models.Model):
     direccion = models.TextField(blank=True)
 
 class Mascotas(models.Model):
+    SEXOS = [
+        ('macho', 'macho'),
+        ('hembra', 'hembra'),
+    ] 
     cliente = models.ForeignKey(Clientes, on_delete=models.CASCADE)
     nombre = models.CharField(max_length=255)
     especie = models.CharField(max_length=255)
@@ -18,3 +22,8 @@ class Mascotas(models.Model):
     vacunas = models.TextField(blank=True)  
     alergias = models.TextField(blank=True)
     vive = models.BooleanField(default=True)
+    sexo = models.CharField(
+        max_length=20,
+        choices=SEXOS,
+        default='macho'  # puedes poner un valor por defecto si quieres
+    )

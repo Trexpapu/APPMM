@@ -28,6 +28,9 @@
                 <strong>Raza:</strong> {{ consulta.mascota.raza }}
             </div>
             <div class="info-item">
+                <strong>Sexo:</strong> {{ consulta.mascota.sexo }}
+            </div>
+            <div class="info-item">
                 <strong>Propietario:</strong> {{ consulta.mascota.cliente.nombre }}
             </div>
             <div class="info-item">
@@ -77,7 +80,7 @@
             </div>
             {% endif %}
             <div class="info-item">
-                <strong>Peso:</strong> {{ consulta.peso }} gr
+                <strong>Peso:</strong> {{ consulta.peso }} kg
             </div>
         </div>
     </div>

@@ -114,6 +114,7 @@
                     <th>🎯 Raza</th>
                     <th>📅 Nacimiento</th>
                     <th>⚖️ Peso (KG)</th>
+                    <th>♂️♀️ Sexo</th>
                     <th>💉 Vacunas</th>
                     <th>⚠️ Alergias</th>
                     <th>❤️ Vive</th>
@@ -153,6 +154,7 @@
                     <td>
                         <span class="weight-value">{{ mascota.peso|default:"0" }}</span> kg
                     </td>
+                    <td>{{ mascota.sexo }}</td>
                     <td>
                         {% if mascota.vacunas %}
                             <div class="truncate-text" title="{{ mascota.vacunas }}">

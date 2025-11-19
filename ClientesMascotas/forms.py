@@ -53,13 +53,14 @@ class ClienteUpdateForm(forms.ModelForm):
 class MascotaForm(forms.ModelForm):
     class Meta:
         model = Mascotas
-        fields = ['nombre', 'especie', 'raza', 'fechaNacimiento', 'peso', 'vacunas', 'alergias', 'vive']
+        fields = ['nombre', 'especie', 'raza', 'fechaNacimiento', 'peso', 'sexo', 'vacunas', 'alergias', 'vive']
         widgets = {
             'nombre': forms.TextInput(attrs={'placeholder': 'Ej. Firulais'}),
             'especie': forms.TextInput(attrs={'placeholder': 'Ej. Perro, Gato...'}),
             'raza': forms.TextInput(attrs={'placeholder': 'Ej. Labrador, Siames...'}),
             'fechaNacimiento': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
             'peso': forms.NumberInput(attrs={'placeholder': 'Ej. 1 (kilogramos)'}),
+            'sexo': forms.Select(attrs={'class': 'form-control'}),
             'vacunas': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Vacunas aplicadas'}),
             'alergias': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Alergias conocidas'}),
             'vive': forms.CheckboxInput(attrs={'class': 'checkbox-grande'}),
@@ -70,6 +71,7 @@ class MascotaForm(forms.ModelForm):
             'raza': 'Raza',
             'fechaNacimiento': 'Fecha de nacimiento',
             'peso': 'Peso (kg)',
+            'sexo': 'Sexo de la mascota',
             'vacunas': 'Vacunas aplicadas',
             'alergias': 'Alergias conocidas',
             'vive': '¿Sigue con vida?',
@@ -79,13 +81,14 @@ class MascotaForm(forms.ModelForm):
 class MascotaUpdateForm(forms.ModelForm):
     class Meta:
         model = Mascotas
-        fields = ['nombre', 'especie', 'raza', 'fechaNacimiento', 'peso', 'vacunas', 'alergias', 'vive']
+        fields = ['nombre', 'especie', 'raza', 'fechaNacimiento', 'peso', 'sexo' , 'vacunas', 'alergias', 'vive']
         widgets = {
             'nombre': forms.TextInput(attrs={'placeholder': 'Ej. Firulais'}),
             'especie': forms.TextInput(attrs={'placeholder': 'Ej. Perro, Gato...'}),
             'raza': forms.TextInput(attrs={'placeholder': 'Ej. Labrador, Siames...'}),
             'fechaNacimiento': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
             'peso': forms.NumberInput(attrs={'placeholder': 'Ej. 1 (kilogramos)'}),
+            'sexo': forms.Select(attrs={'class': 'form-control'}),
             'vacunas': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Vacunas aplicadas'}),
             'alergias': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Alergias conocidas'}),
             'vive': forms.CheckboxInput(attrs={'class': 'checkbox-grande'}),
@@ -96,6 +99,7 @@ class MascotaUpdateForm(forms.ModelForm):
             'raza': 'Raza',
             'fechaNacimiento': 'Fecha de nacimiento',
             'peso': 'Peso (kg)',
+            'sexo': 'Sexo de la mascota',
             'vacunas': 'Vacunas aplicadas',
             'alergias': 'Alergias conocidas',
             'vive': '¿Sigue con vida?',
