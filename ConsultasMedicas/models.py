@@ -66,5 +66,6 @@ class SiguientesConsultas(models.Model):
 class Desparasitaciones(models.Model):
     mascota = models.ForeignKey(Mascotas, on_delete=models.CASCADE)
     fechaUltimaDesparasitacion = models.DateField(blank= True, null=True)
-    Desparasitante = models.TextField(blank=True)
+    UltimoDesparasitante = models.TextField(blank=True)
+    SiguienteDesparasitante = models.TextField(blank=True)
     proximaDesparasitacion = models.DateField(blank= True, null=True)

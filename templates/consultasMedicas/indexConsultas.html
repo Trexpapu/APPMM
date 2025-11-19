@@ -4,13 +4,14 @@
 
 {% block content %}
 <section class="container index-cliente">
-    <h2>Inicio Consultas</h2>
+    <h2>➕ Gestión de Consultas</h2>
     <div class="options">
-        <a href="{% url 'agendar-consultas' %}" class="btn-home">Agendar Consulta</a>
-        <a href="{% url 'ver-proximas-consultas' %}" class="btn-home">Ver Proximas Consultas</a>
-        <a href="{% url 'ver-consultas' %}" class="btn-home">Ver Historial de Consultas</a>
-        <a href="{% url 'nueva-consulta' %}" class="btn-home">Nueva Consulta</a>
-        
+        <a href="{% url 'agendar-consultas' %}" class="btn-home">📅 Agendar Consulta</a>
+        <a href="{% url 'ver-proximas-consultas' %}" class="btn-home">🔭 Ver Próximas Consultas</a>
+        <a href="{% url 'ver-consultas' %}" class="btn-home">📋 Ver Historial de Consultas</a>
+        <a href="{% url 'nueva-consulta' %}" class="btn-home">🩺 Nueva Consulta</a>
+        <a href="{% url 'ver-consultas' %}" class="btn-home">📊 Ver Historial de Desparasitantes</a>
+        <a href="{% url 'nueva-consulta' %}" class="btn-home">💊 Nueva Desparacitación</a>
     </div>
 </section>
 {% endblock %}
