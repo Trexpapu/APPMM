@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}👤 {{ cliente.nombre }} - Mascotas Morelia{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2>👤 Detalle del Cliente</h2>
+    </div>
+
+    <!-- Información del Cliente -->
+    <div class="form-section">
+        <h3 style="color: var(--brand-bg); margin-bottom: 20px;">📋 Información Personal</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <strong>👤 Nombre:</strong>
+                <p>{{ cliente.nombre }}</p>
+            </div>
+            <div class="info-item">
+                <strong>📧 Email:</strong>
+                <p>{{ cliente.email|default:"No especificado" }}</p>
+            </div>
+            <div class="info-item">
+                <strong>📞 Teléfono:</strong>
+                <p>{{ cliente.telefono|default:"No especificado" }}</p>
+            </div>
+            <div class="info-item full-width">
+                <strong>🏠 Dirección:</strong>
+                <p>{{ cliente.direccion|default:"No especificada"|linebreaks }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mascotas del Cliente -->
+    <div class="form-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="color: var(--brand-bg); margin: 0;">🐕 Mascotas ({{ mascotas|length }})</h3>
+            <a href="{% url 'agregar_mascota' %}?cliente_id={{ cliente.id }}" class="btn-agregar">
+                ➕ Agregar Mascota
+            </a>
+        </div>
+
+        {% if mascotas %}
+        <div class="custom-table-container">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>🐕 Nombre</th>
+                        <th>🔬 Especie</th>
+                        <th>🎯 Raza</th>
+                        <th>📅 Nacimiento</th>
+                        <th>⚖️ Peso</th>
+                        <th>⚧️ Sexo</th>
+                        <th>❤️ Estado</th>
+                        <th>⚡ Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mascota in mascotas %}
+                    <tr>
+                        <td>
+                            <strong>{{ mascota.nombre }}</strong>
+                        </td>
+                        <td>{{ mascota.especie|default:"-" }}</td>
+                        <td>{{ mascota.raza|default:"-" }}</td>
+                        <td>{{ mascota.fechaNacimiento }}</td>
+                        <td>
+                            <span class="weight-value">{{ mascota.peso|default:"0" }}</span> kg
+                        </td>
+                        <td>
+                            {% if mascota.sexo == 'macho' %}
+                                <span class="badge" style="background: #3498db;">♂️ Macho</span>
+                            {% else %}
+                                <span class="badge" style="background: #e84393;">♀️ Hembra</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if mascota.vive %}
+                                <span class="badge badge-success">✅ Viva</span>
+                            {% else %}
+                                <span class="badge badge-danger">❌ Fallecida</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-buttons compact">
+                                <a href="{% url 'detalle_mascota' mascota.pk %}" 
+                                   class="btn-home" 
+                                   style="background: #17a2b8; padding: 5px 10px;"
+                                   title="Ver detalles">
+                                    👁️
+                                </a>
+                                <a href="{% url 'editar_mascota' mascota.pk %}" 
+                                   class="btn-home" 
+                                   style="background: #ffc107; color: black; padding: 5px 10px;"
+                                   title="Editar mascota">
+                                    ✏️
+                                </a>
+                                
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="no-data">
+            <p>📝 Este cliente no tiene mascotas registradas.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Información Adicional -->
+    <div class="form-section">
+        <h3 style="color: var(--brand-bg); margin-bottom: 20px;">📊 Resumen</h3>
+        <div class="info-grid compact">
+            <div class="info-item">
+                <strong>📈 Total de Mascotas:</strong>
+                <p style="font-size: 1.5em; font-weight: bold; color: var(--brand-bg);">
+                    {{ mascotas|length }}
+                </p>
+            </div>
+            <div class="info-item">
+                <strong>❤️ Mascotas Vivas:</strong>
+                <p style="font-size: 1.5em; font-weight: bold; color: var(--success-color);">
+                    {{ mascotasVivas|default:0 }}
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

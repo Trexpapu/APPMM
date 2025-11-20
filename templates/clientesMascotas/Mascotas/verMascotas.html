@@ -180,8 +180,16 @@
                             <span class="badge badge-danger" title="Mascota fallecida">❌ No</span>
                         {% endif %}
                     </td>
+
+
                     <td>
                         <div class="action-buttons compact">
+                            <a href="{% url 'detalle_mascota' mascota.pk %}" 
+                               class="btn-home" 
+                               style="background: #17a2b8; padding: 5px 10px;"
+                               title="Ver detalles de mascota">
+                                👁️
+                            </a>
                             <a href="{% url 'editar_mascota' mascota.pk %}" 
                                class="btn-home" 
                                style="background: #ffc107; color: black; padding: 5px 10px;"
@@ -191,7 +199,7 @@
                             <a href="{% url 'borrar_mascota' mascota.pk %}" 
                                class="btn-home" 
                                style="background: #dc3545; padding: 5px 10px;" 
-                               onclick="return confirm('¿Estás seguro de que quieres eliminar a {{ mascota.nombre }}?');"
+                               onclick="return confirm('¿Seguro que quieres borrar a {{ mascota.nombre }}?');"
                                title="Eliminar mascota">
                                 🗑️
                             </a>

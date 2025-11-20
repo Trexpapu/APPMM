@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}🐕 {{ mascota.nombre }} - Mascotas Morelia{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2>🐕 Detalle de Mascota</h2>
+    </div>
+
+    <!-- Información Principal -->
+    <div class="form-section">
+        <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+            <div style="font-size: 3em;">🐕</div>
+            <div>
+                <h1 style="color: var(--brand-bg); margin: 0 0 5px 0;">{{ mascota.nombre }}</h1>
+                <p style="margin: 0; color: #666;">Mascota de <strong>{{ mascota.cliente.nombre }}</strong></p>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-item">
+                <strong>👤 Dueño:</strong>
+                <p>
+                    <a href="{% url 'detalle_cliente' mascota.cliente.id %}" style="color: var(--btn-bg); text-decoration: none;">
+                        {{ mascota.cliente.nombre }}
+                    </a>
+                </p>
+            </div>
+            <div class="info-item">
+                <strong>🔬 Especie:</strong>
+                <p>{{ mascota.especie|default:"No especificada" }}</p>
+            </div>
+            <div class="info-item">
+                <strong>🎯 Raza:</strong>
+                <p>{{ mascota.raza|default:"No especificada" }}</p>
+            </div>
+            <div class="info-item">
+                <strong>📅 Fecha de Nacimiento:</strong>
+                <p>{{ mascota.fechaNacimiento }}</p>
+            </div>
+            <div class="info-item">
+                <strong>🎂 Edad Aproximada:</strong>
+                <p>{{ edad }} años</p>
+            </div>
+            <div class="info-item">
+                <strong>⚖️ Peso:</strong>
+                <p><span class="weight-value">{{ mascota.peso|default:"0" }}</span> kg</p>
+            </div>
+            <div class="info-item">
+                <strong>⚧️ Sexo:</strong>
+                <p>
+                    {% if mascota.sexo == 'macho' %}
+                        <span class="badge" style="background: #3498db;">♂️ Macho</span>
+                    {% else %}
+                        <span class="badge" style="background: #e84393;">♀️ Hembra</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="info-item">
+                <strong>❤️ Estado:</strong>
+                <p>
+                    {% if mascota.vive %}
+                        <span class="badge badge-success">✅ Viva</span>
+                    {% else %}
+                        <span class="badge badge-danger">❌ Fallecida</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información Médica -->
+    <div class="form-section">
+        <h3 style="color: var(--brand-bg); margin-bottom: 20px;">💊 Información Médica</h3>
+        <div class="info-grid">
+            <div class="info-item full-width">
+                <strong>💉 Vacunas:</strong>
+                <div class="content-box">
+                    {{ mascota.vacunas|default:"No se han registrado vacunas."|linebreaks }}
+                </div>
+            </div>
+            <div class="info-item full-width">
+                <strong>⚠️ Alergias:</strong>
+                <div class="content-box">
+                    {{ mascota.alergias|default:"No se han registrado alergias."|linebreaks }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información de Contacto del Dueño -->
+    <div class="form-section">
+        <h3 style="color: var(--brand-bg); margin-bottom: 20px;">📞 Información de Contacto del Dueño</h3>
+        <div class="info-grid compact">
+            <div class="info-item">
+                <strong>📧 Email:</strong>
+                <p>{{ mascota.cliente.email|default:"No especificado" }}</p>
+            </div>
+            <div class="info-item">
+                <strong>📞 Teléfono:</strong>
+                <p>{{ mascota.cliente.telefono|default:"No especificado" }}</p>
+            </div>
+            <div class="info-item full-width">
+                <strong>🏠 Dirección:</strong>
+                <p>{{ mascota.cliente.direccion|default:"No especificada"|linebreaks }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="form-section">
+        <h3 style="color: var(--brand-bg); margin-bottom: 20px;">⚡ Acciones Rápidas</h3>
+        <div class="action-buttons" style="justify-content: center;">
+            <a href="{% url 'editar_mascota' mascota.id %}" class="btn-home" style="background: #ffc107; color: black;">
+                ✏️ Editar Mascota
+            </a>
+            <a href="{% url 'borrar_mascota' mascota.id %}" 
+               class="btn-home" 
+               style="background: #dc3545;" 
+               onclick="return confirm('¿Estás seguro de que quieres eliminar a {{ mascota.nombre }}?');">
+                🗑️ Eliminar
+            </a>
+        </div>
+    </div>
+</section>
+
+<style>
+.weight-value {
+    font-weight: bold;
+    color: var(--brand-bg);
+    font-size: 1.1em;
+}
+</style>
+{% endblock %}

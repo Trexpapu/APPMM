@@ -163,6 +163,41 @@ def borrar_mascota(request, pk):
     return redirect('ver_mascotas')
 
 
+
+
+@login_required
+def detalle_cliente(request, cliente_id):
+    """Vista para mostrar el detalle de un cliente y sus mascotas"""
+    cliente = get_object_or_404(Clientes, id=cliente_id)
+    mascotas = Mascotas.objects.filter(cliente=cliente).order_by('nombre')
+    mascotasVivas = Mascotas.objects.filter(cliente=cliente, vive = True).count()
+    
+    context = {
+        'cliente': cliente,
+        'mascotas': mascotas,
+        'mascotasVivas': mascotasVivas
+    }
+    return render(request, 'clientesMascotas/Clientes/detalleCliente.html', context)
+
+@login_required
+def detalle_mascota(request, mascota_id):
+    """Vista para mostrar el detalle de una mascota específica"""
+    mascota = get_object_or_404(Mascotas, id=mascota_id)
+    
+    # Calcular edad aproximada
+    from datetime import date
+    hoy = date.today()
+    edad = hoy.year - mascota.fechaNacimiento.year - (
+        (hoy.month, hoy.day) < (mascota.fechaNacimiento.month, mascota.fechaNacimiento.day)
+    )
+    
+    context = {
+        'mascota': mascota,
+        'edad': edad,
+    }
+    return render(request, 'clientesMascotas/Mascotas/DetalleMascota.html', context)
+
+
 def user_login(request):
     if request.method == 'POST':
         username = request.POST['username']

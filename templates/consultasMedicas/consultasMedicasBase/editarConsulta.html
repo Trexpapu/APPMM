@@ -6,6 +6,11 @@
 <section class="container">
     <div class="header-actions">
         <h2>✏️ Editar Consulta Médica</h2>
+        <div class="action-buttons">
+            <a href="{% url 'detalle-consulta' consulta.id %}" class="btn-home" style="background: #17a2b8;">
+                👁️ Ver Detalles
+            </a>
+        </div>
     </div>
 
     <form method="post" enctype="multipart/form-data">
@@ -16,7 +21,7 @@
             <h3>🐾 Selección de Mascota</h3>
             
             <div class="form-group">
-                <label for="mascota-search">Buscar mascota:</label>
+                <label for="mascota-search">🔍 Buscar mascota:</label>
                 <input 
                     type="text" 
                     id="mascota-search" 
@@ -26,8 +31,8 @@
             </div>
 
             <div class="form-group">
-                <label for="mascota">Seleccionar mascota:</label>
-                <select id="mascota" name="mascota" class="searchable-dropdown">
+                <label for="mascota">🐕 Seleccionar mascota:</label>
+                <select id="mascota" name="mascota" class="searchable-dropdown" required>
                     <option value="">Seleccione una mascota</option>
                     {% for mascota in mascotas %}
                     <option 
@@ -35,6 +40,14 @@
                         data-vacunas="{{ mascota.vacunas|escapejs }}"
                         data-alergias="{{ mascota.alergias|escapejs }}"
                         data-peso="{{ mascota.peso }}"
+                        data-nombre="{{ mascota.nombre|escapejs }}"
+                        data-especie="{{ mascota.especie|escapejs }}"
+                        data-raza="{{ mascota.raza|escapejs }}"
+                        data-fechanacimiento="{{ mascota.fechaNacimiento|escapejs }}"
+                        data-sexo="{{ mascota.get_sexo_display|escapejs }}"
+                        data-cliente="{{ mascota.cliente.nombre|escapejs }}"
+                        data-telefono="{{ mascota.cliente.telefono|escapejs }}"
+                        data-email="{{ mascota.cliente.email|escapejs }}"
                         {% if mascota.id == mascota_seleccionada.id %}selected{% endif %}
                     >
                         {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - 
@@ -50,6 +63,47 @@
             </button>
         </div>
 
+        <!-- 📋 INFORMACIÓN DE LA MASCOTA -->
+        {% if datos_mascota %}
+        <div class="form-section" style="background: #f0f8ff; border-left: 4px solid #3498db;">
+            <h3>📋 Información de la Mascota</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>🐕 Nombre:</strong>
+                    <span>{{ datos_mascota.nombre }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>🔬 Especie:</strong>
+                    <span>{{ datos_mascota.especie }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>🎯 Raza:</strong>
+                    <span>{{ datos_mascota.raza }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>📅 Fecha Nacimiento:</strong>
+                    <span>{{ datos_mascota.fechaNacimiento }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>⚧️ Sexo:</strong>
+                    <span>{{ datos_mascota.sexo }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>👤 Dueño:</strong>
+                    <span>{{ datos_mascota.cliente_nombre }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>📞 Teléfono:</strong>
+                    <span>{{ datos_mascota.cliente_telefono }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>📧 Email:</strong>
+                    <span>{{ datos_mascota.cliente_email }}</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- 📝 FORMULARIO DE CONSULTA MÉDICA -->
         <div class="form-section">
             <h3>🩺 Datos de la Consulta</h3>
@@ -62,21 +116,60 @@
             </div>
             {% endif %}
             
-            <!-- Renderizar campos del formulario en grid -->
+            <!-- Campos editables: Peso y Alergias -->
             <div class="form-grid">
-                {% for field in form %}
-                <div class="form-group {% if field.field.widget.input_type == 'textarea' %}full-width{% endif %}">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.help_text %}
-                    <small class="help-text">{{ field.help_text }}</small>
-                    {% endif %}
-                    {% if field.errors %}
+                <div class="form-group">
+                    <label for="id_peso">⚖️ Peso (kg):</label>
+                    {{ form.peso }}
+                    <small class="help-text">Peso actual de la mascota</small>
+                    {% if form.peso.errors %}
                     <div class="field-errors">
-                        {{ field.errors }}
+                        {{ form.peso.errors }}
                     </div>
                     {% endif %}
                 </div>
+                
+                <div class="form-group full-width">
+                    <label for="id_alergias">⚠️ Alergias:</label>
+                    {{ form.alergias }}
+                    <small class="help-text">Alergias conocidas de la mascota</small>
+                    {% if form.alergias.errors %}
+                    <div class="field-errors">
+                        {{ form.alergias.errors }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Campo de solo lectura: Vacunas -->
+            <div class="form-group full-width">
+                <label for="id_vacunas">💉 Vacunas (solo lectura):</label>
+                {{ form.vacunas }}
+                <small class="help-text">Las vacunas se gestionan en el perfil de la mascota</small>
+                {% if form.vacunas.errors %}
+                <div class="field-errors">
+                    {{ form.vacunas.errors }}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Resto de campos de la consulta -->
+            <div class="form-grid">
+                {% for field in form %}
+                    {% if field.name not in 'peso alergias vacunas' %}
+                    <div class="form-group {% if field.field.widget.input_type == 'textarea' %}full-width{% endif %}">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                        <div class="field-errors">
+                            {{ field.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -88,30 +181,29 @@
             {% if documentos_existentes %}
                 <div class="documentos-list">
                     {% for documento in documentos_existentes %}
-                    <div class="documento-existente">
-                        <div class="documento-header">
-                            <div class="documento-info">
-                                <strong>{{ documento.archivo.name|cut:"consultas/documentos/" }}</strong>
-                                <small>Subido el: {{ documento.fecha|date:"d/m/Y H:i" }}</small>
-                            </div>
-                            <div class="documento-actions">
-                                <a href="{% url 'descargar_documento' documento.id %}" 
-                                   class="btn-home" 
-                                   style="background: #28a745; padding: 5px 10px;"
-                                   target="_blank">
-                                    ⬇️ Descargar
-                                </a>
-                                <button type="button" 
-                                        class="btn-home eliminar-doc-btn" 
-                                        style="background: #dc3545; padding: 5px 10px;"
-                                        data-documento-id="{{ documento.id }}"
-                                        data-documento-nombre="{{ documento.archivo.name }}">
-                                    🗑️ Eliminar
-                                </button>
-                            </div>
+                    <div class="documento-item">
+                        <div class="documento-info">
+                            <strong>{{ documento.archivo.name }}</strong>
+                            <small>Subido el: {{ documento.fecha|date:"d/m/Y H:i" }}</small>
+                        </div>
+                        <div class="documento-actions">
+                            <a href="{{ documento.archivo.url }}" 
+                               class="btn-home" 
+                               style="background: #28a745; padding: 5px 10px;"
+                               target="_blank" 
+                               download>
+                                ⬇️ Descargar
+                            </a>
+                            <button type="button" 
+                                    class="btn-home eliminar-doc-btn" 
+                                    style="background: #dc3545; padding: 5px 10px;"
+                                    data-documento-id="{{ documento.id }}"
+                                    data-documento-nombre="{{ documento.archivo.name }}">
+                                🗑️ Eliminar
+                            </button>
                         </div>
                         <div class="form-group" style="margin-top: 10px;">
-                            <label>Descripción del documento:</label>
+                            <label>📝 Descripción del documento:</label>
                             <textarea name="descripcion_existente_{{ documento.id }}" 
                                       rows="2" 
                                       placeholder="Describe brevemente el documento" 
@@ -134,11 +226,11 @@
                 <!-- 📄 PRIMER DOCUMENTO NUEVO -->
                 <div class="documento-group">
                     <div class="form-group">
-                        <label>Archivo:</label>
+                        <label>📄 Archivo:</label>
                         <input type="file" name="archivo" accept="image/*, .pdf, .doc, .docx, .txt" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label>Descripción:</label>
+                        <label>📝 Descripción:</label>
                         <textarea name="descripcion" rows="2" placeholder="Describe brevemente el documento" class="form-control"></textarea>
                     </div>
                 </div>
@@ -155,12 +247,18 @@
             <button type="submit" class="btn-home" style="background: #28a745; padding: 12px 24px;">
                 💾 Guardar Cambios
             </button>
+            <a href="{% url 'ver-consultas' %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
+                ❌ Cancelar
+            </a>
+            <a href="{% url 'detalle-consulta' consulta.id %}" class="btn-home" style="background: #17a2b8; padding: 12px 24px;">
+                👁️ Ver Detalles
+            </a>
         </div>
     </form>
 </section>
 
 <!-- Modal de confirmación para eliminar documentos -->
-<div id="confirmModal" class="modal" style="display: none;">
+<div id="confirmModal" class="modal">
     <div class="modal-content">
         <h3>🗑️ Confirmar Eliminación</h3>
         <p id="modalMessage">¿Estás seguro de que quieres eliminar este documento?</p>
@@ -220,17 +318,13 @@ document.addEventListener('DOMContentLoaded', function() {
     addDocBtn.addEventListener('click', function() {
         const newDoc = document.createElement('div');
         newDoc.classList.add('documento-group');
-        newDoc.style.marginTop = '15px';
-        newDoc.style.padding = '15px';
-        newDoc.style.border = '1px solid #ddd';
-        newDoc.style.borderRadius = '5px';
         newDoc.innerHTML = `
             <div class="form-group">
-                <label>Archivo adicional:</label>
+                <label>📄 Archivo adicional:</label>
                 <input type="file" name="archivo" accept="image/*, .pdf, .doc, .docx, .txt" class="form-control">
             </div>
             <div class="form-group">
-                <label>Descripción:</label>
+                <label>📝 Descripción:</label>
                 <textarea name="descripcion" rows="2" placeholder="Describe brevemente el documento" class="form-control"></textarea>
             </div>
             <button type="button" class="btn-home" onclick="this.parentElement.remove()" style="background: #dc3545;">
@@ -264,49 +358,19 @@ document.addEventListener('DOMContentLoaded', function() {
         if (alergiasField) alergiasField.value = selectedOption.getAttribute('data-alergias') || '';
         if (pesoField) pesoField.value = selectedOption.getAttribute('data-peso') || '';
     }
-});
 
-// Cerrar modal si se hace clic fuera de él
-window.addEventListener('click', function(event) {
-    const modal = document.getElementById('confirmModal');
-    if (event.target === modal) {
-        modal.style.display = 'none';
-    }
+    // Cerrar modal si se hace clic fuera de él
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
 });
 </script>
 
 <style>
-.documento-existente {
-    background: white;
-    padding: 15px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    margin-bottom: 15px;
-}
-
-.documento-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.documento-info strong {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.documento-info small {
-    color: #666;
-}
-
-.documento-actions {
-    display: flex;
-    gap: 10px;
-}
-
-/* Modal styles */
 .modal {
+    display: none;
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -331,23 +395,6 @@ window.addEventListener('click', function(event) {
     display: flex;
     gap: 10px;
     justify-content: flex-end;
-}
-
-@media (max-width: 768px) {
-    .documento-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-    
-    .documento-actions {
-        justify-content: center;
-    }
-    
-    .modal-content {
-        width: 95%;
-        margin: 10% auto;
-    }
 }
 </style>
 {% endblock %}

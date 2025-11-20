@@ -163,18 +163,18 @@ def editar_proxima_consulta(request, pk):
 
 
 
-
 @login_required
 def nueva_consulta(request):
     """
     Vista para crear una nueva consulta médica
     """
-    mascotas = Mascotas.objects.all()
+    mascotas = Mascotas.objects.all().select_related('cliente')
     mascota_id = request.GET.get('mascota') or request.POST.get('mascota')
     cargar_prev = request.GET.get('cargar_prev')
 
     initial_data = {}
     mascota = None
+    datos_mascota = None
 
     # 🔹 SIEMPRE cargar datos de la mascota cuando se selecciona una
     if mascota_id:
@@ -186,6 +186,18 @@ def nueva_consulta(request):
                 'vacunas': mascota.vacunas,
                 'alergias': mascota.alergias,
             })
+            
+            # 🔹 Preparar datos de la mascota para mostrar en el template
+            datos_mascota = {
+                'nombre': mascota.nombre,
+                'especie': mascota.especie,
+                'raza': mascota.raza,
+                'fechaNacimiento': mascota.fechaNacimiento,
+                'sexo': mascota.get_sexo_display(),
+                'cliente_nombre': mascota.cliente.nombre,
+                'cliente_telefono': mascota.cliente.telefono,
+                'cliente_email': mascota.cliente.email,
+            }
             
             # 🔹 Cargar consulta anterior SOLO si el usuario lo solicita
             if cargar_prev == "1":
@@ -218,27 +230,23 @@ def nueva_consulta(request):
                 nConsulta.veterinario = request.user
                 nConsulta.save()
 
-                # 🐾 Actualizar datos de la mascota
+                # 🐾 Actualizar datos de la mascota (solo peso y alergias)
                 mascota = Mascotas.objects.get(pk=mascota_id)
                 mascota.peso = form.cleaned_data.get('peso') or mascota.peso
-                mascota.vacunas = form.cleaned_data.get('vacunas') or mascota.vacunas
                 mascota.alergias = form.cleaned_data.get('alergias') or mascota.alergias
+                # NO actualizamos vacunas aquí
                 mascota.save()
 
                 # 📎 GUARDAR DOCUMENTOS usando el modelo DocumentosConsulta
-                # Los archivos se guardarán automáticamente en 'consultas/documentos/'
                 archivos = request.FILES.getlist('archivo')
                 descripciones = request.POST.getlist('descripcion')
                 
                 for i, archivo in enumerate(archivos):
-                    if archivo:  # Solo si se subió un archivo
+                    if archivo:
                         descripcion = descripciones[i] if i < len(descripciones) else ''
-                        
-                        # ✅ Crear instancia del modelo DocumentosConsulta
-                        # El campo 'archivo' guardará automáticamente en 'media/consultas/documentos/'
                         documento = DocumentosConsulta(
                             consulta=nConsulta,
-                            archivo=archivo,  # Esto usa el FileField con upload_to
+                            archivo=archivo,
                             descripcion=descripcion
                         )
                         documento.save()
@@ -264,9 +272,9 @@ def nueva_consulta(request):
             'mascotas': mascotas,
             'mostrar_pregunta': mostrar_pregunta,
             'mascota_id': mascota_id,
+            'datos_mascota': datos_mascota,  # Nuevo contexto
         }
     )
-
 
 
 
@@ -594,57 +602,57 @@ def generar_pdf_consulta(request, consulta_id):
 
 
 
-
 @login_required
 def editar_consulta(request, consulta_id):
     """Vista para editar una consulta médica existente"""
     consulta = get_object_or_404(ConsultasMedicas, id=consulta_id)
     documentos_existentes = DocumentosConsulta.objects.filter(consulta=consulta)
     
-    # Si la consulta ya tiene una mascota, la pre-seleccionamos
     mascota_seleccionada = consulta.mascota
     mascotas = Mascotas.objects.all()
+    
+    # 🔹 Preparar datos de la mascota para mostrar
+    datos_mascota = {
+        'nombre': mascota_seleccionada.nombre,
+        'especie': mascota_seleccionada.especie,
+        'raza': mascota_seleccionada.raza,
+        'fechaNacimiento': mascota_seleccionada.fechaNacimiento,
+        'sexo': mascota_seleccionada.get_sexo_display(),
+        'cliente_nombre': mascota_seleccionada.cliente.nombre,
+        'cliente_telefono': mascota_seleccionada.cliente.telefono,
+        'cliente_email': mascota_seleccionada.cliente.email,
+    }
 
     if request.method == 'POST':
         form = ConsultaMedicaUpdateForm(request.POST, instance=consulta)
         
-        # Procesar documentos existentes
-        documentos_a_eliminar = request.POST.getlist('eliminar_documento')
-        
         if form.is_valid():
-            # Guardar la consulta
             consulta_editada = form.save(commit=False)
-            # Actualizar la mascota si se cambió en el select
             mascota_id = request.POST.get('mascota')
             if mascota_id:
                 consulta_editada.mascota_id = mascota_id
             consulta_editada.save()
 
-            # 🐾 Actualizar datos de la mascota
+            # 🐾 Actualizar datos de la mascota (solo peso y alergias)
             mascota = consulta_editada.mascota
             mascota.peso = form.cleaned_data.get('peso') or mascota.peso
-            mascota.vacunas = form.cleaned_data.get('vacunas') or mascota.vacunas
             mascota.alergias = form.cleaned_data.get('alergias') or mascota.alergias
+            # NO actualizamos vacunas aquí
             mascota.save()
-
-            # 🗑️ Eliminar documentos marcados para eliminar
-            if documentos_a_eliminar:
-                DocumentosConsulta.objects.filter(id__in=documentos_a_eliminar).delete()
 
             # ✏️ Actualizar descripciones de documentos existentes
             for documento in documentos_existentes:
-                if str(documento.id) not in documentos_a_eliminar:
-                    nueva_descripcion = request.POST.get(f'descripcion_existente_{documento.id}')
-                    if nueva_descripcion is not None:
-                        documento.descripcion = nueva_descripcion
-                        documento.save()
+                nueva_descripcion = request.POST.get(f'descripcion_existente_{documento.id}')
+                if nueva_descripcion is not None:
+                    documento.descripcion = nueva_descripcion
+                    documento.save()
 
             # 📎 Guardar nuevos documentos
             archivos = request.FILES.getlist('archivo')
             descripciones = request.POST.getlist('descripcion')
             
             for i, archivo in enumerate(archivos):
-                if archivo:  # Solo si se subió un archivo
+                if archivo:
                     descripcion = descripciones[i] if i < len(descripciones) else ''
                     DocumentosConsulta.objects.create(
                         consulta=consulta_editada,
@@ -666,9 +674,9 @@ def editar_consulta(request, consulta_id):
             'documentos_existentes': documentos_existentes,
             'mascotas': mascotas,
             'mascota_seleccionada': mascota_seleccionada,
+            'datos_mascota': datos_mascota,  # Nuevo contexto
         }
     )
-
 
 @login_required
 def eliminar_documento(request, documento_id):

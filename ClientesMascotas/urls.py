@@ -14,5 +14,11 @@ urlpatterns = [
     path('agregar-mascota/', views.agregar_mascota, name='agregar_mascota'),
     path('editar-mascota/<int:pk>/', views.editar_mascota, name='editar_mascota'),
     path('borrar-mascota/<int:pk>/', views.borrar_mascota, name='borrar_mascota'),
+    path('cliente/<int:cliente_id>/', views.detalle_cliente, name='detalle_cliente'),
+    path('mascota/<int:mascota_id>/', views.detalle_mascota, name='detalle_mascota'),
+
+
+
+
     path('', views.user_login, name='login'),
 ]

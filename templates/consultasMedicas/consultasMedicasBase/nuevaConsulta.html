@@ -4,17 +4,19 @@
 
 {% block content %}
 <section class="container">
-    <h2>Nueva Consulta Médica</h2>
+    <div class="header-actions">
+        <h2>🩺 Nueva Consulta Médica</h2>
+    </div>
 
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         
-        <!-- 🔍 Búsqueda y selección de mascota - Mejorado como en el ejemplo -->
+        <!-- 🔍 Búsqueda y selección de mascota -->
         <div class="form-section">
-            <h3>Selección de Mascota</h3>
+            <h3>🐾 Selección de Mascota</h3>
             
             <div class="form-group">
-                <label for="mascota-search">Buscar mascota:</label>
+                <label for="mascota-search">🔍 Buscar mascota:</label>
                 <input 
                     type="text" 
                     id="mascota-search" 
@@ -24,8 +26,8 @@
             </div>
 
             <div class="form-group">
-                <label for="mascota">Seleccionar mascota:</label>
-                <select id="mascota" name="mascota" class="searchable-dropdown">
+                <label for="mascota">🐕 Seleccionar mascota:</label>
+                <select id="mascota" name="mascota" class="searchable-dropdown" required>
                     <option value="">Seleccione una mascota</option>
                     {% for mascota in mascotas %}
                     <option 
@@ -33,6 +35,14 @@
                         data-vacunas="{{ mascota.vacunas|escapejs }}"
                         data-alergias="{{ mascota.alergias|escapejs }}"
                         data-peso="{{ mascota.peso }}"
+                        data-nombre="{{ mascota.nombre|escapejs }}"
+                        data-especie="{{ mascota.especie|escapejs }}"
+                        data-raza="{{ mascota.raza|escapejs }}"
+                        data-fechanacimiento="{{ mascota.fechaNacimiento|escapejs }}"
+                        data-sexo="{{ mascota.get_sexo_display|escapejs }}"
+                        data-cliente="{{ mascota.cliente.nombre|escapejs }}"
+                        data-telefono="{{ mascota.cliente.telefono|escapejs }}"
+                        data-email="{{ mascota.cliente.email|escapejs }}"
                         {% if mascota.id|stringformat:"s" == mascota_id|stringformat:"s" %}selected{% endif %}
                     >
                         {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - 
@@ -44,7 +54,7 @@
 
             <!-- 🔄 Botón para cargar datos de la mascota seleccionada -->
             <button type="button" id="cargar-mascota-btn" class="btn-home">
-                Cargar Datos de Mascota
+                🔄 Cargar Datos de Mascota
             </button>
         </div>
 
@@ -64,66 +74,134 @@
         </div>
         {% endif %}
 
-        <!-- 📝 FORMULARIO DE CONSULTA MÉDICA - Mejorado visualmente -->
+        <!-- 📋 INFORMACIÓN DE LA MASCOTA -->
+        {% if datos_mascota %}
+        <div class="form-section" style="background: #f0f8ff; border-left: 4px solid #3498db;">
+            <h3>📋 Información de la Mascota</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>🐕 Nombre:</strong>
+                    <span>{{ datos_mascota.nombre }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>🔬 Especie:</strong>
+                    <span>{{ datos_mascota.especie }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>🎯 Raza:</strong>
+                    <span>{{ datos_mascota.raza }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>📅 Fecha Nacimiento:</strong>
+                    <span>{{ datos_mascota.fechaNacimiento }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>⚧️ Sexo:</strong>
+                    <span>{{ datos_mascota.sexo }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>👤 Dueño:</strong>
+                    <span>{{ datos_mascota.cliente_nombre }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>📞 Teléfono:</strong>
+                    <span>{{ datos_mascota.cliente_telefono }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>📧 Email:</strong>
+                    <span>{{ datos_mascota.cliente_email }}</span>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 📝 FORMULARIO DE CONSULTA MÉDICA -->
         <div class="form-section">
-            <h3>Datos de la Consulta</h3>
+            <h3>🩺 Datos de la Consulta</h3>
             
             <!-- Mostrar errores del formulario -->
             {% if form.errors %}
             <div class="alert alert-error">
-                <strong>Por favor corrige los siguientes errores:</strong>
+                <strong>❌ Por favor corrige los siguientes errores:</strong>
                 {{ form.errors }}
             </div>
             {% endif %}
             
-            <!-- Renderizar campos del formulario en grid -->
+            <!-- Campos editables: Peso y Alergias -->
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="id_peso">⚖️ Peso (kg):</label>
+                    {{ form.peso }}
+                    <small class="help-text">Peso actual de la mascota</small>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="id_alergias">⚠️ Alergias:</label>
+                    {{ form.alergias }}
+                    <small class="help-text">Alergias conocidas de la mascota</small>
+                </div>
+            </div>
+
+            <!-- Campo de solo lectura: Vacunas -->
+            <div class="form-group full-width">
+                <label for="id_vacunas">💉 Vacunas (solo lectura):</label>
+                {{ form.vacunas }}
+                <small class="help-text">Las vacunas se gestionan en el perfil de la mascota</small>
+            </div>
+
+            <!-- Resto de campos de la consulta -->
             <div class="form-grid">
                 {% for field in form %}
-                <div class="form-group {% if field.field.widget.input_type == 'textarea' %}full-width{% endif %}">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.help_text %}
-                    <small class="help-text">{{ field.help_text }}</small>
-                    {% endif %}
-                    {% if field.errors %}
-                    <div class="field-errors">
-                        {{ field.errors }}
+                    {% if field.name not in 'peso alergias vacunas' %}
+                    <div class="form-group {% if field.field.widget.input_type == 'textarea' %}full-width{% endif %}">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                        <div class="field-errors">
+                            {{ field.errors }}
+                        </div>
+                        {% endif %}
                     </div>
                     {% endif %}
-                </div>
                 {% endfor %}
             </div>
         </div>
 
-        <!-- 📎 SECCIÓN DE DOCUMENTOS - Mejorada -->
+        <!-- 📎 SECCIÓN DE DOCUMENTOS -->
         <div class="form-section">
             <h3>📎 Documentos e Imágenes</h3>
             <p class="help-text">Los archivos se guardarán automáticamente en: <code>media/consultas/documentos/</code></p>
             
             <div id="documentos-container">
-                <!-- 📄 PRIMER DOCUMENTO -->
                 <div class="documento-group">
                     <div class="form-group">
-                        <label>Archivo:</label>
+                        <label>📄 Archivo:</label>
                         <input type="file" name="archivo" accept="image/*, .pdf, .doc, .docx, .txt" class="form-control">
                     </div>
                     <div class="form-group">
-                        <label>Descripción:</label>
+                        <label>📝 Descripción:</label>
                         <textarea name="descripcion" rows="2" placeholder="Describe brevemente el documento" class="form-control"></textarea>
                     </div>
                 </div>
             </div>
             
-            <!-- ➕ Botón para añadir más campos de documento -->
             <button type="button" id="add-doc-btn" class="btn-home" style="background: #007bff;">
                 ➕ Añadir otro archivo
             </button>
         </div>
 
-        <!-- 📤 BOTÓN PARA ENVIAR TODO EL FORMULARIO -->
-        <button type="submit" class="btn-home" style="background: #28a745; padding: 1rem 2rem; font-size: 1.1rem;">
-            💾 Guardar Consulta y Documentos
-        </button>
+        <!-- 📤 BOTONES DE ACCIÓN -->
+        <div class="action-buttons">
+            <button type="submit" class="btn-home" style="background: #28a745; padding: 12px 24px;">
+                💾 Guardar Consulta
+            </button>
+            <a href="{% url 'index-consultas' %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
+                ❌ Cancelar
+            </a>
+        </div>
     </form>
 </section>
 
@@ -138,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const addDocBtn = document.getElementById('add-doc-btn');
     const container = document.getElementById('documentos-container');
 
-    // 🔍 FILTRO DE BÚSQUEDA - Mejorado como en el ejemplo
+    // 🔍 FILTRO DE BÚSQUEDA
     searchInput.addEventListener('input', function() {
         const filter = searchInput.value.toLowerCase().replace(/\s+/g, '');
         dropdown.querySelectorAll('option').forEach(option => {
@@ -170,11 +248,11 @@ document.addEventListener('DOMContentLoaded', function() {
         newDoc.classList.add('documento-group');
         newDoc.innerHTML = `
             <div class="form-group">
-                <label>Archivo adicional:</label>
+                <label>📄 Archivo adicional:</label>
                 <input type="file" name="archivo" accept="image/*, .pdf, .doc, .docx, .txt" class="form-control">
             </div>
             <div class="form-group">
-                <label>Descripción:</label>
+                <label>📝 Descripción:</label>
                 <textarea name="descripcion" rows="2" placeholder="Describe brevemente el documento" class="form-control"></textarea>
             </div>
             <button type="button" class="btn-home" onclick="this.parentElement.remove()" style="background: #dc3545;">

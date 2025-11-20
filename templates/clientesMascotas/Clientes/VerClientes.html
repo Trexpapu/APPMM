@@ -37,12 +37,25 @@
                     <td>{{ cliente.telefono|default:"-" }}</td>
                     <td>{{ cliente.direccion|linebreaksbr|default:"-" }}</td>
                     <td>
-                        <div class="action-buttons">
-                            <a href="{% url 'editar_cliente' cliente.pk %}" class="btn-home" style="background: #ffc107; color: black; padding: 5px 10px;">
-                                ✏️ Editar
+                        <div class="action-buttons compact">
+                            <a href="{% url 'detalle_cliente' cliente.pk %}" 
+                               class="btn-home" 
+                               style="background: #17a2b8; padding: 5px 10px;"
+                               title="Ver detalles de cliente">
+                                👁️
                             </a>
-                            <a href="{% url 'borrar_cliente' cliente.pk %}" class="btn-home" style="background: #dc3545; padding: 5px 10px;" onclick="return confirm('¿Seguro que quieres borrar a {{ cliente.nombre }}?');">
-                                🗑️ Borrar
+                            <a href="{% url 'editar_cliente' cliente.pk %}" 
+                               class="btn-home" 
+                               style="background: #ffc107; color: black; padding: 5px 10px;"
+                               title="Editar cliente">
+                                ✏️
+                            </a>
+                            <a href="{% url 'borrar_cliente' cliente.pk %}" 
+                               class="btn-home" 
+                               style="background: #dc3545; padding: 5px 10px;" 
+                               onclick="return confirm('¿Seguro que quieres borrar a {{ cliente.nombre }}?');"
+                               title="Eliminar cliente">
+                                🗑️
                             </a>
                         </div>
                     </td>

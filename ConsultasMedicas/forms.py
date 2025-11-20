@@ -114,7 +114,7 @@ class UpdateSiguienteConsultaForm(forms.ModelForm):
         return cleaned_data
 
 
-
+# forms.py
 class ConsultaMedicaForm(forms.ModelForm):
     class Meta:
         model = ConsultasMedicas
@@ -151,8 +151,8 @@ class ConsultaMedicaForm(forms.ModelForm):
             'pulso': forms.TextInput(attrs={'placeholder': 'Ej. 100'}),
             'frecuenciaCardiaca': forms.TextInput(attrs={'placeholder': 'Ej. 100 bpm'}),
             'puntuacionCorporal': forms.TextInput(attrs={'placeholder': 'Ej. 5/9'}),
-            'peso': forms.NumberInput(attrs={'step': '1', 'placeholder': 'Peso en kg'}),
-            'vacunas': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Vacunas aplicadas'}),
+            'peso': forms.NumberInput(attrs={'step': '0.1', 'placeholder': 'Peso en kg'}),
+            'vacunas': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Vacunas aplicadas', 'readonly': 'readonly', 'style': 'background-color: #f8f9fa;'}),
             'alergias': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Alergias conocidas'}),
             'parasitos': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Parásitos detectados'}),
             'agua': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Hábitos de consumo de agua'}),
@@ -199,7 +199,16 @@ class ConsultaMedicaForm(forms.ModelForm):
             'veterinario': 'Médico veterinario',
         }
 
-
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Hacer el campo vacunas readonly
+        self.fields['vacunas'].widget.attrs['readonly'] = True
+        self.fields['vacunas'].widget.attrs['style'] = 'background-color: #f8f9fa;'
+        
+        # Establecer el veterinario actual como opción por defecto
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        self.fields['veterinario'].queryset = User.objects.filter(is_active=True)
 
 class ConsultaMedicaUpdateForm(forms.ModelForm):
     class Meta:
@@ -238,7 +247,7 @@ class ConsultaMedicaUpdateForm(forms.ModelForm):
             'frecuenciaCardiaca': forms.TextInput(attrs={'placeholder': 'Ej. 100 bpm', 'class': 'form-control'}),
             'puntuacionCorporal': forms.TextInput(attrs={'placeholder': 'Ej. 5/9', 'class': 'form-control'}),
             'peso': forms.NumberInput(attrs={'step': '0.01', 'placeholder': 'Peso en kg', 'class': 'form-control'}),
-            'vacunas': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Vacunas aplicadas', 'class': 'form-control'}),
+            'vacunas': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Vacunas aplicadas', 'class': 'form-control', 'readonly': 'readonly', 'style': 'background-color: #f8f9fa;'}),
             'alergias': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Alergias conocidas', 'class': 'form-control'}),
             'parasitos': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Parásitos detectados', 'class': 'form-control'}),
             'agua': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Hábitos de consumo de agua', 'class': 'form-control'}),
@@ -285,6 +294,11 @@ class ConsultaMedicaUpdateForm(forms.ModelForm):
             'veterinario': 'Médico veterinario',
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Hacer el campo vacunas readonly
+        self.fields['vacunas'].widget.attrs['readonly'] = True
+        self.fields['vacunas'].widget.attrs['style'] = 'background-color: #f8f9fa;'
 
 class DocumentoConsultaUpdateForm(forms.ModelForm):
     class Meta:
