@@ -211,6 +211,7 @@
                     <th>🎯 Raza</th>
                     <th>📅 Fecha-Hora</th>
                     <th>📝 Motivo</th>
+                    <th>✅ ❌ 🕒 Asistencia</th>
                     <th>👨‍⚕️ Veterinario</th>
                     <th>🏥 Veterinaria</th>
                     <th>⚡ Acciones</th>
@@ -255,6 +256,17 @@
                             -
                         {% endif %}
                     </td>
+
+                    <td>
+                        {% if siguientesConsulta.asistencia == "Pendiente" %}
+                            <span class="badge badge-wait" title="Estado">🕒 {{ siguientesConsulta.asistencia }}</span>
+                        {% elif siguientesConsulta.asistencia == "Si asistió" %}
+                            <span class="badge badge-success" title="Estado">✅ {{ siguientesConsulta.asistencia }}</span>
+                        {% else %}
+                            <span class="badge badge-danger" title="Estado">❌ {{ siguientesConsulta.asistencia }}</span>
+                        {% endif %}
+                    </td>
+
                     <td>{{ siguientesConsulta.veterinario.get_full_name|default:siguientesConsulta.veterinario.username }}</td>
                     <td>{{ siguientesConsulta.clinicaVeterinaria|default:"-" }}</td>
                     <td>

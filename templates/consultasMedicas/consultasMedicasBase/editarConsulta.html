@@ -20,6 +20,10 @@
         <div class="form-section">
             <h3>🐾 Selección de Mascota</h3>
             
+            <div class="alert alert-warning" style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+                <strong>⚠️ Atención:</strong> Si cambias la mascota, los datos de peso y alergias se mantendrán como estaban en esta consulta.
+            </div>
+            
             <div class="form-group">
                 <label for="mascota-search">🔍 Buscar mascota:</label>
                 <input 
@@ -40,6 +44,8 @@
                         data-vacunas="{{ mascota.vacunas|escapejs }}"
                         data-alergias="{{ mascota.alergias|escapejs }}"
                         data-peso="{{ mascota.peso }}"
+                        data-ultimadesparasitacion="{{ mascota.ultimaDesparasitacion|date:'Y-m-d'|default:'' }}"
+                        data-ultimodesparasitante="{{ mascota.ultimoDesparasitante|escapejs }}"
                         data-nombre="{{ mascota.nombre|escapejs }}"
                         data-especie="{{ mascota.especie|escapejs }}"
                         data-raza="{{ mascota.raza|escapejs }}"
@@ -59,14 +65,16 @@
 
             <!-- 🔄 Botón para cargar datos de la mascota seleccionada -->
             <button type="button" id="cargar-mascota-btn" class="btn-home">
-                🔄 Cargar Datos de Mascota
+                🔄 Cargar Datos Actuales de Mascota
             </button>
+            <small class="help-text" style="display: block; margin-top: 5px;">
+                Este botón carga los datos <strong>actuales</strong> de la mascota seleccionada. Los datos de la consulta original se mantendrán si no los cambias.
+            </small>
         </div>
 
-        <!-- 📋 INFORMACIÓN DE LA MASCOTA -->
-        {% if datos_mascota %}
+        <!-- 📋 INFORMACIÓN DE LA MASCOTA ACTUAL -->
         <div class="form-section" style="background: #f0f8ff; border-left: 4px solid #3498db;">
-            <h3>📋 Información de la Mascota</h3>
+            <h3>📋 Información de la Mascota Actual</h3>
             <div class="info-grid">
                 <div class="info-item">
                     <strong>🐕 Nombre:</strong>
@@ -102,7 +110,6 @@
                 </div>
             </div>
         </div>
-        {% endif %}
 
         <!-- 📝 FORMULARIO DE CONSULTA MÉDICA -->
         <div class="form-section">
@@ -121,7 +128,7 @@
                 <div class="form-group">
                     <label for="id_peso">⚖️ Peso (kg):</label>
                     {{ form.peso }}
-                    <small class="help-text">Peso actual de la mascota</small>
+                    <small class="help-text">Peso registrado en esta consulta</small>
                     {% if form.peso.errors %}
                     <div class="field-errors">
                         {{ form.peso.errors }}
@@ -132,7 +139,7 @@
                 <div class="form-group full-width">
                     <label for="id_alergias">⚠️ Alergias:</label>
                     {{ form.alergias }}
-                    <small class="help-text">Alergias conocidas de la mascota</small>
+                    <small class="help-text">Alergias registradas en esta consulta</small>
                     {% if form.alergias.errors %}
                     <div class="field-errors">
                         {{ form.alergias.errors }}
@@ -141,22 +148,52 @@
                 </div>
             </div>
 
-            <!-- Campo de solo lectura: Vacunas -->
-            <div class="form-group full-width">
-                <label for="id_vacunas">💉 Vacunas (solo lectura):</label>
-                {{ form.vacunas }}
-                <small class="help-text">Las vacunas se gestionan en el perfil de la mascota</small>
-                {% if form.vacunas.errors %}
-                <div class="field-errors">
-                    {{ form.vacunas.errors }}
+            <!-- SECCIÓN DE DATOS DE PROCEDIMIENTOS (solo lectura) -->
+            <div class="form-section" style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <h4 style="color: #495057; margin-bottom: 15px;">📋 Datos de Procedimientos (solo lectura)</h4>
+                
+                <!-- Campo de solo lectura: Vacunas -->
+                <div class="form-group full-width">
+                    <label for="id_vacunas">💉 Vacunas:</label>
+                    {{ form.vacunas }}
+                    <small class="help-text">Vacunas registradas en esta consulta</small>
+                    {% if form.vacunas.errors %}
+                    <div class="field-errors">
+                        {{ form.vacunas.errors }}
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
+
+                <!-- Campos de solo lectura: Desparasitación -->
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="id_ultimaDesparasitacion">📅 Última desparasitación:</label>
+                        {{ form.ultimaDesparasitacion }}
+                        <small class="help-text">Fecha de la última desparasitación registrada</small>
+                        {% if form.ultimaDesparasitacion.errors %}
+                        <div class="field-errors">
+                            {{ form.ultimaDesparasitacion.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_ultimoDesparasitante">💊 Último desparasitante:</label>
+                        {{ form.ultimoDesparasitante }}
+                        <small class="help-text">Desparasitante aplicado registrado</small>
+                        {% if form.ultimoDesparasitante.errors %}
+                        <div class="field-errors">
+                            {{ form.ultimoDesparasitante.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
 
             <!-- Resto de campos de la consulta -->
             <div class="form-grid">
                 {% for field in form %}
-                    {% if field.name not in 'peso alergias vacunas' %}
+                    {% if field.name not in 'peso alergias vacunas ultimaDesparasitacion ultimoDesparasitante' %}
                     <div class="form-group {% if field.field.widget.input_type == 'textarea' %}full-width{% endif %}">
                         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                         {{ field }}
@@ -284,6 +321,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const vacunasField = document.getElementById('id_vacunas');
     const alergiasField = document.getElementById('id_alergias');
     const pesoField = document.getElementById('id_peso');
+    const ultimaDesparasitacionField = document.getElementById('id_ultimaDesparasitacion');
+    const ultimoDesparasitanteField = document.getElementById('id_ultimoDesparasitante');
     const addDocBtn = document.getElementById('add-doc-btn');
     const container = document.getElementById('documentos-container');
     const modal = document.getElementById('confirmModal');
@@ -308,10 +347,28 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Actualizar campos con datos de la mascota
-        if (vacunasField) vacunasField.value = selectedOption.getAttribute('data-vacunas') || '';
-        if (alergiasField) alergiasField.value = selectedOption.getAttribute('data-alergias') || '';
-        if (pesoField) pesoField.value = selectedOption.getAttribute('data-peso') || '';
+        // Mostrar confirmación antes de cargar datos
+        const confirmar = confirm(
+            '¿Estás seguro de que quieres cargar los datos actuales de la nueva mascota?\n\n' +
+            'Esto sobrescribirá los datos de peso, alergias, vacunas y desparasitación de esta consulta.'
+        );
+        
+        if (confirmar) {
+            // Actualizar campos con datos de la mascota
+            if (vacunasField) vacunasField.value = selectedOption.getAttribute('data-vacunas') || '';
+            if (alergiasField) alergiasField.value = selectedOption.getAttribute('data-alergias') || '';
+            if (pesoField) pesoField.value = selectedOption.getAttribute('data-peso') || '';
+            
+            // Cargar campos de desparasitación
+            if (ultimaDesparasitacionField) {
+                ultimaDesparasitacionField.value = selectedOption.getAttribute('data-ultimadesparasitacion') || '';
+            }
+            if (ultimoDesparasitanteField) {
+                ultimoDesparasitanteField.value = selectedOption.getAttribute('data-ultimodesparasitante') || '';
+            }
+            
+            alert('Datos de la nueva mascota cargados. Recuerda guardar los cambios.');
+        }
     });
 
     // ➕ AÑADIR MÁS CAMPOS DE DOCUMENTOS
@@ -351,20 +408,24 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.style.display = 'none';
     });
 
-    // 🎯 CARGAR DATOS AUTOMÁTICAMENTE SI YA HAY MASCOTA SELECCIONADA
-    if (dropdown.value) {
-        const selectedOption = dropdown.options[dropdown.selectedIndex];
-        if (vacunasField) vacunasField.value = selectedOption.getAttribute('data-vacunas') || '';
-        if (alergiasField) alergiasField.value = selectedOption.getAttribute('data-alergias') || '';
-        if (pesoField) pesoField.value = selectedOption.getAttribute('data-peso') || '';
-    }
-
     // Cerrar modal si se hace clic fuera de él
     window.addEventListener('click', function(event) {
         if (event.target === modal) {
             modal.style.display = 'none';
         }
     });
+
+    // 🎯 CARGAR DATOS DE DESPARASITACIÓN AUTOMÁTICAMENTE SI YA HAY MASCOTA SELECCIONADA
+    if (dropdown.value) {
+        const selectedOption = dropdown.options[dropdown.selectedIndex];
+        // Cargar campos de desparasitación automáticamente
+        if (ultimaDesparasitacionField) {
+            ultimaDesparasitacionField.value = selectedOption.getAttribute('data-ultimadesparasitacion') || '';
+        }
+        if (ultimoDesparasitanteField) {
+            ultimoDesparasitanteField.value = selectedOption.getAttribute('data-ultimodesparasitante') || '';
+        }
+    }
 });
 </script>
 
@@ -395,6 +456,45 @@ document.addEventListener('DOMContentLoaded', function() {
     display: flex;
     gap: 10px;
     justify-content: flex-end;
+}
+
+.alert-warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.form-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.field-errors {
+    color: #dc3545;
+    font-size: 0.875em;
+    margin-top: 5px;
+}
+
+.help-text {
+    color: #6c757d;
+    font-size: 0.875em;
+    margin-top: 5px;
+    display: block;
 }
 </style>
 {% endblock %}

@@ -88,6 +88,18 @@
                     {{ mascota.alergias|default:"No se han registrado alergias."|linebreaks }}
                 </div>
             </div>
+            <div class="info-item full-width">
+                <strong>📅 Fecha de la última desparasitación aplicada:</strong>
+                <div class="content-box">
+                    {{ mascota.ultimaDesparasitacion|default:"No se ha desparasitado."|linebreaks }}
+                </div>
+            </div>
+            <div class="info-item full-width">
+                <strong>💊 Último desparasitante aplicado:</strong>
+                <div class="content-box">
+                    {{ mascota.ultimoDesparasitante|default:"No se ha desparasitado."|linebreaks }}
+                </div>
+            </div>
         </div>
     </div>
 

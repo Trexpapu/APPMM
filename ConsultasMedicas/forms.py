@@ -25,13 +25,16 @@ class DocumentosConsultaForm(forms.ModelForm):
 class SiguienteConsultaForm(forms.ModelForm):
     class Meta:
         model = SiguientesConsultas
-        fields = ['fechaSiguienteConsulta', 'motivoSiguienteConsulta', 'clinicaVeterinaria', 'veterinario']
+        fields = ['fechaSiguienteConsulta', 'motivoSiguienteConsulta', 'asistencia' , 'clinicaVeterinaria', 'veterinario']
         widgets = {
             'fechaSiguienteConsulta': forms.DateTimeInput(
                 attrs={'type': 'datetime-local', 'placeholder': 'Selecciona la fecha y hora de la próxima consulta'}
             ),
             'motivoSiguienteConsulta': forms.Textarea(
                 attrs={'rows': 3, 'placeholder': 'Describe brevemente el motivo de la próxima consulta'}
+            ),
+            'asistencia': forms.Select(
+                attrs={'placeholder': 'Selecciona el estado de asistencia'}
             ),
             'clinicaVeterinaria': forms.Select(
                 attrs={'placeholder': 'Selecciona la clínica veterinaria'}
@@ -43,6 +46,7 @@ class SiguienteConsultaForm(forms.ModelForm):
         labels = {
             'fechaSiguienteConsulta': 'Fecha de la siguiente consulta',
             'motivoSiguienteConsulta': 'Motivo de la siguiente consulta',
+            'asistencia' : 'Asistencia del paciente',
             'clinicaVeterinaria': 'Clínica veterinaria',
             'veterinario': 'Veterinario responsable',
         }
@@ -60,7 +64,7 @@ class SiguienteConsultaForm(forms.ModelForm):
             ).exists()
 
             if existe:
-                raise ValidationError("⚠️ El veterinario ya tiene una cita agendada en esa fecha y hora.")
+                raise ValidationError("⚠️ El veterinario se encuentra ocupado en esa fecha y hora.")
 
         return cleaned_data
 
@@ -68,7 +72,7 @@ class SiguienteConsultaForm(forms.ModelForm):
 class UpdateSiguienteConsultaForm(forms.ModelForm):
     class Meta:
         model = SiguientesConsultas
-        fields = ['fechaSiguienteConsulta', 'motivoSiguienteConsulta', 'clinicaVeterinaria', 'veterinario']
+        fields = ['fechaSiguienteConsulta', 'motivoSiguienteConsulta', 'asistencia', 'clinicaVeterinaria', 'veterinario']
         widgets = {
 
             'fechaSiguienteConsulta': forms.DateTimeInput(
@@ -83,6 +87,9 @@ class UpdateSiguienteConsultaForm(forms.ModelForm):
             'motivoSiguienteConsulta': forms.Textarea(
                 attrs={'rows': 3, 'placeholder': 'Actualiza el motivo o notas de la próxima consulta'}
             ),
+            'asistencia': forms.Select(
+                attrs={'placeholder': 'Selecciona el estado de asistencia'}
+            ),
             'clinicaVeterinaria': forms.Select(
                 attrs={'placeholder': 'Selecciona la clínica veterinaria'}
             ),
@@ -93,6 +100,7 @@ class UpdateSiguienteConsultaForm(forms.ModelForm):
         labels = {
             'fechaSiguienteConsulta': 'Fecha de la siguiente consulta',
             'motivoSiguienteConsulta': 'Motivo de la siguiente consulta',
+            'asistencia' : 'Asistencia del paciente',
             'clinicaVeterinaria': 'Clínica veterinaria',
             'veterinario': 'Veterinario responsable',
         }
@@ -109,7 +117,7 @@ class UpdateSiguienteConsultaForm(forms.ModelForm):
             ).exclude(id=self.instance.id).exists()
 
             if existe:
-                raise ValidationError("⚠️ El veterinario ya tiene otra cita agendada en esa fecha y hora.")
+                raise ValidationError("⚠️ El veterinario ya se encuentra ocupado en esa fecha y hora.")
 
         return cleaned_data
 
@@ -126,6 +134,8 @@ class ConsultaMedicaForm(forms.ModelForm):
             'puntuacionCorporal',
             'peso',
             'vacunas',
+            'ultimaDesparasitacion', 
+            'ultimoDesparasitante',
             'alergias',
             'parasitos',
             'agua',
@@ -153,6 +163,11 @@ class ConsultaMedicaForm(forms.ModelForm):
             'puntuacionCorporal': forms.TextInput(attrs={'placeholder': 'Ej. 5/9'}),
             'peso': forms.NumberInput(attrs={'step': '0.1', 'placeholder': 'Peso en kg'}),
             'vacunas': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Vacunas aplicadas', 'readonly': 'readonly', 'style': 'background-color: #f8f9fa;'}),
+            
+            'ultimaDesparasitacion': forms.DateInput(attrs={'rows': 2, 'placeholder': 'Último fecha de desparasitación', 'readonly': 'readonly', 'style': 'background-color: #f8f9fa;'}),
+            
+            'ultimoDesparasitante': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Último desparasitante aplicado', 'readonly': 'readonly', 'style': 'background-color: #f8f9fa;'}),
+
             'alergias': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Alergias conocidas'}),
             'parasitos': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Parásitos detectados'}),
             'agua': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Hábitos de consumo de agua'}),
@@ -180,6 +195,8 @@ class ConsultaMedicaForm(forms.ModelForm):
             'puntuacionCorporal': 'Puntuación corporal',
             'peso': 'Peso (kg)',
             'vacunas': 'Vacunas',
+            'ultimaDesparasitacion': 'Última fecha de desparasitación',
+            'ultimoDesparasitante': 'Último desparasitante aplicado',
             'alergias': 'Alergias',
             'parasitos': 'Parásitos',
             'agua': 'Consumo de agua',
@@ -221,6 +238,8 @@ class ConsultaMedicaUpdateForm(forms.ModelForm):
             'puntuacionCorporal',
             'peso',
             'vacunas',
+            'ultimaDesparasitacion', 
+            'ultimoDesparasitante',
             'alergias',
             'parasitos',
             'agua',
@@ -248,6 +267,11 @@ class ConsultaMedicaUpdateForm(forms.ModelForm):
             'puntuacionCorporal': forms.TextInput(attrs={'placeholder': 'Ej. 5/9', 'class': 'form-control'}),
             'peso': forms.NumberInput(attrs={'step': '0.01', 'placeholder': 'Peso en kg', 'class': 'form-control'}),
             'vacunas': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Vacunas aplicadas', 'class': 'form-control', 'readonly': 'readonly', 'style': 'background-color: #f8f9fa;'}),
+            
+            'ultimaDesparasitacion': forms.DateInput(attrs={'rows': 2, 'placeholder': 'Último fecha de desparasitación', 'readonly': 'readonly', 'style': 'background-color: #f8f9fa;'}),
+            
+            'ultimoDesparasitante': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Último desparasitante aplicado', 'readonly': 'readonly', 'style': 'background-color: #f8f9fa;'}),
+
             'alergias': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Alergias conocidas', 'class': 'form-control'}),
             'parasitos': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Parásitos detectados', 'class': 'form-control'}),
             'agua': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Hábitos de consumo de agua', 'class': 'form-control'}),
@@ -275,6 +299,8 @@ class ConsultaMedicaUpdateForm(forms.ModelForm):
             'puntuacionCorporal': 'Puntuación corporal',
             'peso': 'Peso (kg)',
             'vacunas': 'Vacunas',
+            'ultimaDesparasitacion': 'Última fecha de desparasitación',
+            'ultimoDesparasitante': 'Último desparasitante aplicado',
             'alergias': 'Alergias',
             'parasitos': 'Parásitos',
             'agua': 'Consumo de agua',

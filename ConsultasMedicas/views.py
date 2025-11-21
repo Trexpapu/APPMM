@@ -90,7 +90,7 @@ def ver_proximas_consultas(request):
             pass
     
     veterinaria_seleccionada = query_veterinaria
-    
+    consultas = consultas.order_by('-fechaSiguienteConsulta')
     context = {
         'siguientesConsultas': consultas,
         'query_cliente': query_cliente,
@@ -162,7 +162,6 @@ def editar_proxima_consulta(request, pk):
     })
 
 
-
 @login_required
 def nueva_consulta(request):
     """
@@ -185,6 +184,8 @@ def nueva_consulta(request):
                 'peso': mascota.peso,
                 'vacunas': mascota.vacunas,
                 'alergias': mascota.alergias,
+                'ultimaDesparasitacion': mascota.ultimaDesparasitacion, 
+                'ultimoDesparasitante': mascota.ultimoDesparasitante
             })
             
             # 🔹 Preparar datos de la mascota para mostrar en el template
@@ -207,7 +208,7 @@ def nueva_consulta(request):
                     .first()
                 )
                 if ultima_consulta:
-                    exclude_fields = ['id', 'fechaConsulta', 'peso', 'vacunas', 'alergias', 'mascota']
+                    exclude_fields = ['id', 'fechaConsulta', 'peso', 'vacunas', 'alergias', 'mascota', 'ultimaDesparasitacion', 'ultimoDesparasitante']
                     for field in ConsultasMedicas._meta.get_fields():
                         if (field.name not in exclude_fields and 
                             hasattr(ultima_consulta, field.name)):
@@ -234,7 +235,7 @@ def nueva_consulta(request):
                 mascota = Mascotas.objects.get(pk=mascota_id)
                 mascota.peso = form.cleaned_data.get('peso') or mascota.peso
                 mascota.alergias = form.cleaned_data.get('alergias') or mascota.alergias
-                # NO actualizamos vacunas aquí
+                # NO actualizamos vacunas, ultimaDesparasitacion ni ultimoDesparasitante aquí
                 mascota.save()
 
                 # 📎 GUARDAR DOCUMENTOS usando el modelo DocumentosConsulta
@@ -272,10 +273,9 @@ def nueva_consulta(request):
             'mascotas': mascotas,
             'mostrar_pregunta': mostrar_pregunta,
             'mascota_id': mascota_id,
-            'datos_mascota': datos_mascota,  # Nuevo contexto
+            'datos_mascota': datos_mascota,
         }
     )
-
 
 
 @login_required
@@ -495,6 +495,10 @@ def generar_pdf_consulta(request, consulta_id):
     historial_data = []
     if consulta.vacunas:
         historial_data.append(['Vacunas:', consulta.vacunas])
+    if consulta.ultimaDesparasitacion:
+        historial_data.append(['Fecha de la última desparasitación aplicada:', consulta.ultimaDesparasitacion])
+    if consulta.ultimoDesparasitante:
+        historial_data.append(['Último desparasitante aplicado:', consulta.ultimoDesparasitante])
     if consulta.alergias:
         historial_data.append(['Alergias:', consulta.alergias])
     if consulta.parasitos:
@@ -601,7 +605,6 @@ def generar_pdf_consulta(request, consulta_id):
     return response
 
 
-
 @login_required
 def editar_consulta(request, consulta_id):
     """Vista para editar una consulta médica existente"""
@@ -611,7 +614,7 @@ def editar_consulta(request, consulta_id):
     mascota_seleccionada = consulta.mascota
     mascotas = Mascotas.objects.all()
     
-    # 🔹 Preparar datos de la mascota para mostrar
+    # 🔹 Preparar datos de la mascota para mostrar (solo información, no para cargar en el form)
     datos_mascota = {
         'nombre': mascota_seleccionada.nombre,
         'especie': mascota_seleccionada.especie,
@@ -633,12 +636,8 @@ def editar_consulta(request, consulta_id):
                 consulta_editada.mascota_id = mascota_id
             consulta_editada.save()
 
-            # 🐾 Actualizar datos de la mascota (solo peso y alergias)
-            mascota = consulta_editada.mascota
-            mascota.peso = form.cleaned_data.get('peso') or mascota.peso
-            mascota.alergias = form.cleaned_data.get('alergias') or mascota.alergias
-            # NO actualizamos vacunas aquí
-            mascota.save()
+            # 🚫 NO actualizamos los datos de la mascota en la edición de consulta
+            # Los datos se mantienen solo en la consulta, no en la mascota
 
             # ✏️ Actualizar descripciones de documentos existentes
             for documento in documentos_existentes:
@@ -674,7 +673,7 @@ def editar_consulta(request, consulta_id):
             'documentos_existentes': documentos_existentes,
             'mascotas': mascotas,
             'mascota_seleccionada': mascota_seleccionada,
-            'datos_mascota': datos_mascota,  # Nuevo contexto
+            'datos_mascota': datos_mascota,
         }
     )
 

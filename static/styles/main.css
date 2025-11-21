@@ -640,6 +640,10 @@ form button[type="submit"]:hover {
     background: var(--error-color);
     color: white;
 }
+.badge-wait {
+    background: grey;
+    color: white;
+}
 
 .badge-warning {
     background: var(--btn-regresar);

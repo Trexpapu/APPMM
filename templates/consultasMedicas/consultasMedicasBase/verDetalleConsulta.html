@@ -102,6 +102,19 @@
                 {{ consulta.alergias|linebreaks }}
             </div>
             {% endif %}
+            {% if consulta.ultimaDesparasitacion %}
+            <div class="info-item full-width">
+                <strong>Fecha de la última desparasitación aplicada:</strong><br>
+                {{ consulta.ultimaDesparasitacion|linebreaks }}
+            </div>
+            {% endif %}
+            
+            {% if consulta.ultimoDesparasitante %}
+            <div class="info-item full-width">
+                <strong>último desparasitante aplicado:</strong><br>
+                {{ consulta.ultimoDesparasitante|linebreaks }}
+            </div>
+            {% endif %}
             {% if consulta.parasitos %}
             <div class="info-item full-width">
                 <strong>Parásitos:</strong><br>

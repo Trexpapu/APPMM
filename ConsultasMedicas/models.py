@@ -1,6 +1,8 @@
 from django.db import models
 from ClientesMascotas.models import Mascotas
 from django.contrib.auth.models import User
+
+
 # Create your models here.
 class ConsultasMedicas(models.Model):
     CLINICAS = [
@@ -8,6 +10,7 @@ class ConsultasMedicas(models.Model):
         ('Mascotas Morelia Salida Apatzingán', 'Mascotas Morelia Salida Apatzingán'),
         ('Mascotas Morelia Mano Huevona', 'Mascotas Morelia Mano Huevona'),
     ] 
+    
     mascota = models.ForeignKey(Mascotas, on_delete=models.CASCADE)
     motivoConsulta = models.TextField(blank=True)
     temperatura = models.TextField( blank=True)
@@ -17,6 +20,8 @@ class ConsultasMedicas(models.Model):
     peso = models.FloatField()
     vacunas = models.TextField(blank=True)  
     alergias = models.TextField(blank=True)
+    ultimaDesparasitacion = models.DateField(blank= True, null=True)
+    ultimoDesparasitante = models.TextField(blank=True)
     parasitos = models.TextField(blank=True)
     agua = models.TextField(blank=True)
     alimento = models.TextField(blank=True)
@@ -52,9 +57,20 @@ class SiguientesConsultas(models.Model):
         ('Mascotas Morelia Centro', 'Mascotas Morelia Centro'),
         ('Mascotas Morelia Salida Apatzingán', 'Mascotas Morelia Salida Apatzingán'),
         ('Mascotas Morelia Mano Huevona', 'Mascotas Morelia Mano Huevona'),
+    ]
+    ESTADOS_ASISTENCIAS = [
+        ('Pendiente', 'Pendiente'),
+        ('Si asistió', 'Si asistió'),
+        ('No asistió', 'No asistió'),
     ] 
+    
     fechaSiguienteConsulta = models.DateTimeField()
     motivoSiguienteConsulta = models.TextField(blank=True)
+    asistencia = models.CharField(
+        max_length=64,
+        choices= ESTADOS_ASISTENCIAS, 
+        default= 'Pendiente'
+    )
     veterinario =  models.ForeignKey(User, on_delete=models.CASCADE)
     mascota = models.ForeignKey(Mascotas, on_delete=models.CASCADE)
     clinicaVeterinaria = models.CharField(
@@ -62,10 +78,3 @@ class SiguientesConsultas(models.Model):
         choices=CLINICAS,
         default='Mascotas Morelia Centro'  # puedes poner un valor por defecto si quieres
     )
-
-class Desparasitaciones(models.Model):
-    mascota = models.ForeignKey(Mascotas, on_delete=models.CASCADE)
-    ultimaDesparasitacion = models.DateField(blank= True, null=True)
-    ultimoDesparasitante = models.TextField(blank=True)
-    siguienteDesparasitante = models.TextField(blank=True)
-    proximaDesparasitacion = models.DateField(blank= True, null=True)

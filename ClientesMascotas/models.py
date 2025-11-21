@@ -20,6 +20,8 @@ class Mascotas(models.Model):
     fechaNacimiento = models.DateField()
     peso = models.FloatField()
     vacunas = models.TextField(blank=True)  
+    ultimaDesparasitacion = models.DateField(blank= True, null=True)
+    ultimoDesparasitante = models.TextField(blank=True)
     alergias = models.TextField(blank=True)
     vive = models.BooleanField(default=True)
     sexo = models.CharField(
