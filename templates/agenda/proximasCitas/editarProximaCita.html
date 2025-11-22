@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 
-{% block title %}Agendar Consulta{% endblock %}
+{% block title %}Editar Agenda{% endblock %}
 
 {% block content %}
 <section class="container">
     <div class="header-actions">
-        <h2>Agendar Nueva Consulta</h2>
+        <h2>Editar Agenda de Citas</h2>
     </div>
 
     <form method="post">
         {% csrf_token %}
-        
+
         <div class="form-section">
             <div class="form-header">
                 <h3>🐾 Selección de Mascota</h3>
@@ -21,7 +21,7 @@
                 <select id="mascota" name="mascota" class="searchable-dropdown">
                     <option value="">Seleccione una mascota</option>
                     {% for mascota in mascotas %}
-                    <option value="{{ mascota.id }}">
+                    <option value="{{ mascota.id }}" {% if mascota.id == form.instance.mascota.id %}selected{% endif %}>
                         {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - {{ mascota.cliente.nombre }} - {{ mascota.cliente.email }} - {{ mascota.cliente.telefono }}
                     </option>
                     {% endfor %}
@@ -31,7 +31,7 @@
 
         <div class="form-section">
             <div class="form-header">
-                <h3>📅 Datos de la Consulta</h3>
+                <h3>📝 Datos de la Siguiente Cita</h3>
             </div>
             
             {% if form.errors %}
@@ -61,9 +61,9 @@
 
         <div class="action-buttons">
             <button type="submit" class="btn-home" style="background: var(--btn-agr); padding: 12px 24px;">
-                💾 Agendar Consulta
+                💾 Actualizar Cita
             </button>
-            <a href="{% url 'index-consultas' %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
+            <a href="{% url 'ver-proximas-citas' %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
                 ❌ Cancelar
             </a>
         </div>

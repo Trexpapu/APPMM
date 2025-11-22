@@ -25,6 +25,7 @@ urlpatterns = [
     # Rutas de tus apps
     path('', include('ClientesMascotas.urls')),
     path('consultas/', include('ConsultasMedicas.urls')),
+    path('agenda/', include('Agenda.urls')),
 ]
 
 # Solo servir archivos multimedia en modo DEBUG

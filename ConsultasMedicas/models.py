@@ -52,29 +52,3 @@ class DocumentosConsulta(models.Model):
 
 
 
-class SiguientesConsultas(models.Model):
-    CLINICAS = [
-        ('Mascotas Morelia Centro', 'Mascotas Morelia Centro'),
-        ('Mascotas Morelia Salida Apatzingán', 'Mascotas Morelia Salida Apatzingán'),
-        ('Mascotas Morelia Mano Huevona', 'Mascotas Morelia Mano Huevona'),
-    ]
-    ESTADOS_ASISTENCIAS = [
-        ('Pendiente', 'Pendiente'),
-        ('Si asistió', 'Si asistió'),
-        ('No asistió', 'No asistió'),
-    ] 
-    
-    fechaSiguienteConsulta = models.DateTimeField()
-    motivoSiguienteConsulta = models.TextField(blank=True)
-    asistencia = models.CharField(
-        max_length=64,
-        choices= ESTADOS_ASISTENCIAS, 
-        default= 'Pendiente'
-    )
-    veterinario =  models.ForeignKey(User, on_delete=models.CASCADE)
-    mascota = models.ForeignKey(Mascotas, on_delete=models.CASCADE)
-    clinicaVeterinaria = models.CharField(
-        max_length=255,
-        choices=CLINICAS,
-        default='Mascotas Morelia Centro'  # puedes poner un valor por defecto si quieres
-    )

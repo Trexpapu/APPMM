@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Citas - Inicio{% endblock %}
+
+{% block content %}
+<section class="container index-cliente">
+    <h2>➕ Gestión de Citas</h2>
+    <div class="options">
+        <a href="{% url 'agendar-cita' %}" class="btn-home">📅 Agendar Cita</a>
+        <a href="{% url 'ver-proximas-citas' %}" class="btn-home">🔭 Ver Próximas Citas</a>
+    </div>
+</section>
+{% endblock %}

@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'ClientesMascotas', 
     'ConsultasMedicas',
     'Procedimientos',
+    'Agenda',
 ]
 
 MIDDLEWARE = [

@@ -2,12 +2,12 @@
 
 {% load static %}
 
-{% block title %}Ver Agenda de Consultas - Agenda de Consultas Mascotas Morelia{% endblock %}
+{% block title %}Ver Agenda de Citas - Agenda de Citas Mascotas Morelia{% endblock %}
 
 {% block content %}
 <section class="container">
     <div class="header-actions">
-        <h2>📅 Agenda de Consultas</h2>
+        <h2>📅 Agenda de Citas</h2>
     </div>
 
     <!-- Filtros Combinados -->
@@ -156,13 +156,75 @@
                     </div>
                 </div>
 
+                <!-- Filtro por Asistencia -->
+                <div class="filtro-group">
+                    <label for="q_asistencia" class="filtro-label">
+                        ✅ Asistencia
+                    </label>
+                    <div class="filtro-input-container">
+                        <select 
+                            id="q_asistencia" 
+                            name="q_asistencia" 
+                            class="filtro-input"
+                        >
+                            <option value="">Todos los estados</option>
+                            {% for estado in estados_asistencia %}
+                            <option value="{{ estado.0 }}" {% if query_asistencia == estado.0 %}selected{% endif %}>
+                                {{ estado.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if query_asistencia %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_asistencia').value = ''; this.form.submit();"
+                            title="Limpiar filtro de asistencia"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Tipo de Cita -->
+                <div class="filtro-group">
+                    <label for="q_tipo_cita" class="filtro-label">
+                        🩺 Tipo de Cita
+                    </label>
+                    <div class="filtro-input-container">
+                        <select 
+                            id="q_tipo_cita" 
+                            name="q_tipo_cita" 
+                            class="filtro-input"
+                        >
+                            <option value="">Todos los tipos</option>
+                            {% for tipo in tipos_cita %}
+                            <option value="{{ tipo.0 }}" {% if query_tipo_cita == tipo.0 %}selected{% endif %}>
+                                {{ tipo.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if query_tipo_cita %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_tipo_cita').value = ''; this.form.submit();"
+                            title="Limpiar filtro de tipo de cita"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
                 <!-- Botones de acción -->
                 <div class="filtro-actions">
                     <button type="submit" class="btn-home filtro-submit">
                         🔍 Buscar
                     </button>
                     {% if filtros_activos %}
-                    <a href="{% url 'ver-proximas-consultas' %}" class="btn-home filtro-reset">
+                    <a href="{% url 'ver-proximas-citas' %}" class="btn-home filtro-reset">
                         🗑️ Limpiar Filtros
                     </a>
                     {% endif %}
@@ -175,7 +237,7 @@
     {% if filtros_activos %}
     <div class="results-info">
         <p>
-            📊 Mostrando <strong>{{ siguientesConsultas|length }}</strong> consulta(s)
+            📊 Mostrando <strong>{{ siguientesConsultas|length }}</strong> cita(s)
             {% if query_cliente %}
                 para cliente: "<strong>{{ query_cliente }}</strong>"
             {% endif %}
@@ -191,11 +253,17 @@
             {% if query_veterinaria %}
                 {% if query_cliente or query_mascota or query_fecha or query_veterinario %}y {% endif %}clínica: "<strong>{{ veterinaria_seleccionada }}</strong>"
             {% endif %}
+            {% if query_asistencia %}
+                {% if query_cliente or query_mascota or query_fecha or query_veterinario or query_veterinaria %}y {% endif %}asistencia: "<strong>{{ asistencia_seleccionada }}</strong>"
+            {% endif %}
+            {% if query_tipo_cita %}
+                {% if query_cliente or query_mascota or query_fecha or query_veterinario or query_veterinaria or query_asistencia %}y {% endif %}tipo: "<strong>{{ tipo_cita_seleccionado }}</strong>"
+            {% endif %}
         </p>
     </div>
     {% else %}
     <div class="results-info">
-        <p>📊 Total de siguientes citas: <strong>{{ siguientesConsultas|length }}</strong></p>
+        <p>📊 Total de citas: <strong>{{ siguientesConsultas|length }}</strong></p>
     </div>
     {% endif %}
 
@@ -210,7 +278,8 @@
                     <th>🔬 Especie</th>
                     <th>🎯 Raza</th>
                     <th>📅 Fecha-Hora</th>
-                    <th>📝 Motivo</th>
+                    <th>🩺 Tipo</th>
+                    <th>📝 Descripción</th>
                     <th>✅ ❌ 🕒 Asistencia</th>
                     <th>👨‍⚕️ Veterinario</th>
                     <th>🏥 Veterinaria</th>
@@ -246,17 +315,21 @@
                     </td>
                     <td>{{ siguientesConsulta.mascota.especie|default:"-" }}</td>
                     <td>{{ siguientesConsulta.mascota.raza|default:"-" }}</td>
-                    <td>{{ siguientesConsulta.fechaSiguienteConsulta }}</td>
+                    <td>{{ siguientesConsulta.fechaSiguienteCita }}</td>
                     <td>
-                        {% if siguientesConsulta.motivoSiguienteConsulta %}
-                            <div class="truncate-text" title="{{ siguientesConsulta.motivoSiguienteConsulta }}">
-                                {{ siguientesConsulta.motivoSiguienteConsulta|truncatewords:8 }}
+                        <span class="badge badge-info" title="Tipo de cita">
+                            {{ siguientesConsulta.tipoCita }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if siguientesConsulta.descripcionCita %}
+                            <div class="truncate-text" title="{{ siguientesConsulta.descripcionCita }}">
+                                {{ siguientesConsulta.descripcionCita|truncatewords:8 }}
                             </div>
                         {% else %}
                             -
                         {% endif %}
                     </td>
-
                     <td>
                         {% if siguientesConsulta.asistencia == "Pendiente" %}
                             <span class="badge badge-wait" title="Estado">🕒 {{ siguientesConsulta.asistencia }}</span>
@@ -266,22 +339,21 @@
                             <span class="badge badge-danger" title="Estado">❌ {{ siguientesConsulta.asistencia }}</span>
                         {% endif %}
                     </td>
-
                     <td>{{ siguientesConsulta.veterinario.get_full_name|default:siguientesConsulta.veterinario.username }}</td>
                     <td>{{ siguientesConsulta.clinicaVeterinaria|default:"-" }}</td>
                     <td>
                         <div class="action-buttons compact">
-                            <a href="{% url 'editar-proximas-consultas' siguientesConsulta.pk %}" 
+                            <a href="{% url 'editar-proximas-citas' siguientesConsulta.pk %}" 
                                class="btn-home" 
                                style="background: #ffc107; color: black; padding: 5px 10px;"
-                               title="Editar consulta">
+                               title="Editar cita">
                                 ✏️
                             </a>
-                            <a href="{% url 'borrar-proximas-consultas' siguientesConsulta.pk %}" 
+                            <a href="{% url 'borrar-proximas-citas' siguientesConsulta.pk %}" 
                                class="btn-home" 
                                style="background: #dc3545; padding: 5px 10px;" 
-                               onclick="return confirm('¿Estás seguro de que quieres eliminar la consulta de {{ siguientesConsulta.mascota.nombre }}?');"
-                               title="Eliminar consulta">
+                               onclick="return confirm('¿Estás seguro de que quieres eliminar la cita de {{ siguientesConsulta.mascota.nombre }}?');"
+                               title="Eliminar cita">
                                 🗑️
                             </a>
                         </div>
@@ -289,13 +361,11 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="11" class="no-data">
+                    <td colspan="13" class="no-data">
                         {% if filtros_activos %}
-                            🔍 No se encontraron consultas que coincidan con los filtros aplicados.
-
+                            🔍 No se encontraron citas que coincidan con los filtros aplicados.
                         {% else %}
-                            📝 No hay consultas agendadas. 
-                        
+                            📝 No hay citas agendadas. 
                         {% endif %}
                     </td>
                 </tr>
@@ -304,4 +374,102 @@
         </table>
     </div>
 </section>
+
+<style>
+.filtros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.filtro-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filtro-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.filtro-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.filtro-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filtro-clear {
+    position: absolute;
+    right: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px 5px;
+}
+
+.filtro-actions {
+    display: flex;
+    gap: 10px;
+    align-items: end;
+}
+
+.filtro-submit, .filtro-reset {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.badge-wait {
+    background-color: #ffc107;
+    color: black;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.badge-success {
+    background-color: #28a745;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.badge-danger {
+    background-color: #dc3545;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.results-info {
+    background: #e9ecef;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border-left: 4px solid #007bff;
+}
+</style>
 {% endblock %}
