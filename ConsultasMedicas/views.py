@@ -26,7 +26,107 @@ def indexInicioConsultas(request):
     return render(request, 'consultasMedicas/consultasMedicasBase/indexConsultas.html')
 
 
+@login_required
+def nueva_consulta_desde_cita(request, mascota_id):
+    """
+    Vista para crear una nueva consulta médica desde una cita programada
+    La mascota ya está preseleccionada y no se puede cambiar
+    """
+    try:
+        mascota = Mascotas.objects.get(pk=mascota_id)
+    except Mascotas.DoesNotExist:
+        messages.error(request, "La mascota seleccionada no existe.")
+        return redirect('ver-proximas-citas')
+    
+    # Obtener parámetro para cargar consulta previa
+    cargar_prev = request.GET.get('cargar_prev')
+    
+    # Cargar datos iniciales de la mascota
+    initial_data = {
+        'peso': mascota.peso,
+        'vacunas': mascota.vacunas,
+        'alergias': mascota.alergias,
+        'ultimaDesparasitacion': mascota.ultimaDesparasitacion, 
+        'ultimoDesparasitante': mascota.ultimoDesparasitante
+    }
+    
+    # Preparar datos de la mascota para mostrar en el template
+    datos_mascota = {
+        'nombre': mascota.nombre,
+        'especie': mascota.especie,
+        'raza': mascota.raza,
+        'fechaNacimiento': mascota.fechaNacimiento,
+        'sexo': mascota.get_sexo_display(),
+        'cliente_nombre': mascota.cliente.nombre,
+        'cliente_telefono': mascota.cliente.telefono,
+        'cliente_email': mascota.cliente.email,
+    }
+    
+    # 🔹 Cargar consulta anterior SOLO si el usuario lo solicita
+    if cargar_prev == "1":
+        ultima_consulta = (
+            ConsultasMedicas.objects.filter(mascota_id=mascota_id)
+            .order_by('-fechaConsulta')
+            .first()
+        )
+        if ultima_consulta:
+            exclude_fields = ['id', 'fechaConsulta', 'peso', 'vacunas', 'alergias', 'mascota', 'ultimaDesparasitacion', 'ultimoDesparasitante']
+            for field in ConsultasMedicas._meta.get_fields():
+                if (field.name not in exclude_fields and 
+                    hasattr(ultima_consulta, field.name)):
+                    initial_data[field.name] = getattr(ultima_consulta, field.name)
+            messages.info(request, "Se cargaron los datos de la última consulta.")
 
+    # POST: Guardar nueva consulta
+    if request.method == 'POST':
+        form = ConsultaMedicaForm(request.POST, initial=initial_data)
+        
+        if form.is_valid():
+            nConsulta = form.save(commit=False)
+            nConsulta.mascota = mascota  # Usar la mascota de la cita
+            nConsulta.veterinario = request.user
+            nConsulta.save()
+
+            # Actualizar datos de la mascota (solo peso y alergias)
+            mascota.peso = form.cleaned_data.get('peso') or mascota.peso
+            mascota.alergias = form.cleaned_data.get('alergias') or mascota.alergias
+            mascota.save()
+
+            # Guardar documentos
+            archivos = request.FILES.getlist('archivo')
+            descripciones = request.POST.getlist('descripcion')
+            
+            for i, archivo in enumerate(archivos):
+                if archivo:
+                    descripcion = descripciones[i] if i < len(descripciones) else ''
+                    DocumentosConsulta.objects.create(
+                        consulta=nConsulta,
+                        archivo=archivo,
+                        descripcion=descripcion
+                    )
+
+            messages.success(request, "Consulta médica y documentos guardados correctamente.")
+            return redirect('index-consultas')
+    else:
+        form = ConsultaMedicaForm(initial=initial_data)
+
+    # 🔹 Determinar si mostrar la pregunta de cargar consulta previa
+    mostrar_pregunta = False
+    if not cargar_prev:
+        hay_consulta_previa = ConsultasMedicas.objects.filter(mascota_id=mascota_id).exists()
+        mostrar_pregunta = hay_consulta_previa
+
+    return render(
+        request,
+        'consultasMedicas/consultasMedicasBase/nuevaConsultaDesdeCita.html',
+        {
+            'form': form,
+            'mascota': mascota,
+            'datos_mascota': datos_mascota,
+            'mascota_id': mascota_id,
+            'mostrar_pregunta': mostrar_pregunta,
+        }
+    )
 
 
 

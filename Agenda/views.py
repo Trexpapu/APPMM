@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from ClientesMascotas.models import *
-
+from ConsultasMedicas.urls import *
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
@@ -172,3 +172,15 @@ def editar_proxima_cita(request, pk):
         'form': form,
         'mascotas': mascota
     })
+
+def atender_cita(request, pk):
+    cita = get_object_or_404(SiguientesCitas, pk=pk)
+    cita.asistencia = 'Si asistió'
+    cita.save()
+    mascota = cita.mascota
+    
+    if cita.tipoCita == 'Consulta':
+        # Redirigir a la nueva vista para consultas desde citas
+        return redirect('nueva-consulta-desde-cita', mascota_id=mascota.id)
+    else:
+        return redirect('ver-proximas-citas')

@@ -5,6 +5,7 @@ from django.urls import path
 urlpatterns = [
     path('indexConsultas/', views.indexInicioConsultas, name='index-consultas'),
     path('CrearNuevaConsulta/', views.nueva_consulta, name='nueva-consulta'),
+    path('CrearNuevaConsultaCita/<int:mascota_id>/', views.nueva_consulta_desde_cita, name='nueva-consulta-desde-cita'),
     path('VerConsultas/', views.ver_consultas, name='ver-consultas'),
     # Detalle de consulta
     path('consulta/<int:consulta_id>/', views.detalle_consulta, name='detalle-consulta'),

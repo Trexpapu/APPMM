@@ -343,6 +343,13 @@
                     <td>{{ siguientesConsulta.clinicaVeterinaria|default:"-" }}</td>
                     <td>
                         <div class="action-buttons compact">
+                             <a href="{% url 'atender-cita' siguientesConsulta.pk%}" 
+                               class="btn-home" 
+                               style="background: #0492ffff; color: black; padding: 5px 10px;"
+                               onclick="return confirm('¿Estás seguro de que quieres atender la cita de {{ siguientesConsulta.mascota.nombre }}?');"
+                               title="Atender cita">
+                                📋
+                            </a>
                             <a href="{% url 'editar-proximas-citas' siguientesConsulta.pk %}" 
                                class="btn-home" 
                                style="background: #ffc107; color: black; padding: 5px 10px;"

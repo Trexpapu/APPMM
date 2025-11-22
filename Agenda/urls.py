@@ -8,4 +8,5 @@ urlpatterns = [
     path('verProximasCitas/', views.ver_proximas_citas, name='ver-proximas-citas'),
     path('borrarProximasCitas/<int:pk>/', views.borrar_proxima_cita, name='borrar-proximas-citas'),
     path('editarProximasCitas/<int:pk>/', views.editar_proxima_cita, name='editar-proximas-citas'),
+    path('atenderCita/<int:pk>/', views.atender_cita, name='atender-cita'),
 ]
