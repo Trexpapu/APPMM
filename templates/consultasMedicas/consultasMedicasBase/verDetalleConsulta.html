@@ -11,6 +11,9 @@
             <a href="{% url 'generar_pdf_consulta' consulta.id %}" class="btn-home" style="background: #dc3545;">
                 📄 Descargar PDF
             </a>
+            <a href="{% url 'editar_consulta' consulta.id %}" class="btn-home" style="background: #ffc107;">
+                ✏️ Editar Consulta
+            </a>
         </div>
     </div>
 
@@ -254,7 +257,9 @@
         <a href="{% url 'generar_pdf_consulta' consulta.id %}" class="btn-home" style="background: #dc3545; padding: 12px 24px;">
             📄 Descargar PDF Completo
         </a>
-        
+        <a href="{% url 'editar_consulta' consulta.id %}" class="btn-home" style="background: #ffc107;">
+                ✏️ Editar Consulta
+            </a>
     </div>
 </section>
 

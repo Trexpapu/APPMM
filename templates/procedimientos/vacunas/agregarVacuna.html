@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Agregar Vacuna{% endblock %}
+
+{% block content %}
+<section class="container">
+
+    <div class="form-section">
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+            <div class="alert alert-error">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="{{ form.vacuna.id_for_label }}">{{ form.vacuna.label }}</label>
+                {{ form.vacuna }}
+                {% if form.vacuna.errors %}
+                <div class="field-errors">
+                    {% for error in form.vacuna.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if form.vacuna.help_text %}
+                <div class="help-text">{{ form.vacuna.help_text }}</div>
+                {% endif %}
+            </div>
+
+            
+        <div class="action-buttons">
+            <button type="submit" class="btn-home" style="back  ground: #28a745; padding: 12px 24px;">
+                💾 Guardar Operación
+            </button>
+            <a href="{% url 'index_vacunas' %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
+                ❌ Cancelar
+            </a>
+        </div>
+
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
 from .models import Operaciones
-from .forms import OperacionesForm
+from .forms import *
 from ClientesMascotas.models import Mascotas
 from django.contrib.auth.models import User
 # Create your views here.
@@ -54,35 +54,44 @@ def crear_operacion(request):
         'veterinarios': veterinarios,
         'title': 'Crear Nueva Operación'
     })
-
-
 @login_required
 def editar_operacion(request, pk):
     operacion = get_object_or_404(Operaciones, pk=pk)
+    mascotas = Mascotas.objects.all().select_related('cliente')
     
     if request.method == 'POST':
-        form = OperacionesForm(request.POST, request.FILES, instance=operacion)
+        form = OperacionesUpdateForm(request.POST, instance=operacion)
         if form.is_valid():
             operacion_editada = form.save(commit=False)
             
-            # Procesar nuevas imágenes si se suben
-            if 'fotoAntes' in request.FILES:
+            # Manejar fotoAntes
+            if 'fotoAntes' in request.FILES and request.FILES['fotoAntes']:
+                # Nueva imagen subida - convertir a base64
                 operacion_editada.fotoAntes = encode_image_to_base64(request.FILES['fotoAntes'])
-            if 'fotoDespues' in request.FILES:
+            else:
+                # Mantener la imagen existente - NO hacer nada, ya está en la instancia
+                pass  # Django automáticamente mantiene el valor existente
+            
+            # Manejar fotoDespues
+            if 'fotoDespues' in request.FILES and request.FILES['fotoDespues']:
+                # Nueva imagen subida - convertir a base64
                 operacion_editada.fotoDespues = encode_image_to_base64(request.FILES['fotoDespues'])
+            else:
+                # Mantener la imagen existente - NO hacer nada, ya está en la instancia
+                pass
             
             operacion_editada.save()
             messages.success(request, "Operación actualizada correctamente.")
             return redirect('detalle_operacion', pk=operacion.pk)
     else:
-        form = OperacionesForm(instance=operacion)
+        form = OperacionesUpdateForm(instance=operacion)
     
-    return render(request, 'operaciones/editar_operacion.html', {
+    return render(request, 'procedimientos/operaciones/editarOperacion.html', {
         'form': form,
         'operacion': operacion,
+        'mascotas': mascotas,
         'title': 'Editar Operación'
     })
-
 @login_required
 def historial_operaciones(request):
     operaciones = Operaciones.objects.all().select_related(
@@ -145,7 +154,7 @@ def historial_operaciones(request):
         'query_fecha_entrada': query_fecha_entrada,
     }
     
-    return render(request, 'operaciones/historial_operaciones.html', context)
+    return render(request, 'procedimientos/operaciones/verOperaciones.html', context)
 
 @login_required
 def detalle_operacion(request, pk):
@@ -160,7 +169,7 @@ def detalle_operacion(request, pk):
     if operacion.fotoDespues:
         foto_despues_data = f"data:image/jpeg;base64,{operacion.fotoDespues}"
     
-    return render(request, 'operaciones/detalle_operacion.html', {
+    return render(request, 'procedimientos/operaciones/detalleOperacion.html', {
         'operacion': operacion,
         'foto_antes_data': foto_antes_data,
         'foto_despues_data': foto_despues_data,
@@ -168,14 +177,76 @@ def detalle_operacion(request, pk):
 
 @login_required
 def eliminar_operacion(request, pk):
+    """View to delete an existing pet."""
     operacion = get_object_or_404(Operaciones, pk=pk)
+    operacion.delete()
+    return redirect('historial_operaciones')
+
+
+
+# Vista para listar vacunas
+@login_required
+def lista_vacunas(request):
+    vacunas = ListaVacunas.objects.all().order_by('vacuna')
+    
+    # Filtro por nombre de vacuna
+    query_vacuna = request.GET.get('q_vacuna', '')
+    if query_vacuna:
+        vacunas = vacunas.filter(vacuna__icontains=query_vacuna)
+    
+    context = {
+        'vacunas': vacunas,
+        'query_vacuna': query_vacuna,
+    }
+    
+    return render(request, 'procedimientos/vacunas/verVacunas.html', context)
+
+# Vista para agregar vacuna
+@login_required
+def agregar_vacuna(request):
+    if request.method == 'POST':
+        form = ListaVacunasForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "✅ Vacuna agregada exitosamente.")
+            return redirect('lista_vacunas')
+    else:
+        form = ListaVacunasForm()
+    
+    return render(request, 'procedimientos/vacunas/agregarVacuna.html', {
+        'form': form,
+        'title': 'Agregar Vacuna'
+    })
+
+# Vista para editar vacuna
+@login_required
+def editar_vacuna(request, pk):
+    vacuna = get_object_or_404(ListaVacunas, pk=pk)
     
     if request.method == 'POST':
-        mascota_nombre = operacion.mascota.nombre
-        operacion.delete()
-        messages.success(request, f"Operación de {mascota_nombre} eliminada correctamente.")
-        return redirect('historial_operaciones')
+        form = ListaVacunasForm(request.POST, instance=vacuna)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "✅ Vacuna actualizada exitosamente.")
+            return redirect('lista_vacunas')
+    else:
+        form = ListaVacunasForm(instance=vacuna)
     
-    return render(request, 'operaciones/eliminar_operacion.html', {
-        'operacion': operacion
+    return render(request, 'procedimientos/vacunas/editarVacuna.html', {
+        'form': form,
+        'vacuna': vacuna,
+        'title': 'Editar Vacuna'
     })
+
+# Vista para eliminar vacuna
+@login_required
+def eliminar_vacuna(request, pk):
+    """View to delete an existing pet."""
+    vacuna = get_object_or_404(ListaVacunas, pk=pk)
+    vacuna.delete()
+    return redirect('lista_vacunas')
+
+
+@login_required
+def indexVacunas(request):
+    return render(request, 'procedimientos/vacunas/indexVacunas.html')

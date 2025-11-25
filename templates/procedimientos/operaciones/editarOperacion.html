@@ -1,0 +1,397 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Operación{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2>✏️ Editar Operación</h2>
+        <div class="action-buttons">
+            <a href="{% url 'detalle_operacion' operacion.pk %}" class="btn-home" style="background: #17a2b8;">
+                👁️ Ver Detalles
+            </a>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- 🔍 Búsqueda y selección de mascota -->
+        <div class="form-section">
+            <h3>🐾 Selección de Mascota</h3>
+            
+            <div class="form-group">
+                <label for="mascota-search">🔍 Buscar mascota:</label>
+                <input 
+                    type="text" 
+                    id="mascota-search" 
+                    placeholder="Buscar mascota por nombre, raza, especie, nombre del cliente, email o teléfono" 
+                    class="search-input"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.mascota.id_for_label }}">🐕 Seleccionar mascota:</label>
+                <select id="{{ form.mascota.id_for_label }}" name="{{ form.mascota.name }}" class="form-control searchable-dropdown" required>
+                    <option value="">Seleccione una mascota</option>
+                    {% for mascota in form.mascota.field.queryset %}
+                    <option 
+                        value="{{ mascota.id }}"
+                        data-nombre="{{ mascota.nombre|escapejs }}"
+                        data-especie="{{ mascota.especie|escapejs }}"
+                        data-raza="{{ mascota.raza|escapejs }}"
+                        data-fechanacimiento="{{ mascota.fechaNacimiento }}"
+                        data-sexo="{{ mascota.get_sexo_display|escapejs }}"
+                        data-vive="{% if mascota.vive %}Sí{% else %}No{% endif %}"
+                        data-cliente="{{ mascota.cliente.nombre|escapejs }}"
+                        data-telefono="{{ mascota.cliente.telefono|escapejs }}"
+                        data-email="{{ mascota.cliente.email|escapejs }}"
+                        {% if mascota.id == operacion.mascota.id %}selected{% endif %}
+                    >
+                        {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - 
+                        {{ mascota.cliente.nombre }} - {{ mascota.cliente.email }} - {{ mascota.cliente.telefono }}
+                    </option>
+                    {% endfor %}
+                </select>
+                {% if form.mascota.errors %}
+                <div class="field-errors">
+                    {{ form.mascota.errors }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- 📋 INFORMACIÓN COMPLETA DE LA MASCOTA SELECCIONADA -->
+        <div id="mascota-info" class="form-section" style="background: #f0f8ff; border-left: 4px solid #3498db; display: none;">
+            <h3>📋 Información de la Mascota</h3>
+            
+            <!-- Información Básica -->
+            <div class="info-section">
+                <h4>👤 Información Básica</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>🐕 Nombre:</strong>
+                        <span id="info-nombre">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>🔬 Especie:</strong>
+                        <span id="info-especie">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>🎯 Raza:</strong>
+                        <span id="info-raza">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>📅 Fecha Nacimiento:</strong>
+                        <span id="info-fechanacimiento">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>⚧️ Sexo:</strong>
+                        <span id="info-sexo">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>❤️ Estado:</strong>
+                        <span id="info-vive">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información del Dueño -->
+            <div class="info-section">
+                <h4>👤 Información del Dueño</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>👤 Dueño:</strong>
+                        <span id="info-cliente">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>📞 Teléfono:</strong>
+                        <span id="info-telefono">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>📧 Email:</strong>
+                        <span id="info-email">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📝 FORMULARIO DE OPERACIÓN - USANDO EL FORM DE DJANGO -->
+        <div class="form-section">
+            <h3>🩺 Datos de la Operación</h3>
+            
+            {% if form.errors %}
+            <div class="alert alert-error">
+                <strong>❌ Por favor corrige los siguientes errores:</strong>
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <div class="form-grid">
+                <!-- Mostrar campos del formulario excepto mascota -->
+                {% for field in form %}
+                    {% if field.name != 'mascota' %}
+                    <div class="form-group {% if field.name in 'operacion,descripcion,complicaciones' %}full-width{% endif %}">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        
+                        {% if field.help_text %}
+                            <small class="help-text">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="field-errors">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                
+                <!-- Campos de imagen MANUALES - NO son parte del formulario Django -->
+                <div class="form-group">
+                    <label for="fotoAntes">🖼️ Foto Antes de la Operación:</label>
+                    <input type="file" id="fotoAntes" name="fotoAntes" class="form-control" accept="image/*">
+                    {% if operacion.fotoAntes %}
+                    <div class="current-image">
+                        <small>Imagen actual:</small>
+                        <div class="image-preview">
+                            <img src="data:image/jpeg;base64,{{ operacion.fotoAntes }}" alt="Foto antes" style="max-width: 200px; max-height: 200px;">
+                        </div>
+                        <small class="help-text">Dejar vacío para mantener la imagen actual</small>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="fotoDespues">🖼️ Foto Después de la Operación:</label>
+                    <input type="file" id="fotoDespues" name="fotoDespues" class="form-control" accept="image/*">
+                    {% if operacion.fotoDespues %}
+                    <div class="current-image">
+                        <small>Imagen actual:</small>
+                        <div class="image-preview">
+                            <img src="data:image/jpeg;base64,{{ operacion.fotoDespues }}" alt="Foto después" style="max-width: 200px; max-height: 200px;">
+                        </div>
+                        <small class="help-text">Dejar vacío para mantener la imagen actual</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn-home" style="background: #28a745; padding: 12px 24px;">
+                💾 Guardar Cambios
+            </button>
+            <a href="{% url 'historial_operaciones' %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
+                ❌ Cancelar
+            </a>
+        </div>
+    </form>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('mascota-search');
+    const dropdown = document.getElementById('{{ form.mascota.id_for_label }}');
+    const mascotaInfo = document.getElementById('mascota-info');
+
+    // 🔍 FILTRO DE BÚSQUEDA
+    searchInput.addEventListener('input', function() {
+        const filter = searchInput.value.toLowerCase().replace(/\s+/g, '');
+        dropdown.querySelectorAll('option').forEach(option => {
+            const text = option.textContent.toLowerCase().replace(/\s+/g, '');
+            option.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+
+    // Función para formatear texto que puede estar vacío
+    function formatText(text) {
+        return text && text.trim() !== '' ? text : 'No especificado';
+    }
+
+    // 🐾 ACTUALIZAR INFORMACIÓN DE MASCOTA AL SELECCIONAR
+    dropdown.addEventListener('change', function() {
+        const selectedOption = dropdown.options[dropdown.selectedIndex];
+        
+        if (selectedOption.value) {
+            // Información básica
+            document.getElementById('info-nombre').textContent = formatText(selectedOption.getAttribute('data-nombre'));
+            document.getElementById('info-especie').textContent = formatText(selectedOption.getAttribute('data-especie'));
+            document.getElementById('info-raza').textContent = formatText(selectedOption.getAttribute('data-raza'));
+            document.getElementById('info-fechanacimiento').textContent = selectedOption.getAttribute('data-fechanacimiento');
+            document.getElementById('info-sexo').textContent = formatText(selectedOption.getAttribute('data-sexo'));
+            document.getElementById('info-vive').textContent = formatText(selectedOption.getAttribute('data-vive'));
+
+            // Información del dueño
+            document.getElementById('info-cliente').textContent = formatText(selectedOption.getAttribute('data-cliente'));
+            document.getElementById('info-telefono').textContent = formatText(selectedOption.getAttribute('data-telefono'));
+            document.getElementById('info-email').textContent = formatText(selectedOption.getAttribute('data-email'));
+            
+            mascotaInfo.style.display = 'block';
+        } else {
+            mascotaInfo.style.display = 'none';
+        }
+    });
+
+    // 🎯 MOSTRAR INFORMACIÓN SI YA HAY MASCOTA SELECCIONADA (al cargar la página)
+    if (dropdown.value) {
+        dropdown.dispatchEvent(new Event('change'));
+    }
+});
+</script>
+
+<style>
+.form-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.field-errors {
+    color: #dc3545;
+    font-size: 0.875em;
+    margin-top: 5px;
+}
+
+.help-text {
+    color: #6c757d;
+    font-size: 0.875em;
+    margin-top: 5px;
+    display: block;
+}
+
+.info-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.info-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.info-section h4 {
+    color: #495057;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #3498db;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.info-item strong {
+    color: #495057;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+.info-content {
+    background: #f8f9fa;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border-left: 3px solid #17a2b8;
+    min-height: 20px;
+}
+
+.search-input, .searchable-dropdown {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.searchable-dropdown {
+    height: auto;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+
+select.form-control {
+    height: auto;
+}
+
+.alert.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid #f5c6cb;
+    margin-bottom: 15px;
+}
+
+.alert.alert-error ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.current-image {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid #17a2b8;
+}
+
+.image-preview {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.image-preview img {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,316 @@
+{% extends 'base.html' %}
+
+{% block title %}Historial de Operaciones{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2>📋 Historial de Operaciones</h2>
+        
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-combinados">
+        <form method="get" action="" class="filtros-form">
+            <div class="filtros-grid">
+                <!-- Filtro por Cliente -->
+                <div class="filtro-group">
+                    <label for="q_cliente" class="filtro-label">👤 Cliente</label>
+                    <div class="filtro-input-container">
+                        <input type="text" id="q_cliente" name="q_cliente" 
+                               value="{{ query_cliente }}" placeholder="Nombre, email o teléfono" class="filtro-input">
+                        {% if query_cliente %}
+                        <button type="button" class="filtro-clear" 
+                                onclick="document.getElementById('q_cliente').value = ''; this.form.submit();">
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Mascota -->
+                <div class="filtro-group">
+                    <label for="q_mascota" class="filtro-label">🐕 Mascota</label>
+                    <div class="filtro-input-container">
+                        <input type="text" id="q_mascota" name="q_mascota" 
+                               value="{{ query_mascota }}" placeholder="Nombre, raza o especie" class="filtro-input">
+                        {% if query_mascota %}
+                        <button type="button" class="filtro-clear" 
+                                onclick="document.getElementById('q_mascota').value = ''; this.form.submit();">
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Operación -->
+                <div class="filtro-group">
+                    <label for="q_operacion" class="filtro-label">🩺 Operación</label>
+                    <div class="filtro-input-container">
+                        <input type="text" id="q_operacion" name="q_operacion" 
+                               value="{{ query_operacion }}" placeholder="Tipo de operación" class="filtro-input">
+                        {% if query_operacion %}
+                        <button type="button" class="filtro-clear" 
+                                onclick="document.getElementById('q_operacion').value = ''; this.form.submit();">
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Veterinario -->
+                <div class="filtro-group">
+                    <label for="q_veterinario" class="filtro-label">👨‍⚕️ Veterinario</label>
+                    <div class="filtro-input-container">
+                        <select id="q_veterinario" name="q_veterinario" class="filtro-input">
+                            <option value="">Todos los veterinarios</option>
+                            {% for vet in veterinarios %}
+                            <option value="{{ vet.id }}" {% if query_veterinario == vet.id|stringformat:"s" %}selected{% endif %}>
+                                {{ vet.get_full_name|default:vet.username }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if query_veterinario %}
+                        <button type="button" class="filtro-clear" 
+                                onclick="document.getElementById('q_veterinario').value = ''; this.form.submit();">
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Veterinaria -->
+                <div class="filtro-group">
+                    <label for="q_veterinaria" class="filtro-label">🏥 Clínica</label>
+                    <div class="filtro-input-container">
+                        <select id="q_veterinaria" name="q_veterinaria" class="filtro-input">
+                            <option value="">Todas las clínicas</option>
+                            {% for clinica in clinicas %}
+                            <option value="{{ clinica.0 }}" {% if query_veterinaria == clinica.0 %}selected{% endif %}>
+                                {{ clinica.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if query_veterinaria %}
+                        <button type="button" class="filtro-clear" 
+                                onclick="document.getElementById('q_veterinaria').value = ''; this.form.submit();">
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Fecha de Entrada -->
+                <div class="filtro-group">
+                    <label for="q_fecha_entrada" class="filtro-label">📅 Fecha Inicio de la Operación</label>
+                    <div class="filtro-input-container">
+                        <input type="date" id="q_fecha_entrada" name="q_fecha_entrada" 
+                               value="{{ query_fecha_entrada }}" class="filtro-input">
+                        {% if query_fecha_entrada %}
+                        <button type="button" class="filtro-clear" 
+                                onclick="document.getElementById('q_fecha_entrada').value = ''; this.form.submit();">
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="filtro-actions">
+                    <button type="submit" class="btn-home filtro-submit">🔍 Buscar</button>
+                    <a href="{% url 'historial_operaciones' %}" class="btn-home filtro-reset">🗑️ Limpiar</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Información de resultados -->
+    <div class="results-info">
+        <p>📊 Total de operaciones: <strong>{{ operaciones|length }}</strong></p>
+    </div>
+
+    <!-- Tabla de operaciones -->
+    <div class="custom-table-container">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>👤 Cliente</th>
+                    <th>🐕 Mascota</th>
+                    <th>🩺 Operación</th>
+                    <th>📅 Fecha Inicio de operación</th>
+                    <th>📅 Fecha Salida de operación</th>
+                    <th>👨‍⚕️ Veterinario</th>
+                    <th>🏥 Clínica</th>
+                    <th>⚡ Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for operacion in operaciones %}
+                <tr>
+                    <td>
+                        <div class="client-info">
+                            <strong>{{ operacion.mascota.cliente.nombre }}</strong>
+                            <div class="client-details">
+                                <small>📞 {{ operacion.mascota.cliente.telefono|default:"Sin teléfono" }}</small>
+                                <small>📧 {{ operacion.mascota.cliente.email|default:"Sin email" }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="pet-info">
+                            <strong>{{ operacion.mascota.nombre }}</strong>
+                            <div class="pet-details">
+                                <small>🎯 {{ operacion.mascota.raza|default:"Sin raza" }}</small>
+                                <small>🔬 {{ operacion.mascota.especie|default:"Sin especie" }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="truncate-text" title="{{ operacion.operacion }}">
+                            {{ operacion.operacion|truncatewords:5 }}
+                        </div>
+                    </td>
+                    <td>{{ operacion.fechaEntrada }}</td>
+                    <td>
+                        {% if operacion.fechaSalida %}
+                            {{ operacion.fechaSalida }}
+                        {% else %}
+                            <span class="badge badge-warning">🕒 En curso</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ operacion.veterinario.get_full_name|default:operacion.veterinario.username }}</td>
+                    <td>{{ operacion.clinicaVeterinaria }}</td>
+                    <td>
+                        <div class="action-buttons compact">
+                            <a href="{% url 'detalle_operacion' operacion.pk %}" 
+                               class="btn-home" style="background: #17a2b8; padding: 5px 10px;"
+                               title="Ver detalles">
+                                👁️
+                            </a>
+                            <a href="{% url 'editar_operacion' operacion.pk %}" 
+                               class="btn-home" style="background: #ffc107; color: black; padding: 5px 10px;"
+                               title="Editar operación">
+                                ✏️
+                            </a>
+                            <a href="{% url 'eliminar_operacion' operacion.pk %}" 
+                               class="btn-home" style="background: #dc3545; padding: 5px 10px;"
+                               onclick="return confirm('¿Estás seguro de que quieres eliminar la operación de {{ operacion.mascota.nombre }}?');"
+                               title="Eliminar operación">
+                                🗑️
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="no-data">
+                        {% if request.GET %}
+                            🔍 No se encontraron operaciones que coincidan con los filtros aplicados.
+                        {% else %}
+                            📝 No hay operaciones registradas. 
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<style>
+.filtros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.filtro-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filtro-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.filtro-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.filtro-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filtro-clear {
+    position: absolute;
+    right: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px 5px;
+}
+
+.filtro-actions {
+    display: flex;
+    gap: 10px;
+    align-items: end;
+}
+
+.filtro-submit, .filtro-reset {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: black;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.results-info {
+    background: #e9ecef;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border-left: 4px solid #007bff;
+}
+
+.client-info, .pet-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.client-details, .pet-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.client-details small, .pet-details small {
+    font-size: 0.75em;
+    color: #6c757d;
+}
+
+.truncate-text {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+</style>
+{% endblock %}

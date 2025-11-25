@@ -6,11 +6,7 @@
 <section class="container">
     <div class="header-actions">
         <h2>🩺 Crear Nueva Operación</h2>
-        <div class="action-buttons">
-            <a href="{% url 'index-procedimientos' %}" class="btn-home" style="background: #17a2b8;">
-                📋 Ver Historial
-            </a>
-        </div>
+        
     </div>
 
     <form method="post" enctype="multipart/form-data">
@@ -31,8 +27,8 @@
             </div>
 
             <div class="form-group">
-                <label for="mascota">🐕 Seleccionar mascota:</label>
-                <select id="mascota" name="mascota" class="searchable-dropdown" required>
+                <label for="{{ form.mascota.id_for_label }}">🐕 Seleccionar mascota:</label>
+                <select id="{{ form.mascota.id_for_label }}" name="{{ form.mascota.name }}" class="form-control searchable-dropdown" required>
                     <option value="">Seleccione una mascota</option>
                     {% for mascota in mascotas %}
                     <option 
@@ -44,7 +40,7 @@
                         data-fechanacimiento="{{ mascota.fechaNacimiento }}"
                         data-sexo="{{ mascota.get_sexo_display|escapejs }}"
                         data-vacunas="{{ mascota.vacunas|escapejs }}"
-                        data-ultimadesparasitacion="{{ mascota.ultimaDesparasitacion|date:'Y-m-d'|default:'' }}"
+                        data-ultimadesparasitacion="{{ mascota.ultimaDesparasitacion|default:'No se ha desparasitado' }}"
                         data-ultimodesparasitante="{{ mascota.ultimoDesparasitante|escapejs }}"
                         data-alergias="{{ mascota.alergias|escapejs }}"
                         data-vive="{% if mascota.vive %}Sí{% else %}No{% endif %}"
@@ -157,121 +153,43 @@
             </div>
         </div>
 
-        <!-- 📝 FORMULARIO DE OPERACIÓN -->
+        <!-- 📝 FORMULARIO DE OPERACIÓN - USANDO EL FORM DE DJANGO -->
         <div class="form-section">
             <h3>🩺 Datos de la Operación</h3>
             
             {% if form.errors %}
             <div class="alert alert-error">
                 <strong>❌ Por favor corrige los siguientes errores:</strong>
-                {{ form.errors }}
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
             </div>
             {% endif %}
             
             <div class="form-grid">
-                <!-- Veterinario -->
-                <div class="form-group">
-                    <label for="id_veterinario">👨‍⚕️ Veterinario:</label>
-                    <select id="id_veterinario" name="veterinario" class="form-control" required>
-                        <option value="">Seleccione un veterinario</option>
-                        {% for vet in veterinarios %}
-                        <option value="{{ vet.id }}" {% if vet.id == request.user.id %}selected{% endif %}>
-                            {{ vet.get_full_name|default:vet.username }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <!-- Clínica Veterinaria -->
-                <div class="form-group">
-                    <label for="{{ form.clinicaVeterinaria.id_for_label }}">🏥 Clínica Veterinaria:</label>
-                    {{ form.clinicaVeterinaria }}
-                    {% if form.clinicaVeterinaria.errors %}
-                    <div class="field-errors">
-                        {{ form.clinicaVeterinaria.errors }}
+                {% for field in form %}
+                    {% if field.name != 'mascota' %}
+                    <div class="form-group {% if field.name in 'operacion,descripcion,complicaciones' %}full-width{% endif %}">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="help-text">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="field-errors">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
                     </div>
                     {% endif %}
-                </div>
-                
-                <!-- Fecha de Entrada -->
-                <div class="form-group">
-                    <label for="{{ form.fechaEntrada.id_for_label }}">📅 Fecha de Entrada:</label>
-                    {{ form.fechaEntrada }}
-                    {% if form.fechaEntrada.errors %}
-                    <div class="field-errors">
-                        {{ form.fechaEntrada.errors }}
-                    </div>
-                    {% endif %}
-                </div>
-
-                <!-- Fecha de Salida -->
-                <div class="form-group">
-                    <label for="{{ form.fechaSalida.id_for_label }}">📅 Fecha de Salida:</label>
-                    {{ form.fechaSalida }}
-                    <small class="help-text">Opcional - dejar vacío si aún no sale</small>
-                    {% if form.fechaSalida.errors %}
-                    <div class="field-errors">
-                        {{ form.fechaSalida.errors }}
-                    </div>
-                    {% endif %}
-                </div>
-
-                <!-- Tipo de Operación -->
-                <div class="form-group full-width">
-                    <label for="{{ form.operacion.id_for_label }}">🩺 Tipo de Operación:</label>
-                    {{ form.operacion }}
-                    {% if form.operacion.errors %}
-                    <div class="field-errors">
-                        {{ form.operacion.errors }}
-                    </div>
-                    {% endif %}
-                </div>
-
-                <!-- Descripción -->
-                <div class="form-group full-width">
-                    <label for="{{ form.descripcion.id_for_label }}">📝 Descripción:</label>
-                    {{ form.descripcion }}
-                    {% if form.descripcion.errors %}
-                    <div class="field-errors">
-                        {{ form.descripcion.errors }}
-                    </div>
-                    {% endif %}
-                </div>
-
-                <!-- Complicaciones -->
-                <div class="form-group full-width">
-                    <label for="{{ form.complicaciones.id_for_label }}">⚠️ Complicaciones:</label>
-                    {{ form.complicaciones }}
-                    <small class="help-text">Opcional - describir cualquier complicación durante o después de la operación</small>
-                    {% if form.complicaciones.errors %}
-                    <div class="field-errors">
-                        {{ form.complicaciones.errors }}
-                    </div>
-                    {% endif %}
-                </div>
-
-                <!-- Fotos -->
-                <div class="form-group">
-                    <label for="{{ form.fotoAntes.id_for_label }}">🖼️ Foto Antes:</label>
-                    {{ form.fotoAntes }}
-                    <small class="help-text">Opcional - foto antes de la operación</small>
-                    {% if form.fotoAntes.errors %}
-                    <div class="field-errors">
-                        {{ form.fotoAntes.errors }}
-                    </div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="{{ form.fotoDespues.id_for_label }}">🖼️ Foto Después:</label>
-                    {{ form.fotoDespues }}
-                    <small class="help-text">Opcional - foto después de la operación</small>
-                    {% if form.fotoDespues.errors %}
-                    <div class="field-errors">
-                        {{ form.fotoDespues.errors }}
-                    </div>
-                    {% endif %}
-                </div>
+                {% endfor %}
             </div>
         </div>
 
@@ -289,7 +207,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('mascota-search');
-    const dropdown = document.getElementById('mascota');
+    const dropdown = document.getElementById('{{ form.mascota.id_for_label }}');
     const mascotaInfo = document.getElementById('mascota-info');
 
     // 🔍 FILTRO DE BÚSQUEDA
@@ -304,13 +222,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Función para formatear texto que puede estar vacío
     function formatText(text) {
         return text && text.trim() !== '' ? text : 'No especificado';
-    }
-
-    // Función para formatear fecha
-    function formatDate(dateString) {
-        if (!dateString) return 'No especificado';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('es-ES');
     }
 
     // 🐾 ACTUALIZAR INFORMACIÓN DE MASCOTA AL SELECCIONAR
@@ -337,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Historial médico
             document.getElementById('info-vacunas').textContent = formatText(selectedOption.getAttribute('data-vacunas'));
-            document.getElementById('info-ultimadesparasitacion').textContent = formatDate(selectedOption.getAttribute('data-ultimadesparasitacion'));
+            document.getElementById('info-ultimadesparasitacion').textContent = selectedOption.getAttribute('data-ultimadesparasitacion');
             document.getElementById('info-ultimodesparasitante').textContent = formatText(selectedOption.getAttribute('data-ultimodesparasitante'));
             document.getElementById('info-alergias').textContent = formatText(selectedOption.getAttribute('data-alergias'));
             
@@ -446,6 +357,39 @@ document.addEventListener('DOMContentLoaded', function() {
     height: auto;
     max-height: 200px;
     overflow-y: auto;
+}
+
+/* Estilos para los campos del formulario */
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+
+select.form-control {
+    height: auto;
+}
+
+.alert.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid #f5c6cb;
+    margin-bottom: 15px;
+}
+
+.alert.alert-error ul {
+    margin: 0;
+    padding-left: 20px;
 }
 </style>
 {% endblock %}

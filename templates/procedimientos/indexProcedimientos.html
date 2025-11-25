@@ -6,8 +6,9 @@
 <section class="container index-cliente">
     <h2>💉 Gestión de Procedimientos</h2>
     <div class="options">
-        <a href="{% url 'ver-consultas' %}" class="btn-home">🏥 Ver Historial de Operaciones</a>
+        <a href="{% url 'historial_operaciones' %}" class="btn-home">🏥 Ver Historial de Operaciones</a>
         <a href="{% url 'crear_operacion' %}" class="btn-home">🩸 Nueva Operación</a>
+        <a href="{% url 'index_vacunas' %}" class="btn-home">💉 Gestión de Vacunas</a>
     </div>
 </section>
 {% endblock %}

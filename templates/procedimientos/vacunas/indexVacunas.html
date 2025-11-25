@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}Vacunas - Inicio{% endblock %}
+
+{% block content %}
+<section class="container index-cliente">
+    <h2>💉 Gestión de Vacunas</h2>
+    <div class="options">
+        <a href="{% url 'agregar_vacuna' %}" class="btn-home">💉 Nueva Vacuna</a>
+        <a href="{% url 'lista_vacunas' %}" class="btn-home">📋 Ver Vacunas</a>
+    </div>
+</section>
+{% endblock %}

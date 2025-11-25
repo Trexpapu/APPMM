@@ -33,9 +33,9 @@ class Desparasitaciones(models.Model):
         ('Mascotas Morelia Mano Huevona', 'Mascotas Morelia Mano Huevona'),
     ]
     mascota = models.ForeignKey(Mascotas, on_delete=models.CASCADE)
+    peso = models.FloatField(default=0)
     desparasitante = models.ForeignKey(ListaDesparasitantes, on_delete= models.CASCADE)
     fecha = models.DateField()
-    
     veterinario =  models.ForeignKey(User, on_delete=models.CASCADE)
     clinicaVeterinaria = models.CharField(
         max_length=255,
@@ -50,6 +50,7 @@ class Operaciones(models.Model):
         ('Mascotas Morelia Mano Huevona', 'Mascotas Morelia Mano Huevona'),
     ]
     mascota = models.ForeignKey(Mascotas, on_delete= models.CASCADE)
+  #  peso = models.FloatField()
     fechaEntrada = models.DateTimeField()
     fechaSalida = models.DateTimeField(blank= True, null = True)
     operacion = models.TextField()
