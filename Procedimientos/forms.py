@@ -4,6 +4,219 @@ from ClientesMascotas.models import Mascotas
 from django.contrib.auth.models import User
 
 
+class DesparasitacionesUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Desparasitaciones
+        fields = [
+            'mascota',
+            'peso',
+            'desparasitante',
+            'fecha',
+            'veterinario',
+            'clinicaVeterinaria',
+        ]
+        widgets = {
+            'fecha': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control'
+            }),
+            'clinicaVeterinaria': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'mascota': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'desparasitante': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'veterinario': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'peso': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'placeholder': 'Peso de la mascota en kg'
+            }),
+        }
+        labels = {
+            'mascota': '🐕 Mascota',
+            'peso': '⚖️ Peso (kg)',
+            'desparasitante': '🪱 Desparasitante',
+            'fecha': '📅 Fecha de Desparasitación',
+            'veterinario': '👨‍⚕️ Veterinario',
+            'clinicaVeterinaria': '🏥 Clínica Veterinaria',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Formatear la fecha para el input type="date"
+        if self.instance and self.instance.fecha:
+            self.initial['fecha'] = self.instance.fecha.strftime('%Y-%m-%d')
+
+class DesparasitacionesForm(forms.ModelForm):
+    class Meta:
+        model = Desparasitaciones
+        fields = [
+            'mascota',
+            'peso',
+            'desparasitante',
+            'fecha',
+            'veterinario',
+            'clinicaVeterinaria',
+        ]
+        widgets = {
+            'fecha': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control'
+            }),
+            'clinicaVeterinaria': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'mascota': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'desparasitante': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'veterinario': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'peso': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'placeholder': 'Peso de la mascota en kg'
+            }),
+        }
+        labels = {
+            'mascota': '🐕 Mascota',
+            'peso': '⚖️ Peso (kg)',
+            'desparasitante': '🪱 Desparasitante',
+            'fecha': '📅 Fecha de Desparasitación',
+            'veterinario': '👨‍⚕️ Veterinario',
+            'clinicaVeterinaria': '🏥 Clínica Veterinaria',
+        }
+
+
+class ListaDesparasitantesForm(forms.ModelForm):
+    class Meta:
+        model = ListaDesparasitantes
+        fields = ['desparasitante']
+        widgets = {
+            'desparasitante': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre del desparasitante'
+            }),
+        }
+        labels = {
+            'desparasitante': '🪱 Desparasitante',
+        }
+class ListaDesparasitantesUpdateForm(forms.ModelForm):
+    class Meta:
+        model = ListaDesparasitantes
+        fields = ['desparasitante']
+        widgets = {
+            'desparasitante': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre del desparasitante'
+            }),
+        }
+        labels = {
+            'desparasitante': '🪱 Desparasitante',
+        }
+
+class VacunacionesUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Vacunaciones
+        fields = [
+            'mascota',
+            'vacunas',
+            'descripcion',
+            'veterinario',
+            'clinicaVeterinaria',
+            'fecha',
+        ]
+        widgets = {
+            'fecha': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control'
+            }),
+            'descripcion': forms.Textarea(attrs={
+                'rows': 4,
+                'class': 'form-control',
+                'placeholder': 'Descripción de la vacunación'
+            }),
+            'clinicaVeterinaria': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'mascota': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'vacunas': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'veterinario': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+        }
+        labels = {
+            'mascota': '🐕 Mascota',
+            'vacunas': '💉 Vacuna',
+            'descripcion': '📝 Descripción',
+            'veterinario': '👨‍⚕️ Veterinario',
+            'clinicaVeterinaria': '🏥 Clínica Veterinaria',
+            'fecha': '📅 Fecha de Vacunación',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Formatear la fecha para el input type="date"
+        if self.instance and self.instance.fecha:
+            self.initial['fecha'] = self.instance.fecha.strftime('%Y-%m-%d')
+
+
+class VacunacionesForm(forms.ModelForm):
+    class Meta:
+        model = Vacunaciones
+        fields = [
+            'mascota',
+            'vacunas',
+            'descripcion',
+            'veterinario',
+            'clinicaVeterinaria',
+            'fecha',
+        ]
+        widgets = {
+            'fecha': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control'
+            }),
+            'descripcion': forms.Textarea(attrs={
+                'rows': 4,
+                'class': 'form-control',
+                'placeholder': 'Descripción de la vacunación'
+            }),
+            'clinicaVeterinaria': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'mascota': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'vacunas': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'veterinario': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+        }
+        labels = {
+            'mascota': '🐕 Mascota',
+            'vacunas': '💉 Vacuna',
+            'descripcion': '📝 Descripción',
+            'veterinario': '👨‍⚕️ Veterinario',
+            'clinicaVeterinaria': '🏥 Clínica Veterinaria',
+            'fecha': '📅 Fecha de Vacunación',
+        }
+
 class ListaVacunasForm(forms.ModelForm):
     class Meta:
         model = ListaVacunas

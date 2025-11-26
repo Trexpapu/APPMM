@@ -2,10 +2,19 @@ from django.db import models
 from ClientesMascotas.models import *
 from django.contrib.auth.models import User
 # Create your models here.
+
+
 class ListaVacunas(models.Model):
     vacuna = models.TextField()
+    
+    def __str__(self):
+        return self.vacuna
+    
 class ListaDesparasitantes(models.Model):
     desparasitante = models.TextField()
+    
+    def __str__(self):
+        return self.desparasitante
 
 class Vacunaciones(models.Model):
     CLINICAS = [

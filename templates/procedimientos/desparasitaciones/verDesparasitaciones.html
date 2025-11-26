@@ -1,0 +1,413 @@
+{% extends 'base.html' %}
+
+{% block title %}🪱 Historial de Desparasitaciones{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2>🪱 Historial de Desparasitaciones</h2>
+        <a href="{% url 'nueva_desparasitacion' %}" class="btn-home btn-agregar">
+            ➕ Nueva Desparasitación
+        </a>
+    </div>
+
+    <!-- Filtros Combinados -->
+    <div class="filtros-combinados">
+        <form method="get" action="" class="filtros-form">
+            <div class="filtros-grid">
+                <!-- Filtro por Cliente -->
+                <div class="filtro-group">
+                    <label for="q_cliente" class="filtro-label">
+                        👤 Buscar por Cliente
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q_cliente" 
+                            name="q_cliente" 
+                            placeholder="Nombre, email o teléfono del cliente..." 
+                            class="filtro-input"
+                            value="{{ query_cliente }}"
+                        >
+                        {% if query_cliente %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_cliente').value = ''; this.form.submit();"
+                            title="Limpiar filtro de cliente"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Mascota -->
+                <div class="filtro-group">
+                    <label for="q_mascota" class="filtro-label">
+                        🐕 Buscar por Mascota
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q_mascota" 
+                            name="q_mascota" 
+                            placeholder="Nombre, raza o especie" 
+                            class="filtro-input"
+                            value="{{ query_mascota }}"
+                        >
+                        {% if query_mascota %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_mascota').value = ''; this.form.submit();"
+                            title="Limpiar filtro de mascota"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Veterinario -->
+                <div class="filtro-group">
+                    <label for="q_veterinario" class="filtro-label">
+                        👨‍⚕️ Veterinario
+                    </label>
+                    <div class="filtro-input-container">
+                        <select id="q_veterinario" name="q_veterinario" class="filtro-input">
+                            <option value="">Todos los veterinarios</option>
+                            {% for vet in veterinarios %}
+                            <option value="{{ vet.id }}" {% if query_veterinario == vet.id|stringformat:"s" %}selected{% endif %}>
+                                {{ vet.get_full_name|default:vet.username }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if query_veterinario %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_veterinario').value = ''; this.form.submit();"
+                            title="Limpiar filtro de veterinario"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Desparasitante -->
+                <div class="filtro-group">
+                    <label for="q_desparasitante" class="filtro-label">
+                        🪱 Buscar por Desparasitante
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q_desparasitante" 
+                            name="q_desparasitante" 
+                            placeholder="Nombre del desparasitante" 
+                            class="filtro-input"
+                            value="{{ query_desparasitante }}"
+                        >
+                        {% if query_desparasitante %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_desparasitante').value = ''; this.form.submit();"
+                            title="Limpiar filtro de desparasitante"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Clínica -->
+                <div class="filtro-group">
+                    <label for="q_veterinaria" class="filtro-label">
+                        🏥 Clínica Veterinaria
+                    </label>
+                    <div class="filtro-input-container">
+                        <select id="q_veterinaria" name="q_veterinaria" class="filtro-input">
+                            <option value="">Todas las clínicas</option>
+                            {% for clinica in clinicas %}
+                            <option value="{{ clinica.0 }}" {% if query_veterinaria == clinica.0 %}selected{% endif %}>
+                                {{ clinica.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if query_veterinaria %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_veterinaria').value = ''; this.form.submit();"
+                            title="Limpiar filtro de clínica"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Fecha -->
+                <div class="filtro-group">
+                    <label for="q_fecha" class="filtro-label">
+                        📅 Fecha de Desparasitación
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="date" 
+                            id="q_fecha" 
+                            name="q_fecha" 
+                            class="filtro-input"
+                            value="{{ query_fecha }}"
+                        >
+                        {% if query_fecha %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_fecha').value = ''; this.form.submit();"
+                            title="Limpiar filtro de fecha"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="filtro-actions">
+                    <button type="submit" class="btn-home filtro-submit">
+                        🔍 Buscar
+                    </button>
+                    {% if filtros_activos %}
+                    <a href="{% url 'historial_desparasitaciones' %}" class="btn-home filtro-reset">
+                        🗑️ Limpiar Filtros
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Información de resultados -->
+    {% if filtros_activos %}
+    <div class="results-info">
+        <p>
+            📊 Mostrando <strong>{{ desparasitaciones|length }}</strong> desparasitación(es)
+            {% if query_cliente %}para cliente: "<strong>{{ query_cliente }}</strong>"{% endif %}
+            {% if query_mascota %}{% if query_cliente %}y {% endif %}mascota: "<strong>{{ query_mascota }}</strong>"{% endif %}
+            {% if query_veterinario %}
+                {% if query_cliente or query_mascota %}y {% endif %}veterinario: 
+                "<strong>
+                    {% for vet in veterinarios %}
+                        {% if vet.id|stringformat:"s" == query_veterinario %}
+                            {{ vet.get_full_name|default:vet.username }}
+                        {% endif %}
+                    {% endfor %}
+                </strong>"
+            {% endif %}
+            {% if query_desparasitante %}{% if query_cliente or query_mascota or query_veterinario %}y {% endif %}desparasitante: "<strong>{{ query_desparasitante }}</strong>"{% endif %}
+            {% if query_veterinaria %}{% if query_cliente or query_mascota or query_veterinario or query_desparasitante %}en {% else %}en {% endif %}clínica: "<strong>{{ query_veterinaria }}</strong>"{% endif %}
+            {% if query_fecha %}{% if query_cliente or query_mascota or query_veterinario or query_desparasitante or query_veterinaria %}el {% else %}el {% endif %}<strong>{{ query_fecha }}</strong>{% endif %}
+        </p>
+    </div>
+    {% else %}
+    <div class="results-info">
+        <p>📊 Total de desparasitaciones: <strong>{{ desparasitaciones|length }}</strong></p>
+    </div>
+    {% endif %}
+
+    <div class="custom-table-container">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>👤 Cliente</th>
+                    <th>🐕 Mascota</th>
+                    <th>⚖️ Peso (kg)</th>
+                    <th>🪱 Desparasitante</th>
+                    <th>👨‍⚕️ Veterinario</th>
+                    <th>🏥 Clínica</th>
+                    <th>📅 Fecha</th>
+                    <th>⚡ Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for desparasitacion in desparasitaciones %}
+                <tr>
+                    <td>
+                        <div class="client-info">
+                            <strong>{{ desparasitacion.mascota.cliente.nombre }}</strong>
+                            <div class="client-details">
+                                {% if desparasitacion.mascota.cliente.email %}
+                                <small>📧 {{ desparasitacion.mascota.cliente.email }}</small>
+                                {% endif %}
+                                {% if desparasitacion.mascota.cliente.telefono %}
+                                <small>📞 {{ desparasitacion.mascota.cliente.telefono }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="pet-info">
+                            <strong>{{ desparasitacion.mascota.nombre }}</strong>
+                            <div class="pet-details">
+                                <small>🎯 {{ desparasitacion.mascota.raza|default:"Sin raza" }}</small>
+                                <small>🔬 {{ desparasitacion.mascota.especie|default:"Sin especie" }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <strong>{{ desparasitacion.peso }} kg</strong>
+                    </td>
+                    <td>
+                        <strong>{{ desparasitacion.desparasitante.desparasitante }}</strong>
+                    </td>
+                    <td>
+                        {{ desparasitacion.veterinario.get_full_name|default:desparasitacion.veterinario.username }}
+                    </td>
+                    <td>{{ desparasitacion.clinicaVeterinaria }}</td>
+                    <td>{{ desparasitacion.fecha }}</td>
+                    <td>
+                        <div class="action-buttons compact">
+                            <a href="{% url 'editar_desparasitacion' desparasitacion.pk %}" 
+                               class="btn-home" 
+                               style="background: #ffc107; color: black; padding: 5px 10px;"
+                               title="Editar desparasitación">
+                                ✏️
+                            </a>
+                            <a href="{% url 'eliminar_desparasitacion' desparasitacion.pk %}" 
+                               class="btn-home" 
+                               style="background: #dc3545; padding: 5px 10px;" 
+                               onclick="return confirm('¿Estás seguro de que quieres eliminar este registro del historial de desparasitacion? Mascota {{ desparasitacion.mascota.nombre }} Desparasitante {{ desparasitacion.desparasitante.desparasitante }}');"
+                               title="Eliminar desparasitación">
+                                🗑️
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="no-data">
+                        {% if filtros_activos %}
+                            🔍 No se encontraron desparasitaciones que coincidan con los filtros aplicados.
+                            <a href="{% url 'historial_desparasitaciones' %}" style="color: #3498db; text-decoration: none; margin-left: 10px;">
+                                📋 Ver todas las desparasitaciones
+                            </a>
+                        {% else %}
+                            📝 No hay desparasitaciones registradas. 
+                            <a href="{% url 'nueva_desparasitacion' %}" style="color: #3498db; text-decoration: none; margin-left: 10px;">
+                                ➕ Registrar primera desparasitación
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<style>
+.filtros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.filtro-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filtro-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.filtro-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.filtro-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filtro-clear {
+    position: absolute;
+    right: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px 5px;
+}
+
+.filtro-actions {
+    display: flex;
+    gap: 10px;
+    align-items: end;
+}
+
+.filtro-submit, .filtro-reset {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.results-info {
+    background: #e9ecef;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border-left: 4px solid #007bff;
+}
+
+.client-info, .pet-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.client-details, .pet-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.client-details small, .pet-details small {
+    font-size: 0.75em;
+    color: #6c757d;
+}
+
+.truncate-text {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.action-buttons.compact {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+
+.no-data {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+}
+</style>
+{% endblock %}

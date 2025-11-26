@@ -10,6 +10,7 @@ from .models import Operaciones
 from .forms import *
 from ClientesMascotas.models import Mascotas
 from django.contrib.auth.models import User
+
 # Create your views here.
 @login_required
 def indexProcedimientos(request):
@@ -201,6 +202,7 @@ def lista_vacunas(request):
     
     return render(request, 'procedimientos/vacunas/verVacunas.html', context)
 
+
 # Vista para agregar vacuna
 @login_required
 def agregar_vacuna(request):
@@ -250,3 +252,362 @@ def eliminar_vacuna(request, pk):
 @login_required
 def indexVacunas(request):
     return render(request, 'procedimientos/vacunas/indexVacunas.html')
+
+
+
+@login_required
+def nueva_vacunacion(request):
+    mascotas = Mascotas.objects.all().select_related('cliente')
+    veterinarios = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
+    
+    if request.method == 'POST':
+        form = VacunacionesForm(request.POST)
+        if form.is_valid():
+            vacunacion = form.save()
+            
+            # Actualizar las vacunas de la mascota
+            mascota = vacunacion.mascota
+            vacunas_data = Vacunaciones.objects.filter(mascota=mascota)
+            vacunas_cleaned_data = ", ".join([str(v.vacunas) for v in vacunas_data])
+            
+            mascota.vacunas = vacunas_cleaned_data
+            mascota.save()
+            
+            messages.success(request, "✅ Vacunación registrada exitosamente.")
+            return redirect('index-procedimientos')
+    else:
+        # Establecer valores por defecto
+        initial_data = {
+            'veterinario': request.user
+        }
+        form = VacunacionesForm(initial=initial_data)
+    
+    return render(request, 'procedimientos/vacunaciones/nuevaVacunacion.html', {
+        'form': form, 
+        'mascotas': mascotas,
+        'veterinarios': veterinarios,
+    })
+
+
+@login_required
+def historial_vacunaciones(request):
+    """View that renders a table with all vaccinations and their associated information."""
+    vacunaciones = Vacunaciones.objects.all().select_related(
+        'mascota', 'mascota__cliente', 'veterinario', 'vacunas'
+    ).order_by('-fecha')
+    
+    # Filtros
+    query_cliente = request.GET.get('q_cliente', '').strip().lower()
+    query_mascota = request.GET.get('q_mascota', '').strip().lower()
+    query_veterinario = request.GET.get('q_veterinario', '')  # Cambiado para usar ID
+    query_veterinaria = request.GET.get('q_veterinaria', '')
+    query_vacuna = request.GET.get('q_vacuna', '').strip().lower()
+    query_fecha = request.GET.get('q_fecha', '')
+    
+    # Aplicar filtros combinados
+    if query_cliente:
+        vacunaciones = vacunaciones.filter(
+            Q(mascota__cliente__nombre__icontains=query_cliente) |
+            Q(mascota__cliente__email__icontains=query_cliente) |
+            Q(mascota__cliente__telefono__icontains=query_cliente)
+        )
+    
+    if query_mascota:
+        vacunaciones = vacunaciones.filter(
+            Q(mascota__nombre__icontains=query_mascota) |
+            Q(mascota__raza__icontains=query_mascota) |
+            Q(mascota__especie__icontains=query_mascota)
+        )
+    
+    # CAMBIO IMPORTANTE: Ahora filtra por ID en lugar de por nombre
+    if query_veterinario:
+        vacunaciones = vacunaciones.filter(veterinario_id=query_veterinario)
+    
+    if query_veterinaria:
+        vacunaciones = vacunaciones.filter(clinicaVeterinaria=query_veterinaria)
+    
+    if query_vacuna:
+        vacunaciones = vacunaciones.filter(vacunas__vacuna__icontains=query_vacuna)
+    
+    if query_fecha:
+        vacunaciones = vacunaciones.filter(fecha=query_fecha)
+    
+    # Datos para los filtros
+    veterinarios = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
+    clinicas = Vacunaciones.CLINICAS
+    vacunas_lista = ListaVacunas.objects.all().order_by('vacuna')
+    
+    # Determinar si hay filtros activos
+    filtros_activos = any([query_cliente, query_mascota, query_veterinario, 
+                          query_veterinaria, query_vacuna, query_fecha])
+    
+    return render(request, 'procedimientos/vacunaciones/verVacunaciones.html', {
+        'vacunaciones': vacunaciones,
+        'veterinarios': veterinarios,
+        'clinicas': clinicas,
+        'vacunas_lista': vacunas_lista,
+        'query_cliente': query_cliente,
+        'query_mascota': query_mascota,
+        'query_veterinario': query_veterinario,
+        'query_veterinaria': query_veterinaria,
+        'query_vacuna': query_vacuna,
+        'query_fecha': query_fecha,
+        'filtros_activos': filtros_activos
+    })
+
+@login_required
+def editar_vacunacion(request, pk):
+    vacunacion = get_object_or_404(Vacunaciones, pk=pk)
+    veterinarios = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
+    
+    if request.method == 'POST':
+        form = VacunacionesUpdateForm(request.POST, instance=vacunacion)
+        if form.is_valid():
+            vacunacion_actualizada = form.save()
+            
+            # Actualizar las vacunas de la mascota
+            mascota = vacunacion_actualizada.mascota
+            vacunas_data = Vacunaciones.objects.filter(mascota=mascota)
+            vacunas_cleaned_data = ", ".join([str(v.vacunas) for v in vacunas_data])
+            
+            mascota.vacunas = vacunas_cleaned_data
+            mascota.save()
+            
+            messages.success(request, "✅ Vacunación actualizada exitosamente.")
+            return redirect('historial_vacunaciones')
+    else:
+        form = VacunacionesUpdateForm(instance=vacunacion)
+    
+    return render(request, 'procedimientos/vacunaciones/editarVacunacion.html', {
+        'form': form,
+        'vacunacion': vacunacion,
+        'veterinarios': veterinarios,
+    })
+
+
+# Vista para eliminar vacuna
+@login_required
+def eliminar_vacunacion(request, pk):
+    """View to delete an existing pet."""
+    vacunacion = get_object_or_404(Vacunaciones, pk=pk)
+    mascota = vacunacion.mascota
+    vacunacion.delete()
+    # Actualizar las vacunas de la mascota
+    
+    vacunas_data = Vacunaciones.objects.filter(mascota=mascota)
+    vacunas_cleaned_data = ", ".join([str(v.vacunas) for v in vacunas_data])
+    mascota.vacunas = vacunas_cleaned_data
+    mascota.save()
+    return redirect('historial_vacunaciones')
+
+
+@login_required
+def agregar_desparasitante(request):
+    if request.method == 'POST':
+        form = ListaDesparasitantesForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "✅ Desparasitante agregado exitosamente.")
+            return redirect('lista_desparasitantes')
+    else:
+        form = ListaDesparasitantesForm()
+        
+    return render(request, 'procedimientos/desparasitantes/agregarDesparasitante.html', {
+        'form': form,
+        'title': 'Agregar Desparasitante'
+    })
+
+
+@login_required
+def lista_desparasitantes(request):
+    desparasitantes = ListaDesparasitantes.objects.all().order_by('desparasitante')
+    
+    # Filtro por nombre de desparasitante
+    query_desparasitante = request.GET.get('q_desparasitante', '')
+    if query_desparasitante:
+        desparasitantes = desparasitantes.filter(desparasitante__icontains=query_desparasitante)
+    
+    context = {
+        'desparasitantes': desparasitantes,
+        'query_desparasitante': query_desparasitante,
+    }
+    
+    return render(request, 'procedimientos/desparasitantes/verDesparasitantes.html', context)
+
+
+
+@login_required
+def editar_desparasitante(request, pk):
+    desparasitante = get_object_or_404(ListaDesparasitantes, pk=pk)
+    
+    if request.method == 'POST':
+        form = ListaDesparasitantesForm(request.POST, instance=desparasitante)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "✅ Desparasitante actualizado exitosamente.")
+            return redirect('lista_desparasitantes')
+    else:
+        form = ListaDesparasitantesForm(instance=desparasitante)
+    
+    return render(request, 'procedimientos/desparasitantes/editarDesparasitante.html', {
+        'form': form,
+        'desparasitante': desparasitante,
+        'title': 'Editar Desparasitante'
+    })
+
+@login_required
+def eliminar_desparasitante(request, pk):
+    desparasitante = get_object_or_404(ListaDesparasitantes, pk=pk)
+    desparasitante.delete()
+    messages.success(request, "✅ Desparasitante eliminado exitosamente.")
+    return redirect('lista_desparasitantes')
+
+@login_required
+def indexDesparasitantes(request):
+    return render(request, 'procedimientos/desparasitantes/indexDesparasitantes.html')
+
+
+
+
+
+
+@login_required
+def nueva_desparasitacion(request):
+    mascotas = Mascotas.objects.all().select_related('cliente')
+    veterinarios = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
+    
+    if request.method == 'POST':
+        form = DesparasitacionesForm(request.POST)
+        if form.is_valid():
+            # Guardar la desparasitación
+            desparasitacion = form.save()
+            
+            # Actualizar datos de mascota
+            mascota = desparasitacion.mascota
+            mascota.ultimaDesparasitacion = desparasitacion.fecha
+            mascota.ultimoDesparasitante = str(desparasitacion.desparasitante)
+            mascota.peso = desparasitacion.peso  # Actualizar el peso con el nuevo valor
+            mascota.save()
+            
+            messages.success(request, "✅ Desparasitación registrada exitosamente.")
+            return redirect('index-procedimientos')
+    else:
+        # Establecer valores por defecto
+        initial_data = {
+            'veterinario': request.user
+        }
+        form = DesparasitacionesForm(initial=initial_data)
+    
+    return render(request, 'procedimientos/desparasitaciones/nuevaDesparasitacion.html', {
+        'form': form, 
+        'mascotas': mascotas,
+        'veterinarios': veterinarios,
+    })
+
+
+@login_required
+def historial_desparasitaciones(request):
+    """View that renders a table with all deworming records and their associated information."""
+    desparasitaciones = Desparasitaciones.objects.all().select_related(
+        'mascota', 'mascota__cliente', 'veterinario', 'desparasitante'
+    ).order_by('-fecha')
+    
+    # Filtros
+    query_cliente = request.GET.get('q_cliente', '').strip().lower()
+    query_mascota = request.GET.get('q_mascota', '').strip().lower()
+    query_veterinario = request.GET.get('q_veterinario', '')
+    query_veterinaria = request.GET.get('q_veterinaria', '')
+    query_desparasitante = request.GET.get('q_desparasitante', '').strip().lower()
+    query_fecha = request.GET.get('q_fecha', '')
+    
+    # Aplicar filtros combinados
+    if query_cliente:
+        desparasitaciones = desparasitaciones.filter(
+            Q(mascota__cliente__nombre__icontains=query_cliente) |
+            Q(mascota__cliente__email__icontains=query_cliente) |
+            Q(mascota__cliente__telefono__icontains=query_cliente)
+        )
+    
+    if query_mascota:
+        desparasitaciones = desparasitaciones.filter(
+            Q(mascota__nombre__icontains=query_mascota) |
+            Q(mascota__raza__icontains=query_mascota) |
+            Q(mascota__especie__icontains=query_mascota)
+        )
+    
+    if query_veterinario:
+        desparasitaciones = desparasitaciones.filter(veterinario_id=query_veterinario)
+    
+    if query_veterinaria:
+        desparasitaciones = desparasitaciones.filter(clinicaVeterinaria=query_veterinaria)
+    
+    if query_desparasitante:
+        desparasitaciones = desparasitaciones.filter(desparasitante__desparasitante__icontains=query_desparasitante)
+    
+    if query_fecha:
+        desparasitaciones = desparasitaciones.filter(fecha=query_fecha)
+    
+    # Datos para los filtros
+    veterinarios = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
+    clinicas = Desparasitaciones.CLINICAS
+    desparasitantes_lista = ListaDesparasitantes.objects.all().order_by('desparasitante')
+    
+    # Determinar si hay filtros activos
+    filtros_activos = any([query_cliente, query_mascota, query_veterinario, 
+                          query_veterinaria, query_desparasitante, query_fecha])
+    
+    return render(request, 'procedimientos/desparasitaciones/verDesparasitaciones.html', {
+        'desparasitaciones': desparasitaciones,
+        'veterinarios': veterinarios,
+        'clinicas': clinicas,
+        'desparasitantes_lista': desparasitantes_lista,
+        'query_cliente': query_cliente,
+        'query_mascota': query_mascota,
+        'query_veterinario': query_veterinario,
+        'query_veterinaria': query_veterinaria,
+        'query_desparasitante': query_desparasitante,
+        'query_fecha': query_fecha,
+        'filtros_activos': filtros_activos
+    })
+
+
+@login_required
+def editar_desparasitacion(request, pk):
+    desparasitacion = get_object_or_404(Desparasitaciones, pk=pk)
+    veterinarios = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
+    
+    if request.method == 'POST':
+        form = DesparasitacionesUpdateForm(request.POST, instance=desparasitacion)
+        if form.is_valid():
+            desparasitacion_actualizada = form.save()
+            
+            # Actualizar datos de mascota
+            mascota = desparasitacion_actualizada.mascota
+            mascota.ultimaDesparasitacion = desparasitacion_actualizada.fecha
+            mascota.ultimoDesparasitante = str(desparasitacion_actualizada.desparasitante)
+            mascota.peso = desparasitacion_actualizada.peso
+            mascota.save()
+            
+            messages.success(request, "✅ Desparasitación actualizada exitosamente.")
+            return redirect('historial_desparasitaciones')
+    else:
+        form = DesparasitacionesUpdateForm(instance=desparasitacion)
+    
+    return render(request, 'procedimientos/desparasitaciones/editar_desparasitacion.html', {
+        'form': form,
+        'desparasitacion': desparasitacion,
+        'veterinarios': veterinarios,
+    })
+
+@login_required
+def eliminar_desparasitacion(request, pk):
+    desparasitacion = get_object_or_404(Desparasitaciones, pk=pk)
+    
+    if request.method == 'POST':
+        desparasitacion.delete()
+        messages.success(request, "✅ Desparasitación eliminada exitosamente.")
+        return redirect('historial_desparasitaciones')
+    
+    return render(request, 'procedimientos/desparasitaciones/eliminar_desparasitacion.html', {
+        'desparasitacion': desparasitacion
+    })

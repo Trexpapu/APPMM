@@ -41,7 +41,7 @@
                         data-sexo="{{ mascota.get_sexo_display|escapejs }}"
                         data-vacunas="{{ mascota.vacunas|escapejs }}"
                         data-ultimadesparasitacion="{{ mascota.ultimaDesparasitacion|default:'No se ha desparasitado' }}"
-                        data-ultimodesparasitante="{{ mascota.ultimoDesparasitante|escapejs }}"
+                        data-ultimodesparasitante="{{ mascota.ultimoDesparasitante }}"
                         data-alergias="{{ mascota.alergias|escapejs }}"
                         data-vive="{% if mascota.vive %}Sí{% else %}No{% endif %}"
                         data-cliente="{{ mascota.cliente.nombre|escapejs }}"

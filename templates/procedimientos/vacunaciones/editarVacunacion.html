@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Vacunación{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2>✏️ Editar Vacunación</h2>
+        
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- 🔍 Información de la mascota (solo lectura) -->
+        <div class="form-section" style="background: #f0f8ff; border-left: 4px solid #3498db;">
+            <h3>📋 Información de la Mascota</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>🐕 Mascota:</strong>
+                    <span>{{ vacunacion.mascota.nombre }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>🔬 Especie:</strong>
+                    <span>{{ vacunacion.mascota.especie }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>🎯 Raza:</strong>
+                    <span>{{ vacunacion.mascota.raza }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>👤 Dueño:</strong>
+                    <span>{{ vacunacion.mascota.cliente.nombre }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>📞 Teléfono:</strong>
+                    <span>{{ vacunacion.mascota.cliente.telefono }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>📧 Email:</strong>
+                    <span>{{ vacunacion.mascota.cliente.email }}</span>
+                </div>
+                <div class="info-item full-width">
+                    <strong>💉 Vacunas Previas:</strong>
+                    <span style="font-style: italic;">
+                        {% if vacunacion.mascota.vacunas %}
+                            {{ vacunacion.mascota.vacunas }}
+                        {% else %}
+                            Ninguna registrada
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 💉 DATOS DE LA VACUNACIÓN -->
+        <div class="form-section">
+            <h3>💉 Datos de la Vacunación</h3>
+            
+            {% if form.errors %}
+            <div class="alert alert-error">
+                <strong>❌ Por favor corrige los siguientes errores:</strong>
+                {{ form.errors }}
+            </div>
+            {% endif %}
+
+            <div class="form-grid">
+                <!-- Campo Mascota (oculto porque no se puede cambiar) -->
+                <input type="hidden" name="mascota" value="{{ vacunacion.mascota.id }}">
+                
+                <!-- Campo Vacuna -->
+                <div class="form-group">
+                    <label for="{{ form.vacunas.id_for_label }}">{{ form.vacunas.label }}</label>
+                    {{ form.vacunas }}
+                    {% if form.vacunas.errors %}
+                    <div class="field-errors">
+                        {{ form.vacunas.errors }}
+                    </div>
+                    {% endif %}
+                    {% if form.vacunas.help_text %}
+                    <small class="help-text">{{ form.vacunas.help_text }}</small>
+                    {% endif %}
+                </div>
+
+                <!-- Campo Veterinario -->
+                <div class="form-group">
+                    <label for="{{ form.veterinario.id_for_label }}">{{ form.veterinario.label }}</label>
+                    {{ form.veterinario }}
+                    {% if form.veterinario.errors %}
+                    <div class="field-errors">
+                        {{ form.veterinario.errors }}
+                    </div>
+                    {% endif %}
+                    {% if form.veterinario.help_text %}
+                    <small class="help-text">{{ form.veterinario.help_text }}</small>
+                    {% endif %}
+                </div>
+
+                <!-- Campo Clínica -->
+                <div class="form-group">
+                    <label for="{{ form.clinicaVeterinaria.id_for_label }}">{{ form.clinicaVeterinaria.label }}</label>
+                    {{ form.clinicaVeterinaria }}
+                    {% if form.clinicaVeterinaria.errors %}
+                    <div class="field-errors">
+                        {{ form.clinicaVeterinaria.errors }}
+                    </div>
+                    {% endif %}
+                    {% if form.clinicaVeterinaria.help_text %}
+                    <small class="help-text">{{ form.clinicaVeterinaria.help_text }}</small>
+                    {% endif %}
+                </div>
+
+                <!-- Campo Fecha -->
+                <div class="form-group">
+                    <label for="{{ form.fecha.id_for_label }}">{{ form.fecha.label }}</label>
+                    {{ form.fecha }}
+                    {% if form.fecha.errors %}
+                    <div class="field-errors">
+                        {{ form.fecha.errors }}
+                    </div>
+                    {% endif %}
+                    {% if form.fecha.help_text %}
+                    <small class="help-text">{{ form.fecha.help_text }}</small>
+                    {% endif %}
+                </div>
+
+                <!-- Campo Descripción (ancho completo) -->
+                <div class="form-group full-width">
+                    <label for="{{ form.descripcion.id_for_label }}">{{ form.descripcion.label }}</label>
+                    {{ form.descripcion }}
+                    {% if form.descripcion.errors %}
+                    <div class="field-errors">
+                        {{ form.descripcion.errors }}
+                    </div>
+                    {% endif %}
+                    {% if form.descripcion.help_text %}
+                    <small class="help-text">{{ form.descripcion.help_text }}</small>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn-home" style="background: #28a745; padding: 12px 24px;">
+                💾 Guardar Cambios
+            </button>
+            <a href="{% url 'historial_vacunaciones' %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
+                ❌ Cancelar
+            </a>
+        </div>
+    </form>
+</section>
+{% endblock %}

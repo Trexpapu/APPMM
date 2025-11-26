@@ -1,0 +1,410 @@
+{% extends 'base.html' %}
+
+{% block title %}💉 Historial de Vacunaciones{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2>💉 Historial de Vacunaciones</h2>
+        <a href="{% url 'nueva_vacunacion' %}" class="btn-home btn-agregar">
+            ➕ Nueva Vacunación
+        </a>
+    </div>
+
+    <!-- Filtros Combinados -->
+    <div class="filtros-combinados">
+        <form method="get" action="" class="filtros-form">
+            <div class="filtros-grid">
+                <!-- Filtro por Cliente -->
+                <div class="filtro-group">
+                    <label for="q_cliente" class="filtro-label">
+                        👤 Buscar por Cliente
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q_cliente" 
+                            name="q_cliente" 
+                            placeholder="Nombre, email o teléfono del cliente..." 
+                            class="filtro-input"
+                            value="{{ query_cliente }}"
+                        >
+                        {% if query_cliente %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_cliente').value = ''; this.form.submit();"
+                            title="Limpiar filtro de cliente"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Mascota -->
+                <div class="filtro-group">
+                    <label for="q_mascota" class="filtro-label">
+                        🐕 Buscar por Mascota
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q_mascota" 
+                            name="q_mascota" 
+                            placeholder="Nombre, raza o especie" 
+                            class="filtro-input"
+                            value="{{ query_mascota }}"
+                        >
+                        {% if query_mascota %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_mascota').value = ''; this.form.submit();"
+                            title="Limpiar filtro de mascota"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Veterinario -->
+                <div class="filtro-group">
+                    <label for="q_veterinario" class="filtro-label">
+                        👨‍⚕️ Buscar por Veterinario
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q_veterinario" 
+                            name="q_veterinario" 
+                            placeholder="Nombre del veterinario" 
+                            class="filtro-input"
+                            value="{{ query_veterinario }}"
+                        >
+                        {% if query_veterinario %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_veterinario').value = ''; this.form.submit();"
+                            title="Limpiar filtro de veterinario"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Vacuna -->
+                <div class="filtro-group">
+                    <label for="q_vacuna" class="filtro-label">
+                        💉 Buscar por Vacuna
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q_vacuna" 
+                            name="q_vacuna" 
+                            placeholder="Nombre de la vacuna" 
+                            class="filtro-input"
+                            value="{{ query_vacuna }}"
+                        >
+                        {% if query_vacuna %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_vacuna').value = ''; this.form.submit();"
+                            title="Limpiar filtro de vacuna"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Clínica -->
+                <div class="filtro-group">
+                    <label for="q_veterinaria" class="filtro-label">
+                        🏥 Clínica Veterinaria
+                    </label>
+                    <div class="filtro-input-container">
+                        <select id="q_veterinaria" name="q_veterinaria" class="filtro-input">
+                            <option value="">Todas las clínicas</option>
+                            {% for clinica in clinicas %}
+                            <option value="{{ clinica.0 }}" {% if query_veterinaria == clinica.0 %}selected{% endif %}>
+                                {{ clinica.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if query_veterinaria %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_veterinaria').value = ''; this.form.submit();"
+                            title="Limpiar filtro de clínica"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Fecha -->
+                <div class="filtro-group">
+                    <label for="q_fecha" class="filtro-label">
+                        📅 Fecha de Vacunación
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="date" 
+                            id="q_fecha" 
+                            name="q_fecha" 
+                            class="filtro-input"
+                            value="{{ query_fecha }}"
+                        >
+                        {% if query_fecha %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_fecha').value = ''; this.form.submit();"
+                            title="Limpiar filtro de fecha"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="filtro-actions">
+                    <button type="submit" class="btn-home filtro-submit">
+                        🔍 Buscar
+                    </button>
+                    {% if filtros_activos %}
+                    <a href="{% url 'historial_vacunaciones' %}" class="btn-home filtro-reset">
+                        🗑️ Limpiar Filtros
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Información de resultados -->
+    {% if filtros_activos %}
+    <div class="results-info">
+        <p>
+            📊 Mostrando <strong>{{ vacunaciones|length }}</strong> vacunación(es)
+            {% if query_cliente %}para cliente: "<strong>{{ query_cliente }}</strong>"{% endif %}
+            {% if query_mascota %}{% if query_cliente %}y {% endif %}mascota: "<strong>{{ query_mascota }}</strong>"{% endif %}
+            {% if query_veterinario %}{% if query_cliente or query_mascota %}y {% endif %}veterinario: "<strong>{{ query_veterinario }}</strong>"{% endif %}
+            {% if query_vacuna %}{% if query_cliente or query_mascota or query_veterinario %}y {% endif %}vacuna: "<strong>{{ query_vacuna }}</strong>"{% endif %}
+            {% if query_veterinaria %}{% if query_cliente or query_mascota or query_veterinario or query_vacuna %}en {% else %}en {% endif %}clínica: "<strong>{{ query_veterinaria }}</strong>"{% endif %}
+            {% if query_fecha %}{% if query_cliente or query_mascota or query_veterinario or query_vacuna or query_veterinaria %}el {% else %}el {% endif %}<strong>{{ query_fecha }}</strong>{% endif %}
+        </p>
+    </div>
+    {% else %}
+    <div class="results-info">
+        <p>📊 Total de vacunaciones: <strong>{{ vacunaciones|length }}</strong></p>
+    </div>
+    {% endif %}
+
+    <div class="custom-table-container">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>👤 Cliente</th>
+                    <th>🐕 Mascota</th>
+                    <th>💉 Vacuna</th>
+                    <th>📝 Descripción</th>
+                    <th>👨‍⚕️ Veterinario</th>
+                    <th>🏥 Clínica</th>
+                    <th>📅 Fecha</th>
+                    <th>⚡ Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vacunacion in vacunaciones %}
+                <tr>
+                    <td>
+                        <div class="client-info">
+                            <strong>{{ vacunacion.mascota.cliente.nombre }}</strong>
+                            <div class="client-details">
+                                {% if vacunacion.mascota.cliente.email %}
+                                <small>📧 {{ vacunacion.mascota.cliente.email }}</small>
+                                {% endif %}
+                                {% if vacunacion.mascota.cliente.telefono %}
+                                <small>📞 {{ vacunacion.mascota.cliente.telefono }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="pet-info">
+                            <strong>{{ vacunacion.mascota.nombre }}</strong>
+                            <div class="pet-details">
+                                <small>🎯 {{ vacunacion.mascota.raza|default:"Sin raza" }}</small>
+                                <small>🔬 {{ vacunacion.mascota.especie|default:"Sin especie" }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <strong>{{ vacunacion.vacunas.vacuna }}</strong>
+                    </td>
+                    <td>
+                        {% if vacunacion.descripcion %}
+                            <div class="truncate-text" title="{{ vacunacion.descripcion }}">
+                                {{ vacunacion.descripcion|truncatewords:10 }}
+                            </div>
+                        {% else %}
+                            <span style="color: #6c757d; font-style: italic;">Sin descripción</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{ vacunacion.veterinario.get_full_name|default:vacunacion.veterinario.username }}
+                    </td>
+                    <td>{{ vacunacion.clinicaVeterinaria }}</td>
+                    <td>{{ vacunacion.fecha }}</td>
+                    <td>
+                        <div class="action-buttons compact">
+                            <a href="{% url 'editar_vacunacion' vacunacion.pk %}" 
+                               class="btn-home" 
+                               style="background: #ffc107; color: black; padding: 5px 10px;"
+                               title="Editar vacunación">
+                                ✏️
+                            </a>
+                            <a href="{% url 'eliminar_vacunacion' vacunacion.pk %}" 
+                               class="btn-home" 
+                               style="background: #dc3545; padding: 5px 10px;" 
+                               onclick="return confirm('¿Estás seguro de que quieres eliminar este registro del historial de vacunacion? Mascota {{ vacunacion.mascota.nombre }} Vacuna {{ vacunacion.vacunas.vacuna }}');"
+                               title="Eliminar vacunación">
+                                🗑️
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="no-data">
+                        {% if filtros_activos %}
+                            🔍 No se encontraron vacunaciones que coincidan con los filtros aplicados.
+                            <a href="{% url 'historial_vacunaciones' %}" style="color: #3498db; text-decoration: none; margin-left: 10px;">
+                                📋 Ver todas las vacunaciones
+                            </a>
+                        {% else %}
+                            📝 No hay vacunaciones registradas. 
+                            <a href="{% url 'nueva_vacunacion' %}" style="color: #3498db; text-decoration: none; margin-left: 10px;">
+                                ➕ Registrar primera vacunación
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<style>
+.filtros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.filtro-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filtro-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.filtro-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.filtro-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filtro-clear {
+    position: absolute;
+    right: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px 5px;
+}
+
+.filtro-actions {
+    display: flex;
+    gap: 10px;
+    align-items: end;
+}
+
+.filtro-submit, .filtro-reset {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.results-info {
+    background: #e9ecef;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border-left: 4px solid #007bff;
+}
+
+.client-info, .pet-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.client-details, .pet-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.client-details small, .pet-details small {
+    font-size: 0.75em;
+    color: #6c757d;
+}
+
+.truncate-text {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.action-buttons.compact {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+
+.no-data {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+}
+</style>
+{% endblock %}

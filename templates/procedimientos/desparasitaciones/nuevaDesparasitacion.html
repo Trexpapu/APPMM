@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block title %}Nueva Desparasitación{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2>💊 Nueva Desparasitación</h2>
+        
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- 🔍 Búsqueda y selección de mascota -->
+        <div class="form-section">
+            <h3>🐾 Selección de Mascota</h3>
+            
+            <div class="form-group">
+                <label for="mascota-search">🔍 Buscar mascota:</label>
+                <input 
+                    type="text" 
+                    id="mascota-search" 
+                    placeholder="Buscar mascota por nombre, raza, especie, nombre del cliente, email o teléfono" 
+                    class="search-input"
+                >
+            </div>
+
+            <div class="form-group">
+                {{ form.mascota.label_tag }}
+                <select id="id_mascota" name="mascota" class="searchable-dropdown" required>
+                    <option value="">Seleccione una mascota</option>
+                    {% for mascota in mascotas %}
+                    <option 
+                        value="{{ mascota.id }}"
+                        data-nombre="{{ mascota.nombre|escapejs }}"
+                        data-especie="{{ mascota.especie|escapejs }}"
+                        data-raza="{{ mascota.raza|escapejs }}"
+                        data-fechanacimiento="{{ mascota.fechaNacimiento }}"
+                        data-sexo="{{ mascota.get_sexo_display|escapejs }}"
+                        data-peso="{{ mascota.peso|default:0 }}"
+                        data-ultimadesparasitacion="{{ mascota.ultimaDesparasitacion }}"
+                        data-ultimodesparasitante="{{ mascota.ultimoDesparasitante }}"
+                        data-cliente="{{ mascota.cliente.nombre|escapejs }}"
+                        data-telefono="{{ mascota.cliente.telefono|escapejs }}"
+                        data-email="{{ mascota.cliente.email|escapejs }}"
+                    >
+                        {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - 
+                        {{ mascota.cliente.nombre }} - {{ mascota.cliente.email }} - {{ mascota.cliente.telefono }}
+                    </option>
+                    {% endfor %}
+                </select>
+                {% if form.mascota.errors %}
+                <div class="field-errors">
+                    {{ form.mascota.errors }}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- 📋 INFORMACIÓN DE LA MASCOTA -->
+            <div id="info-mascota" class="form-section" style="background: #f0f8ff; border-left: 4px solid #3498db; display: none;">
+                <h3>📋 Información de la Mascota Seleccionada</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>🐕 Nombre:</strong>
+                        <span id="info-nombre">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>🔬 Especie:</strong>
+                        <span id="info-especie">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>🎯 Raza:</strong>
+                        <span id="info-raza">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>📅 Fecha Nacimiento:</strong>
+                        <span id="info-fechanacimiento">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>⚖️ Peso Actual:</strong>
+                        <span id="info-peso">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>⚧️ Sexo:</strong>
+                        <span id="info-sexo">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>👤 Dueño:</strong>
+                        <span id="info-cliente">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>📞 Teléfono:</strong>
+                        <span id="info-telefono">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>📧 Email:</strong>
+                        <span id="info-email">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>📅 Última Desparasitación:</strong>
+                        <span id="info-ultimadesparasitacion" style="font-style: italic;">Nunca</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>🪱 Último Desparasitante:</strong>
+                        <span id="info-ultimodesparasitante" style="font-style: italic;">Ninguno</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🪱 DATOS DE LA DESPARASITACIÓN -->
+        <div class="form-section">
+            <h3>🪱 Datos de la Desparasitación</h3>
+            
+            {% if form.errors %}
+            <div class="alert alert-error">
+                <strong>❌ Por favor corrige los siguientes errores:</strong>
+                {{ form.errors }}
+            </div>
+            {% endif %}
+
+            <div class="form-grid">
+                {% for field in form %}
+                    {% if field.name != 'mascota' %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                        <small class="help-text">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                        <div class="field-errors">
+                            {{ field.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+         <div class="action-buttons">
+            <button type="submit" class="btn-home" style="back  ground: #28a745; padding: 12px 24px;">
+                💾 Guardar Desparasitación
+            </button>
+            <a href="{% url 'index-procedimientos' %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
+                ❌ Cancelar
+            </a>
+        </div>
+       
+    </form>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('mascota-search');
+    const dropdown = document.getElementById('id_mascota');
+    const infoSection = document.getElementById('info-mascota');
+    const pesoField = document.getElementById('id_peso');
+    
+    // Elementos de información de la mascota
+    const infoElements = {
+        nombre: document.getElementById('info-nombre'),
+        especie: document.getElementById('info-especie'),
+        raza: document.getElementById('info-raza'),
+        fechanacimiento: document.getElementById('info-fechanacimiento'),
+        peso: document.getElementById('info-peso'),
+        sexo: document.getElementById('info-sexo'),
+        cliente: document.getElementById('info-cliente'),
+        telefono: document.getElementById('info-telefono'),
+        email: document.getElementById('info-email'),
+        ultimadesparasitacion: document.getElementById('info-ultimadesparasitacion'),
+        ultimodesparasitante: document.getElementById('info-ultimodesparasitante')
+    };
+
+    // 🔍 FILTRO DE BÚSQUEDA
+    searchInput.addEventListener('input', function() {
+        const filter = searchInput.value.toLowerCase().replace(/\s+/g, '');
+        dropdown.querySelectorAll('option').forEach(option => {
+            const text = option.textContent.toLowerCase().replace(/\s+/g, '');
+            option.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+
+    // 🐾 ACTUALIZAR INFORMACIÓN DE LA MASCOTA AL SELECCIONAR
+    dropdown.addEventListener('change', function() {
+        const selectedOption = dropdown.options[dropdown.selectedIndex];
+        
+        if (selectedOption.value) {
+            // Actualizar información en el panel
+            Object.keys(infoElements).forEach(key => {
+                const value = selectedOption.getAttribute(`data-${key}`) || '';
+                if (key === 'peso') {
+                    infoElements[key].textContent = value ? `${value} kg` : '0 kg';
+                } else if (key === 'ultimadesparasitacion') {
+                    infoElements[key].textContent = value ? value : 'Nunca';
+                } else if (key === 'ultimodesparasitante') {
+                    infoElements[key].textContent = value ? value : 'Ninguno';
+                } else {
+                    infoElements[key].textContent = value || '-';
+                }
+            });
+            
+            // 🎯 CARGAR PESO AUTOMÁTICAMENTE EN EL CAMPO
+            const pesoMascota = selectedOption.getAttribute('data-peso') || '0';
+            if (pesoField) {
+                pesoField.value = pesoMascota;
+            }
+            
+            infoSection.style.display = 'block';
+        } else {
+            infoSection.style.display = 'none';
+            // Limpiar campo de peso si no hay mascota seleccionada
+            if (pesoField) {
+                pesoField.value = '';
+            }
+        }
+    });
+
+    // 🎯 CARGAR INFORMACIÓN INICIAL SI YA HAY MASCOTA SELECCIONADA
+    if (dropdown.value) {
+        dropdown.dispatchEvent(new Event('change'));
+    }
+
+    // 📅 ESTABLECER FECHA ACTUAL COMO VALOR POR DEFECTO
+    const fechaField = document.getElementById('id_fecha');
+    if (fechaField && !fechaField.value) {
+        fechaField.value = new Date().toISOString().split('T')[0];
+    }
+});
+</script>
+{% endblock %}

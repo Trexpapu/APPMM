@@ -8,7 +8,18 @@
     <div class="options">
         <a href="{% url 'historial_operaciones' %}" class="btn-home">🏥 Ver Historial de Operaciones</a>
         <a href="{% url 'crear_operacion' %}" class="btn-home">🩸 Nueva Operación</a>
-        <a href="{% url 'index_vacunas' %}" class="btn-home">💉 Gestión de Vacunas</a>
+        
+        <a href="{% url 'historial_vacunaciones' %}" class="btn-home">🗃️ Historial de Vacunaciones</a>
+        <a href="{% url 'nueva_vacunacion' %}" class="btn-home">💉 Nueva Vacunación</a>
+        
+
+        
+        <a href="{% url 'historial_desparasitaciones' %}" class="btn-home">🗃️ Historial de Desparasitaciones</a>
+        <a href="{% url 'nueva_desparasitacion' %}" class="btn-home">💊 Nueva Desparasitación</a>
+
+        <a href="{% url 'index_vacunas' %}" class="btn-home">🗂️ Gestión de Vacunas</a>
+        
+        <a href="{% url 'index_desparasitantes' %}" class="btn-home">📊 Gestión de Desparasitantes</a>
     </div>
 </section>
 {% endblock %}

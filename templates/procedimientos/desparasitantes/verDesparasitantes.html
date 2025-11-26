@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Desparasitantes{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2>🐛 Lista de Desparasitantes</h2>
+        <a href="{% url 'agregar_desparasitante' %}" class="btn-home btn-agregar">
+            ➕ Agregar Desparasitante
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filtros-combinados">
+        <form method="get" action="" class="filtros-form">
+            <div class="filtros-grid">
+                <!-- Filtro por Desparasitante -->
+                <div class="filtro-group">
+                    <label for="q_desparasitante" class="filtro-label">🐛 Desparasitante</label>
+                    <div class="filtro-input-container">
+                        <input type="text" id="q_desparasitante" name="q_desparasitante" 
+                               value="{{ query_desparasitante }}" placeholder="Buscar por nombre de desparasitante" class="filtro-input">
+                        {% if query_desparasitante %}
+                        <button type="button" class="filtro-clear" 
+                                onclick="document.getElementById('q_desparasitante').value = ''; this.form.submit();">
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="filtro-actions">
+                    <button type="submit" class="btn-home filtro-submit">🔍 Buscar</button>
+                    <a href="{% url 'lista_desparasitantes' %}" class="btn-home filtro-reset">🗑️ Limpiar</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Información de resultados -->
+    <div class="results-info">
+        <p>📊 Total de desparasitantes: <strong>{{ desparasitantes|length }}</strong></p>
+    </div>
+
+    <!-- Tabla de desparasitantes -->
+    <div class="custom-table-container">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>🐛 Desparasitante</th>
+                    <th>⚡ Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for desparasitante in desparasitantes %}
+                <tr>
+                    <td>
+                        <div class="desparasitante-info">
+                            <strong>{{ desparasitante.desparasitante }}</strong>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="action-buttons compact">
+                            <a href="{% url 'editar_desparasitante' desparasitante.pk %}" 
+                               class="btn-home" style="background: #ffc107; color: black; padding: 5px 10px;"
+                               title="Editar desparasitante">
+                                ✏️
+                            </a>
+                            <a href="{% url 'eliminar_desparasitante' desparasitante.pk %}" 
+                               class="btn-home" style="background: #dc3545; padding: 5px 10px;"
+                               onclick="return confirm('¿Estás seguro de que quieres eliminar el desparasitante {{ desparasitante.desparasitante }}?');"
+                               title="Eliminar desparasitante">
+                                🗑️
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="2" class="no-data">
+                        {% if request.GET %}
+                            🔍 No se encontraron desparasitantes que coincidan con los filtros aplicados.
+                        {% else %}
+                            📝 No hay desparasitantes registrados. 
+                            <a href="{% url 'agregar_desparasitante' %}" style="color: #3498db; text-decoration: none;">
+                                ➕ Agregar el primer desparasitante
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<style>
+.desparasitante-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.action-buttons.compact {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+</style>
+{% endblock %}

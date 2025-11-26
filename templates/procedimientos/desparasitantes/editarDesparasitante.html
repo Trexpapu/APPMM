@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Desparasitante{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2>✏️ Editar Desparasitante</h2>
+        
+    </div>
+
+    <div class="form-section">
+        <form method="post">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+            <div class="alert alert-error">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="{{ form.desparasitante.id_for_label }}">{{ form.desparasitante.label }}</label>
+                {{ form.desparasitante }}
+                {% if form.desparasitante.errors %}
+                <div class="field-errors">
+                    {% for error in form.desparasitante.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% if form.desparasitante.help_text %}
+                <small class="help-text">{{ form.desparasitante.help_text }}</small>
+                {% endif %}
+            </div>
+
+            
+        <div class="action-buttons">
+            <button type="submit" class="btn-home" style="back  ground: #28a745; padding: 12px 24px;">
+                💾 Guardar Operación
+            </button>
+            <a href="{% url 'lista_desparasitantes' %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
+                ❌ Cancelar
+            </a>
+        </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
