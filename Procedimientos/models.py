@@ -59,7 +59,8 @@ class Operaciones(models.Model):
         ('Mascotas Morelia Mano Huevona', 'Mascotas Morelia Mano Huevona'),
     ]
     mascota = models.ForeignKey(Mascotas, on_delete= models.CASCADE)
-  #  peso = models.FloatField()
+    peso = models.FloatField(default=0)
+    estadoSaludPrevio = models.TextField(blank= True)
     fechaEntrada = models.DateTimeField()
     fechaSalida = models.DateTimeField(blank= True, null = True)
     operacion = models.TextField()

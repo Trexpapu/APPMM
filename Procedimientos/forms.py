@@ -266,6 +266,8 @@ class OperacionesForm(forms.ModelForm):
             'fechaSalida',
             'operacion',
             'descripcion',
+            'peso',
+            'estadoSaludPrevio',
             'complicaciones',
             'fotoAntes',
             'fotoDespues',
@@ -288,6 +290,16 @@ class OperacionesForm(forms.ModelForm):
                 'rows': 4,
                 'class': 'form-control',
                 'placeholder': 'Descripción detallada de la operación'
+            }),
+            'peso': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'placeholder': 'Peso de la mascota en kg'
+            }),
+            'estadoSaludPrevio': forms.Textarea(attrs={
+                'rows': 3,
+                'class': 'form-control',
+                'placeholder': 'Estado de salud previo a la operación'
             }),
             'complicaciones': forms.Textarea(attrs={
                 'rows': 3,
@@ -315,6 +327,8 @@ class OperacionesForm(forms.ModelForm):
             'fechaSalida': '📅 Fecha y Hora de Fin de la Operación',
             'operacion': '🩺 Tipo de Operación',
             'descripcion': '📝 Descripción de la Operación',
+            'peso': '⚖️ Peso (kg)',
+            'estadoSaludPrevio': '💓 Estado de Salud Previo a la Operación',
             'complicaciones': '⚠️ Complicaciones',
             'fotoAntes': '🖼️ Foto Antes de la Operación',
             'fotoDespues': '🖼️ Foto Después de la Operación',
@@ -354,6 +368,8 @@ class OperacionesUpdateForm(forms.ModelForm):
             'fechaSalida',
             'operacion',
             'descripcion',
+            'peso',
+            'estadoSaludPrevio',
             'complicaciones',
             'clinicaVeterinaria',
             # EXCLUIMOS fotoAntes y fotoDespues del formulario
@@ -376,6 +392,17 @@ class OperacionesUpdateForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Descripción detallada de la operación'
             }),
+            
+            'peso': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': '0.01',
+                'placeholder': 'Peso de la mascota en kg'
+            }),
+            'estadoSaludPrevio': forms.Textarea(attrs={
+                'rows': 3,
+                'class': 'form-control',
+                'placeholder': 'Estado de salud previo a la operación'
+            }),
             'complicaciones': forms.Textarea(attrs={
                 'rows': 3,
                 'class': 'form-control',
@@ -394,6 +421,8 @@ class OperacionesUpdateForm(forms.ModelForm):
             'fechaSalida': '📅 Fecha y Hora de Fin de la Operación',
             'operacion': '🩺 Tipo de Operación',
             'descripcion': '📝 Descripción de la Operación',
+            'peso': '⚖️ Peso (kg)',
+            'estadoSaludPrevio': '💓 Estado de Salud Previo a la Operación',
             'complicaciones': '⚠️ Complicaciones',
             'clinicaVeterinaria': '🏥 Clínica Veterinaria',
             'mascota': '🐕 Mascota',

@@ -69,20 +69,20 @@
                     </div>
                 </div>
 
-                <!-- Filtro por Veterinario -->
+                <!-- Filtro por Veterinario (MODIFICADO: ahora es select) -->
                 <div class="filtro-group">
                     <label for="q_veterinario" class="filtro-label">
-                        👨‍⚕️ Buscar por Veterinario
+                        👨‍⚕️ Veterinario
                     </label>
                     <div class="filtro-input-container">
-                        <input 
-                            type="text" 
-                            id="q_veterinario" 
-                            name="q_veterinario" 
-                            placeholder="Nombre del veterinario" 
-                            class="filtro-input"
-                            value="{{ query_veterinario }}"
-                        >
+                        <select id="q_veterinario" name="q_veterinario" class="filtro-input">
+                            <option value="">Todos los veterinarios</option>
+                            {% for vet in veterinarios %}
+                            <option value="{{ vet.id }}" {% if query_veterinario == vet.id|stringformat:"s" %}selected{% endif %}>
+                                {{ vet.get_full_name|default:vet.username }}
+                            </option>
+                            {% endfor %}
+                        </select>
                         {% if query_veterinario %}
                         <button 
                             type="button" 
@@ -198,7 +198,16 @@
             📊 Mostrando <strong>{{ vacunaciones|length }}</strong> vacunación(es)
             {% if query_cliente %}para cliente: "<strong>{{ query_cliente }}</strong>"{% endif %}
             {% if query_mascota %}{% if query_cliente %}y {% endif %}mascota: "<strong>{{ query_mascota }}</strong>"{% endif %}
-            {% if query_veterinario %}{% if query_cliente or query_mascota %}y {% endif %}veterinario: "<strong>{{ query_veterinario }}</strong>"{% endif %}
+            {% if query_veterinario %}
+                {% if query_cliente or query_mascota %}y {% endif %}veterinario: 
+                "<strong>
+                    {% for vet in veterinarios %}
+                        {% if vet.id|stringformat:"s" == query_veterinario %}
+                            {{ vet.get_full_name|default:vet.username }}
+                        {% endif %}
+                    {% endfor %}
+                </strong>"
+            {% endif %}
             {% if query_vacuna %}{% if query_cliente or query_mascota or query_veterinario %}y {% endif %}vacuna: "<strong>{{ query_vacuna }}</strong>"{% endif %}
             {% if query_veterinaria %}{% if query_cliente or query_mascota or query_veterinario or query_vacuna %}en {% else %}en {% endif %}clínica: "<strong>{{ query_veterinaria }}</strong>"{% endif %}
             {% if query_fecha %}{% if query_cliente or query_mascota or query_veterinario or query_vacuna or query_veterinaria %}el {% else %}el {% endif %}<strong>{{ query_fecha }}</strong>{% endif %}

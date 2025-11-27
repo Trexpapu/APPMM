@@ -6,7 +6,6 @@
 <section class="container">
     <div class="header-actions">
         <h2>🩺 Crear Nueva Operación</h2>
-        
     </div>
 
     <form method="post" enctype="multipart/form-data">
@@ -176,8 +175,12 @@
             <div class="form-grid">
                 {% for field in form %}
                     {% if field.name != 'mascota' %}
-                    <div class="form-group {% if field.name in 'operacion,descripcion,complicaciones' %}full-width{% endif %}">
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    <div class="form-group {% if field.name in 'operacion,descripcion,complicaciones,estadoSaludPrevio' %}full-width{% endif %}">
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                            {% if field.name == 'peso' %}
+                            {% endif %}
+                        </label>
                         {{ field }}
                         {% if field.help_text %}
                             <small class="help-text">{{ field.help_text }}</small>
@@ -209,6 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('mascota-search');
     const dropdown = document.getElementById('{{ form.mascota.id_for_label }}');
     const mascotaInfo = document.getElementById('mascota-info');
+    const pesoField = document.getElementById('id_peso'); // Campo de peso del formulario
 
     // 🔍 FILTRO DE BÚSQUEDA
     searchInput.addEventListener('input', function() {
@@ -224,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return text && text.trim() !== '' ? text : 'No especificado';
     }
 
-    // 🐾 ACTUALIZAR INFORMACIÓN DE MASCOTA AL SELECCIONAR
+    // 🐾 ACTUALIZAR INFORMACIÓN DE MASCOTA AL SELECCIONAR Y LLENAR PESO
     dropdown.addEventListener('change', function() {
         const selectedOption = dropdown.options[dropdown.selectedIndex];
         
@@ -236,6 +240,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const peso = selectedOption.getAttribute('data-peso');
             document.getElementById('info-peso').textContent = peso ? `${peso} kg` : 'No especificado';
+            
+            // 🆕 ACTUALIZAR CAMPO DE PESO EN EL FORMULARIO
+            if (peso && pesoField) {
+                pesoField.value = peso;
+            }
             
             document.getElementById('info-fechanacimiento').textContent = selectedOption.getAttribute('data-fechanacimiento');
             document.getElementById('info-sexo').textContent = formatText(selectedOption.getAttribute('data-sexo'));
@@ -255,6 +264,10 @@ document.addEventListener('DOMContentLoaded', function() {
             mascotaInfo.style.display = 'block';
         } else {
             mascotaInfo.style.display = 'none';
+            // 🆕 LIMPIAR CAMPO DE PESO SI NO HAY MASCOTA SELECCIONADA
+            if (pesoField) {
+                pesoField.value = '';
+            }
         }
     });
 
@@ -391,5 +404,7 @@ select.form-control {
     margin: 0;
     padding-left: 20px;
 }
+
+
 </style>
 {% endblock %}

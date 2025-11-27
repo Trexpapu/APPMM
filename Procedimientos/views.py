@@ -34,6 +34,11 @@ def crear_operacion(request):
     if request.method == 'POST':
         form = OperacionesForm(request.POST, request.FILES)
         if form.is_valid():
+            peso = form.cleaned_data.get('peso')
+            mascota_id = form.cleaned_data.get('mascota')
+            mascota = Mascotas.objects.get(pk = mascota_id.pk)
+            mascota.peso = peso
+            mascota.save()
             operacion = form.save(commit=False)
             
             # Procesar imágenes
@@ -55,6 +60,8 @@ def crear_operacion(request):
         'veterinarios': veterinarios,
         'title': 'Crear Nueva Operación'
     })
+
+
 @login_required
 def editar_operacion(request, pk):
     operacion = get_object_or_404(Operaciones, pk=pk)
@@ -572,42 +579,9 @@ def historial_desparasitaciones(request):
 
 
 @login_required
-def editar_desparasitacion(request, pk):
-    desparasitacion = get_object_or_404(Desparasitaciones, pk=pk)
-    veterinarios = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
-    
-    if request.method == 'POST':
-        form = DesparasitacionesUpdateForm(request.POST, instance=desparasitacion)
-        if form.is_valid():
-            desparasitacion_actualizada = form.save()
-            
-            # Actualizar datos de mascota
-            mascota = desparasitacion_actualizada.mascota
-            mascota.ultimaDesparasitacion = desparasitacion_actualizada.fecha
-            mascota.ultimoDesparasitante = str(desparasitacion_actualizada.desparasitante)
-            mascota.peso = desparasitacion_actualizada.peso
-            mascota.save()
-            
-            messages.success(request, "✅ Desparasitación actualizada exitosamente.")
-            return redirect('historial_desparasitaciones')
-    else:
-        form = DesparasitacionesUpdateForm(instance=desparasitacion)
-    
-    return render(request, 'procedimientos/desparasitaciones/editar_desparasitacion.html', {
-        'form': form,
-        'desparasitacion': desparasitacion,
-        'veterinarios': veterinarios,
-    })
-
-@login_required
 def eliminar_desparasitacion(request, pk):
+    
     desparasitacion = get_object_or_404(Desparasitaciones, pk=pk)
-    
-    if request.method == 'POST':
-        desparasitacion.delete()
-        messages.success(request, "✅ Desparasitación eliminada exitosamente.")
-        return redirect('historial_desparasitaciones')
-    
-    return render(request, 'procedimientos/desparasitaciones/eliminar_desparasitacion.html', {
-        'desparasitacion': desparasitacion
-    })
+    desparasitacion.delete()
+    messages.success(request, "✅ Desparasitación eliminada exitosamente.")
+    return redirect('historial_desparasitaciones')

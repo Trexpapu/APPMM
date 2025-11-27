@@ -36,6 +36,5 @@ urlpatterns = [
 
     path('desparasitacion/historial/', views.historial_desparasitaciones, name='historial_desparasitaciones'),
     path('desparasitacion/crear/', views.nueva_desparasitacion, name='nueva_desparasitacion'),
-    path('desparasitacion/editar/<int:pk>/', views.editar_desparasitacion, name='editar_desparasitacion'),
     path('desparasitacion/eliminar/<int:pk>/', views.eliminar_desparasitacion, name='eliminar_desparasitacion'),
 ]

@@ -27,6 +27,7 @@ urlpatterns = [
     path('consultas/', include('ConsultasMedicas.urls')),
     path('agenda/', include('Agenda.urls')),
     path('procedimientos/', include('Procedimientos.urls')),
+    path('guarderia/', include('GuarderiaHospitalizacion.urls')),
 ]
 
 # Solo servir archivos multimedia en modo DEBUG
