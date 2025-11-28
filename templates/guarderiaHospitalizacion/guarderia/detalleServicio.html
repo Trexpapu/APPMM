@@ -1,0 +1,285 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Guardería - {{ guarderia.mascota.nombre }}{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2>🏠 Detalle de Servicio de Guardería</h2>
+        <div class="action-buttons">
+            <a href="{% url 'servicio_guarderia_editar' guarderia.pk %}" class="btn-home" style="background: #ffc107; color: black;">
+                ✏️ Editar
+            </a>
+        </div>
+    </div>
+
+    <!-- Información General -->
+    <div class="form-section" style="background: #f0f8ff; border-left: 4px solid #3498db;">
+        <h3>📋 Información General</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <strong>👤 Cliente:</strong>
+                <span>{{ guarderia.mascota.cliente.nombre }}</span>
+            </div>
+            <div class="info-item">
+                <strong>📞 Teléfono:</strong>
+                <span>{{ guarderia.mascota.cliente.telefono|default:"No especificado" }}</span>
+            </div>
+            <div class="info-item">
+                <strong>📧 Email:</strong>
+                <span>{{ guarderia.mascota.cliente.email|default:"No especificado" }}</span>
+            </div>
+            <div class="info-item">
+                <strong>🐕 Mascota:</strong>
+                <span>{{ guarderia.mascota.nombre }}</span>
+            </div>
+            <div class="info-item">
+                <strong>🔬 Especie:</strong>
+                <span>{{ guarderia.mascota.especie|default:"No especificado" }}</span>
+            </div>
+            <div class="info-item">
+                <strong>🎯 Raza:</strong>
+                <span>{{ guarderia.mascota.raza|default:"No especificado" }}</span>
+            </div>
+            <div class="info-item">
+                <strong>🏥 Clínica:</strong>
+                <span>{{ guarderia.clinicaVeterinaria }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fechas -->
+    <div class="form-section">
+        <h3>📅 Fechas</h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <strong>Fecha de Entrada:</strong>
+                <p>{{ guarderia.fechaEntrada }}</p>
+            </div>
+            <div class="form-group">
+                <strong>Fecha de Salida Programada:</strong>
+                <p>
+                    {% if guarderia.fechaSalidaProgramada %}
+                        {{ guarderia.fechaSalidaProgramada }}
+                    {% else %}
+                        <span class="badge badge-warning">No programada</span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="form-group">
+                <strong>Fecha de Salida Real:</strong>
+                <p>
+                    {% if guarderia.fechaSalidaReal %}
+                        {{ guarderia.fechaSalidaReal }}
+                    {% else %}
+                        <span class="badge badge-info">En guardería</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del Servicio -->
+    <div class="form-grid" style="gap: 20px;">
+        <div class="form-section">
+            <h3>🍖 Alimento</h3>
+            <div class="description-content">
+                {% if guarderia.alimento %}
+                    {{ guarderia.alimento|linebreaks }}
+                {% else %}
+                    <p class="no-data">No hay información sobre alimento.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>🎒 Accesorios Recibidos</h3>
+            <div class="description-content">
+                {% if guarderia.accesoriosRecibidos %}
+                    {{ guarderia.accesoriosRecibidos|linebreaks }}
+                {% else %}
+                    <p class="no-data">No hay accesorios registrados.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>💓 Estado de Salud</h3>
+            <div class="description-content">
+                {% if guarderia.estadoSalud %}
+                    {{ guarderia.estadoSalud|linebreaks }}
+                {% else %}
+                    <p class="no-data">No hay información sobre estado de salud.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>💊 Tratamientos</h3>
+            <div class="description-content">
+                {% if guarderia.tratamientos %}
+                    {{ guarderia.tratamientos|linebreaks }}
+                {% else %}
+                    <p class="no-data">No hay tratamientos registrados.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-section full-width">
+            <h3>📝 Otros Datos</h3>
+            <div class="description-content">
+                {% if guarderia.otrosDatos %}
+                    {{ guarderia.otrosDatos|linebreaks }}
+                {% else %}
+                    <p class="no-data">No hay otros datos registrados.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Información Financiera -->
+    <div class="form-section">
+        <h3>💰 Información Financiera</h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <strong>Pagado:</strong>
+                <p>${{ guarderia.pagado }}</p>
+            </div>
+            <div class="form-group">
+                <strong>Pago Total:</strong>
+                <p>${{ guarderia.pagoTotal }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fotos -->
+    <div class="form-section">
+        <h3>🖼️ Fotos</h3>
+        <div class="photos-grid">
+            <div class="photo-container">
+                <h4>Foto Antes</h4>
+                {% if guarderia.fotoAntes %}
+                    <img src="data:image/jpeg;base64,{{ guarderia.fotoAntes }}" alt="Foto antes de la guardería" class="operation-photo">
+                {% else %}
+                    <div class="no-photo">
+                        <p>No hay foto disponible</p>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="photo-container">
+                <h4>Foto Después</h4>
+                {% if guarderia.fotoDespues %}
+                    <img src="data:image/jpeg;base64,{{ guarderia.fotoDespues }}" alt="Foto después de la guardería" class="operation-photo">
+                {% else %}
+                    <div class="no-photo">
+                        <p>No hay foto disponible</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="action-buttons" style="margin-top: 30px;">
+        <a href="{% url 'servicio_guarderia_editar' guarderia.pk %}" class="btn-home" style="background: #ffc107; color: black; padding: 12px 24px;">
+            ✏️ Editar Servicio
+        </a>
+        <a href="{% url 'historial-guarderia' %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
+            📋 Volver al Listado
+        </a>
+    </div>
+</section>
+
+<style>
+.form-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.info-item strong {
+    color: #495057;
+    margin-bottom: 5px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.description-content {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    min-height: 100px;
+}
+
+.photos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.photo-container {
+    text-align: center;
+}
+
+.operation-photo {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.no-photo {
+    background: #f8f9fa;
+    padding: 40px 20px;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+    color: #6c757d;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: black;
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+.no-data {
+    color: #6c757d;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+</style>
+{% endblock %}

@@ -38,6 +38,7 @@
                         data-raza="{{ mascota.raza|escapejs }}"
                         data-fechanacimiento="{{ mascota.fechaNacimiento }}"
                         data-sexo="{{ mascota.get_sexo_display|escapejs }}"
+                        data-alimento ="{{ mascota.alimento|escapejs }}"
                         data-vacunas="{{ mascota.vacunas|escapejs }}"
                         data-cliente="{{ mascota.cliente.nombre|escapejs }}"
                         data-telefono="{{ mascota.cliente.telefono|escapejs }}"
@@ -78,6 +79,11 @@
                     <div class="info-item">
                         <strong>⚧️ Sexo:</strong>
                         <span id="info-sexo">-</span>
+                    </div>
+                    
+                    <div class="info-item">
+                        <strong>🥫 Alimento:</strong>
+                        <span id="info-alimento">-</span>
                     </div>
                     <div class="info-item">
                         <strong>👤 Dueño:</strong>
@@ -160,7 +166,8 @@ document.addEventListener('DOMContentLoaded', function() {
         cliente: document.getElementById('info-cliente'),
         telefono: document.getElementById('info-telefono'),
         email: document.getElementById('info-email'),
-        vacunas: document.getElementById('info-vacunas')
+        vacunas: document.getElementById('info-vacunas'),
+        alimento : document.getElementById('info-alimento')
     };
 
     // 🔍 FILTRO DE BÚSQUEDA

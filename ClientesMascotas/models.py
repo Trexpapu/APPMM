@@ -29,3 +29,4 @@ class Mascotas(models.Model):
         choices=SEXOS,
         default='macho'  # puedes poner un valor por defecto si quieres
     )
+    alimento = models.TextField(blank = True)

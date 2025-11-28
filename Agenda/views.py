@@ -8,6 +8,7 @@ from django.db.models import Q
 from ClientesMascotas.models import *
 from ConsultasMedicas.urls import *
 from datetime import datetime
+from django.contrib import messages
 
 from django.contrib.auth.decorators import login_required
 
@@ -119,28 +120,65 @@ def ver_proximas_citas(request):
     
     return render(request, 'agenda/proximasCitas/verProximasCitas.html', context)
 
-
 @login_required
 def agendar_proxima_cita(request):
     """View to add a next consultation."""
-    mascotas = Mascotas.objects.all()
+    mascotas = Mascotas.objects.all().select_related('cliente')
+    mascota_id = request.GET.get('mascota') or request.POST.get('mascota')
+    
+    initial_data = {}
+    datos_mascota = None
 
+    # 🔹 Cargar datos de la mascota cuando se selecciona una
+    if mascota_id:
+        try:
+            mascota = Mascotas.objects.get(pk=mascota_id)
+            # 🔹 Preparar datos de la mascota para mostrar en el template
+            datos_mascota = {
+                'nombre': mascota.nombre,
+                'especie': mascota.especie,
+                'raza': mascota.raza,
+                'fechaNacimiento': mascota.fechaNacimiento,
+                'peso': mascota.peso,
+                'sexo': mascota.get_sexo_display(),
+                'vacunas': mascota.vacunas,
+                'alergias': mascota.alergias,
+                'ultimaDesparasitacion': mascota.ultimaDesparasitacion,
+                'ultimoDesparasitante': mascota.ultimoDesparasitante,
+                'alimento': mascota.alimento,
+                'cliente_nombre': mascota.cliente.nombre,
+                'cliente_telefono': mascota.cliente.telefono,
+                'cliente_email': mascota.cliente.email,
+                'cliente_direccion': mascota.cliente.direccion,
+            }
+            
+        except Mascotas.DoesNotExist:
+            mascota_id = None
+
+    # 🔹 POST: Guardar nueva cita
     if request.method == 'POST':
         form = SiguientesCitasForm(request.POST)
         if form.is_valid():
             proximaCita = form.save(commit=False)
             mascota_id = request.POST.get('mascota')
+
             if mascota_id:
                 proximaCita.mascota_id = mascota_id
+                proximaCita.veterinario = request.user
                 proximaCita.save()
+                messages.success(request, "Cita agendada correctamente.")
                 return redirect('index-agenda')
             else:
                 form.add_error(None, "Debe seleccionar una mascota antes de guardar.")
     else:
-        form = SiguientesCitasForm()
+        form = SiguientesCitasForm(initial={'veterinario': request.user})
  
-    return render(request, 'agenda/proximasCitas/agendarCita.html', {'form': form, 'mascotas': mascotas})
-
+    return render(request, 'agenda/proximasCitas/agendarCita.html', {
+        'form': form, 
+        'mascotas': mascotas,
+        'mascota_id': mascota_id,
+        'datos_mascota': datos_mascota
+    })
 
 @login_required
 def borrar_proxima_cita(request, pk):
@@ -149,13 +187,43 @@ def borrar_proxima_cita(request, pk):
     proxConsulta.delete()
     return redirect('ver-proximas-citas')
 
-
 @login_required
 def editar_proxima_cita(request, pk):
     """Editar mascota con selector personalizado de cliente."""
     proxConsulta = get_object_or_404(SiguientesCitas, pk=pk)
-    mascota = Mascotas.objects.all()
+    mascotas = Mascotas.objects.all().select_related('cliente')
+    mascota_id = request.GET.get('mascota') or str(proxConsulta.mascota.id) if proxConsulta.mascota else None
+    
+    initial_data = {}
+    datos_mascota = None
 
+    # 🔹 Cargar datos de la mascota cuando se selecciona una o la actual
+    if mascota_id:
+        try:
+            mascota = Mascotas.objects.get(pk=mascota_id)
+            # 🔹 Preparar datos de la mascota para mostrar en el template
+            datos_mascota = {
+                'nombre': mascota.nombre,
+                'especie': mascota.especie,
+                'raza': mascota.raza,
+                'fechaNacimiento': mascota.fechaNacimiento,
+                'peso': mascota.peso,
+                'sexo': mascota.get_sexo_display(),
+                'vacunas': mascota.vacunas,
+                'alergias': mascota.alergias,
+                'ultimaDesparasitacion': mascota.ultimaDesparasitacion,
+                'ultimoDesparasitante': mascota.ultimoDesparasitante,
+                'alimento': mascota.alimento,
+                'cliente_nombre': mascota.cliente.nombre,
+                'cliente_telefono': mascota.cliente.telefono,
+                'cliente_email': mascota.cliente.email,
+                'cliente_direccion': mascota.cliente.direccion,
+            }
+            
+        except Mascotas.DoesNotExist:
+            mascota_id = None
+
+    # 🔹 POST: Guardar cambios en la cita
     if request.method == 'POST':
         form = UpdateSiguienteCitaForm(request.POST, instance=proxConsulta)
         if form.is_valid():
@@ -164,15 +232,21 @@ def editar_proxima_cita(request, pk):
             if mascota_id:
                 proxConsultaEditada.mascota_id = mascota_id
             proxConsultaEditada.save()
+            messages.success(request, "Cita actualizada correctamente.")
             return redirect('ver-proximas-citas')
     else:
         form = UpdateSiguienteCitaForm(instance=proxConsulta)
 
     return render(request, 'agenda/proximasCitas/editarProximaCita.html', {
         'form': form,
-        'mascotas': mascota
+        'mascotas': mascotas,
+        'mascota_id': mascota_id,
+        'datos_mascota': datos_mascota,
+        'cita_actual': proxConsulta
     })
 
+
+    
 def atender_cita(request, pk):
     cita = get_object_or_404(SiguientesCitas, pk=pk)
     cita.asistencia = 'Si asistió'

@@ -46,6 +46,7 @@
                         data-cliente="{{ mascota.cliente.nombre|escapejs }}"
                         data-telefono="{{ mascota.cliente.telefono|escapejs }}"
                         data-email="{{ mascota.cliente.email|escapejs }}"
+                        data-alimento="{{ mascota.alimento|escapejs }}"
                         {% if mascota.id == operacion.mascota.id %}selected{% endif %}
                     >
                         {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - 
@@ -88,6 +89,10 @@
                     <div class="info-item">
                         <strong>⚧️ Sexo:</strong>
                         <span id="info-sexo">-</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>🥫 Alimento:</strong>
+                        <span id="info-alimento">-</span>
                     </div>
                     <div class="info-item">
                         <strong>❤️ Estado:</strong>
@@ -230,6 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('info-fechanacimiento').textContent = selectedOption.getAttribute('data-fechanacimiento');
             document.getElementById('info-sexo').textContent = formatText(selectedOption.getAttribute('data-sexo'));
             document.getElementById('info-vive').textContent = formatText(selectedOption.getAttribute('data-vive'));
+            document.getElementById('info-alimento').textContent = formatText(selectedOption.getAttribute('data-alimento'));
 
             // Información del dueño
             document.getElementById('info-cliente').textContent = formatText(selectedOption.getAttribute('data-cliente'));

@@ -42,10 +42,12 @@
                         data-ultimadesparasitacion="{{ mascota.ultimaDesparasitacion|default:'No se ha desparasitado' }}"
                         data-ultimodesparasitante="{{ mascota.ultimoDesparasitante }}"
                         data-alergias="{{ mascota.alergias|escapejs }}"
+                        data-alimento="{{ mascota.alimento|escapejs }}"
                         data-vive="{% if mascota.vive %}Sí{% else %}No{% endif %}"
                         data-cliente="{{ mascota.cliente.nombre|escapejs }}"
                         data-telefono="{{ mascota.cliente.telefono|escapejs }}"
                         data-email="{{ mascota.cliente.email|escapejs }}"
+                        {% if mascota.id|stringformat:"s" == mascota_id|stringformat:"s" %}selected{% endif %}
                     >
                         {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - 
                         {{ mascota.cliente.nombre }} - {{ mascota.cliente.email }} - {{ mascota.cliente.telefono }}
@@ -58,10 +60,16 @@
                 </div>
                 {% endif %}
             </div>
+
+            <!-- 🔄 Botón para cargar datos de la mascota seleccionada -->
+            <button type="button" id="cargar-mascota-btn" class="btn-home">
+                🔄 Cargar Datos de Mascota
+            </button>
         </div>
 
         <!-- 📋 INFORMACIÓN COMPLETA DE LA MASCOTA SELECCIONADA -->
-        <div id="mascota-info" class="form-section" style="background: #f0f8ff; border-left: 4px solid #3498db; display: none;">
+        {% if datos_mascota %}
+        <div class="form-section" style="background: #f0f8ff; border-left: 4px solid #3498db;">
             <h3>📋 Información Completa de la Mascota</h3>
             
             <!-- Información Básica -->
@@ -70,31 +78,31 @@
                 <div class="info-grid">
                     <div class="info-item">
                         <strong>🐕 Nombre:</strong>
-                        <span id="info-nombre">-</span>
+                        <span>{{ datos_mascota.nombre }}</span>
                     </div>
                     <div class="info-item">
                         <strong>🔬 Especie:</strong>
-                        <span id="info-especie">-</span>
+                        <span>{{ datos_mascota.especie }}</span>
                     </div>
                     <div class="info-item">
                         <strong>🎯 Raza:</strong>
-                        <span id="info-raza">-</span>
+                        <span>{{ datos_mascota.raza }}</span>
                     </div>
                     <div class="info-item">
                         <strong>⚖️ Peso:</strong>
-                        <span id="info-peso">-</span>
+                        <span>{{ datos_mascota.peso }} kg</span>
                     </div>
                     <div class="info-item">
                         <strong>📅 Fecha Nacimiento:</strong>
-                        <span id="info-fechanacimiento">-</span>
+                        <span>{{ datos_mascota.fechaNacimiento }}</span>
                     </div>
                     <div class="info-item">
                         <strong>⚧️ Sexo:</strong>
-                        <span id="info-sexo">-</span>
+                        <span>{{ datos_mascota.sexo }}</span>
                     </div>
                     <div class="info-item">
                         <strong>❤️ Estado:</strong>
-                        <span id="info-vive">-</span>
+                        <span>{% if datos_mascota.vive %}Sí{% else %}No{% endif %}</span>
                     </div>
                 </div>
             </div>
@@ -105,15 +113,15 @@
                 <div class="info-grid">
                     <div class="info-item">
                         <strong>👤 Dueño:</strong>
-                        <span id="info-cliente">-</span>
+                        <span>{{ datos_mascota.cliente_nombre }}</span>
                     </div>
                     <div class="info-item">
                         <strong>📞 Teléfono:</strong>
-                        <span id="info-telefono">-</span>
+                        <span>{{ datos_mascota.cliente_telefono }}</span>
                     </div>
                     <div class="info-item">
                         <strong>📧 Email:</strong>
-                        <span id="info-email">-</span>
+                        <span>{{ datos_mascota.cliente_email }}</span>
                     </div>
                 </div>
             </div>
@@ -125,8 +133,8 @@
                 <!-- Vacunas -->
                 <div class="info-item full-width">
                     <strong>💉 Vacunas:</strong>
-                    <div id="info-vacunas" class="info-content">
-                        -
+                    <div class="info-content">
+                        {{ datos_mascota.vacunas|default:"No especificado" }}
                     </div>
                 </div>
 
@@ -134,23 +142,32 @@
                 <div class="info-grid">
                     <div class="info-item">
                         <strong>📅 Última Desparasitación:</strong>
-                        <span id="info-ultimadesparasitacion">-</span>
+                        <span>{{ datos_mascota.ultimaDesparasitacion|default:"No registrada" }}</span>
                     </div>
                     <div class="info-item">
                         <strong>💊 Último Desparasitante:</strong>
-                        <span id="info-ultimodesparasitante">-</span>
+                        <span>{{ datos_mascota.ultimoDesparasitante|default:"No especificado" }}</span>
                     </div>
                 </div>
 
                 <!-- Alergias -->
                 <div class="info-item full-width">
                     <strong>⚠️ Alergias:</strong>
-                    <div id="info-alergias" class="info-content">
-                        -
+                    <div class="info-content">
+                        {{ datos_mascota.alergias|default:"No especificado" }}
+                    </div>
+                </div>
+
+                <!-- Alimento -->
+                <div class="info-item full-width">
+                    <strong>🍖 Alimento:</strong>
+                    <div class="info-content">
+                        {{ datos_mascota.alimento|default:"No especificado" }}
                     </div>
                 </div>
             </div>
         </div>
+        {% endif %}
 
         <!-- 📝 FORMULARIO DE GUARDERÍA - USANDO EL FORM DE DJANGO -->
         <div class="form-section">
@@ -176,7 +193,12 @@
                 {% for field in form %}
                     {% if field.name != 'mascota' %}
                     <div class="form-group {% if field.name in 'alimento,accesoriosRecibidos,estadoSalud,tratamientos,otrosDatos' %}full-width{% endif %}">
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                            {% if field.name == 'alimento' %}
+                            <small style="color: #666; font-style: italic;">(Se llena automáticamente al cargar datos de la mascota)</small>
+                            {% endif %}
+                        </label>
                         {{ field }}
                         {% if field.help_text %}
                             <small class="help-text">{{ field.help_text }}</small>
@@ -207,7 +229,8 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('mascota-search');
     const dropdown = document.getElementById('{{ form.mascota.id_for_label }}');
-    const mascotaInfo = document.getElementById('mascota-info');
+    const cargarBtn = document.getElementById('cargar-mascota-btn');
+    const alimentoField = document.getElementById('id_alimento'); // Campo de alimento del formulario
 
     // 🔍 FILTRO DE BÚSQUEDA
     searchInput.addEventListener('input', function() {
@@ -218,48 +241,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Función para formatear texto que puede estar vacío
-    function formatText(text) {
-        return text && text.trim() !== '' ? text : 'No especificado';
-    }
-
-    // 🐾 ACTUALIZAR INFORMACIÓN DE MASCOTA AL SELECCIONAR
-    dropdown.addEventListener('change', function() {
+    // 🐾 CARGAR DATOS DE MASCOTA
+    cargarBtn.addEventListener('click', function() {
         const selectedOption = dropdown.options[dropdown.selectedIndex];
-        
-        if (selectedOption.value) {
-            // Información básica
-            document.getElementById('info-nombre').textContent = formatText(selectedOption.getAttribute('data-nombre'));
-            document.getElementById('info-especie').textContent = formatText(selectedOption.getAttribute('data-especie'));
-            document.getElementById('info-raza').textContent = formatText(selectedOption.getAttribute('data-raza'));
-            
-            const peso = selectedOption.getAttribute('data-peso');
-            document.getElementById('info-peso').textContent = peso ? `${peso} kg` : 'No especificado';
-            
-            document.getElementById('info-fechanacimiento').textContent = selectedOption.getAttribute('data-fechanacimiento');
-            document.getElementById('info-sexo').textContent = formatText(selectedOption.getAttribute('data-sexo'));
-            document.getElementById('info-vive').textContent = formatText(selectedOption.getAttribute('data-vive'));
-
-            // Información del dueño
-            document.getElementById('info-cliente').textContent = formatText(selectedOption.getAttribute('data-cliente'));
-            document.getElementById('info-telefono').textContent = formatText(selectedOption.getAttribute('data-telefono'));
-            document.getElementById('info-email').textContent = formatText(selectedOption.getAttribute('data-email'));
-
-            // Historial médico
-            document.getElementById('info-vacunas').textContent = formatText(selectedOption.getAttribute('data-vacunas'));
-            document.getElementById('info-ultimadesparasitacion').textContent = selectedOption.getAttribute('data-ultimadesparasitacion');
-            document.getElementById('info-ultimodesparasitante').textContent = formatText(selectedOption.getAttribute('data-ultimodesparasitante'));
-            document.getElementById('info-alergias').textContent = formatText(selectedOption.getAttribute('data-alergias'));
-            
-            mascotaInfo.style.display = 'block';
-        } else {
-            mascotaInfo.style.display = 'none';
+        if (!selectedOption.value) {
+            alert('Por favor, selecciona una mascota primero.');
+            return;
         }
+        
+        // 🆕 ACTUALIZAR CAMPO DE ALIMENTO EN EL FORMULARIO
+        const alimento = selectedOption.getAttribute('data-alimento');
+        if (alimento && alimentoField) {
+            alimentoField.value = alimento;
+        }
+        
+        // Recargar página con la mascota seleccionada
+        window.location.href = `?mascota=${selectedOption.value}`;
     });
 
-    // 🎯 MOSTRAR INFORMACIÓN SI YA HAY MASCOTA SELECCIONADA (en caso de edición)
-    if (dropdown.value) {
-        dropdown.dispatchEvent(new Event('change'));
+    // 🎯 CARGAR AUTOMÁTICAMENTE SI YA HAY MASCOTA EN URL
+    if (dropdown.value && window.location.search.includes('mascota=')) {
+        // El botón se mostrará automáticamente y los datos se cargarán desde la vista
     }
 });
 </script>
@@ -391,5 +393,16 @@ select.form-control {
     padding-left: 20px;
 }
 
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Estilo para indicar que el campo de alimento se llena automáticamente */
+#id_alimento {
+    background-color: #f8f9fa;
+    border-color: #28a745;
+}
 </style>
 {% endblock %}

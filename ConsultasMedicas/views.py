@@ -47,7 +47,8 @@ def nueva_consulta_desde_cita(request, mascota_id):
         'vacunas': mascota.vacunas,
         'alergias': mascota.alergias,
         'ultimaDesparasitacion': mascota.ultimaDesparasitacion, 
-        'ultimoDesparasitante': mascota.ultimoDesparasitante
+        'ultimoDesparasitante': mascota.ultimoDesparasitante,
+        'alimento': mascota.alimento
     }
     
     # Preparar datos de la mascota para mostrar en el template
@@ -90,6 +91,7 @@ def nueva_consulta_desde_cita(request, mascota_id):
             # Actualizar datos de la mascota (solo peso y alergias)
             mascota.peso = form.cleaned_data.get('peso') or mascota.peso
             mascota.alergias = form.cleaned_data.get('alergias') or mascota.alergias
+            mascota.alimento = form.cleaned_data.get('alimento') or mascota.alimento
             mascota.save()
 
             # Guardar documentos
@@ -154,7 +156,8 @@ def nueva_consulta(request):
                 'vacunas': mascota.vacunas,
                 'alergias': mascota.alergias,
                 'ultimaDesparasitacion': mascota.ultimaDesparasitacion, 
-                'ultimoDesparasitante': mascota.ultimoDesparasitante
+                'ultimoDesparasitante': mascota.ultimoDesparasitante,
+                'alimento': mascota.alimento,
             })
             
             # 🔹 Preparar datos de la mascota para mostrar en el template
@@ -177,7 +180,7 @@ def nueva_consulta(request):
                     .first()
                 )
                 if ultima_consulta:
-                    exclude_fields = ['id', 'fechaConsulta', 'peso', 'vacunas', 'alergias', 'mascota', 'ultimaDesparasitacion', 'ultimoDesparasitante']
+                    exclude_fields = ['id', 'fechaConsulta', 'peso', 'vacunas', 'alergias', 'mascota', 'ultimaDesparasitacion', 'ultimoDesparasitante', 'alimento']
                     for field in ConsultasMedicas._meta.get_fields():
                         if (field.name not in exclude_fields and 
                             hasattr(ultima_consulta, field.name)):
@@ -204,6 +207,7 @@ def nueva_consulta(request):
                 mascota = Mascotas.objects.get(pk=mascota_id)
                 mascota.peso = form.cleaned_data.get('peso') or mascota.peso
                 mascota.alergias = form.cleaned_data.get('alergias') or mascota.alergias
+                mascota.alimento = form.cleaned_data.get('alimento') or mascota.alimento
                 # NO actualizamos vacunas, ultimaDesparasitacion ni ultimoDesparasitante aquí
                 mascota.save()
 

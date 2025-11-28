@@ -5,56 +5,189 @@
 {% block content %}
 <section class="container">
     <div class="header-actions">
-        <h2>Editar Agenda de Citas</h2>
+        <h2>📅 Editar Cita</h2>
     </div>
 
     <form method="post">
         {% csrf_token %}
 
+        <!-- 🔍 Búsqueda y selección de mascota -->
         <div class="form-section">
-            <div class="form-header">
-                <h3>🐾 Selección de Mascota</h3>
-            </div>
+            <h3>🐾 Selección de Mascota</h3>
+            
             <div class="form-group">
-                <label for="mascota">Seleccionar mascota:</label>
-                <input type="text" id="mascota-search" placeholder="Buscar mascota por nombre, raza, especie, nombre del cliente, email o teléfono" class="search-input">
-                <select id="mascota" name="mascota" class="searchable-dropdown">
+                <label for="mascota-search">🔍 Buscar mascota:</label>
+                <input 
+                    type="text" 
+                    id="mascota-search" 
+                    placeholder="Buscar mascota por nombre, raza, especie, nombre del cliente, email o teléfono" 
+                    class="search-input"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="mascota">🐕 Seleccionar mascota:</label>
+                <select id="mascota" name="mascota" class="searchable-dropdown" required>
                     <option value="">Seleccione una mascota</option>
                     {% for mascota in mascotas %}
-                    <option value="{{ mascota.id }}" {% if mascota.id == form.instance.mascota.id %}selected{% endif %}>
-                        {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - {{ mascota.cliente.nombre }} - {{ mascota.cliente.email }} - {{ mascota.cliente.telefono }}
+                    <option 
+                        value="{{ mascota.id }}"
+                        data-nombre="{{ mascota.nombre|escapejs }}"
+                        data-especie="{{ mascota.especie|escapejs }}"
+                        data-raza="{{ mascota.raza|escapejs }}"
+                        data-peso="{{ mascota.peso }}"
+                        data-fechanacimiento="{{ mascota.fechaNacimiento }}"
+                        data-sexo="{{ mascota.get_sexo_display|escapejs }}"
+                        data-vacunas="{{ mascota.vacunas|escapejs }}"
+                        data-alergias="{{ mascota.alergias|escapejs }}"
+                        data-ultimadesparasitacion="{{ mascota.ultimaDesparasitacion }}"
+                        data-ultimodesparasitante="{{ mascota.ultimoDesparasitante|escapejs }}"
+                        data-alimento="{{ mascota.alimento|escapejs }}"
+                        data-cliente="{{ mascota.cliente.nombre|escapejs }}"
+                        data-telefono="{{ mascota.cliente.telefono|escapejs }}"
+                        data-email="{{ mascota.cliente.email|escapejs }}"
+                        data-direccion="{{ mascota.cliente.direccion|escapejs }}"
+                        {% if mascota.id == cita_actual.mascota.id %}selected{% endif %}
+                        {% if mascota.id|stringformat:"s" == mascota_id|stringformat:"s" %}selected{% endif %}
+                    >
+                        {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - 
+                        {{ mascota.cliente.nombre }} - {{ mascota.cliente.email }} - {{ mascota.cliente.telefono }}
                     </option>
                     {% endfor %}
                 </select>
             </div>
+
+            <!-- 🔄 Botón para cargar datos de la mascota seleccionada -->
+            <button type="button" id="cargar-mascota-btn" class="btn-home">
+                🔄 Cargar Datos de Mascota
+            </button>
         </div>
 
-        <div class="form-section">
-            <div class="form-header">
-                <h3>📝 Datos de la Siguiente Cita</h3>
+        <!-- 📋 INFORMACIÓN DE LA MASCOTA Y DUEÑO -->
+        {% if datos_mascota %}
+        <div class="form-section" style="background: #f0f8ff; border-left: 4px solid #3498db;">
+            <h3>📋 Información de la Mascota y Dueño</h3>
+            
+            <!-- Información de la Mascota -->
+            <div class="info-section">
+                <h4>🐕 Información de la Mascota</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Nombre:</strong>
+                        <span>{{ datos_mascota.nombre }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Especie:</strong>
+                        <span>{{ datos_mascota.especie }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Raza:</strong>
+                        <span>{{ datos_mascota.raza }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Peso:</strong>
+                        <span>{{ datos_mascota.peso }} kg</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Fecha Nacimiento:</strong>
+                        <span>{{ datos_mascota.fechaNacimiento }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Sexo:</strong>
+                        <span>{{ datos_mascota.sexo }}</span>
+                    </div>
+                    <div class="info-item full-width">
+                        <strong>Vacunas:</strong>
+                        <div class="info-content">
+                            {{ datos_mascota.vacunas|default:"No especificado" }}
+                        </div>
+                    </div>
+                    <div class="info-item full-width">
+                        <strong>Alergias:</strong>
+                        <div class="info-content">
+                            {{ datos_mascota.alergias|default:"No especificado" }}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <strong>Última Desparasitación:</strong>
+                        <span>{{ datos_mascota.ultimaDesparasitacion|default:"No registrada" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Último Desparasitante:</strong>
+                        <span>{{ datos_mascota.ultimoDesparasitante|default:"No especificado" }}</span>
+                    </div>
+                    <div class="info-item full-width">
+                        <strong>Alimento:</strong>
+                        <div class="info-content">
+                            {{ datos_mascota.alimento|default:"No especificado" }}
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <!-- Información del Dueño -->
+            <div class="info-section">
+                <h4>👤 Información del Dueño</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Nombre:</strong>
+                        <span>{{ datos_mascota.cliente_nombre }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Teléfono:</strong>
+                        <span>{{ datos_mascota.cliente_telefono }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Email:</strong>
+                        <span>{{ datos_mascota.cliente_email }}</span>
+                    </div>
+                    <div class="info-item full-width">
+                        <strong>Dirección:</strong>
+                        <div class="info-content">
+                            {{ datos_mascota.cliente_direccion|default:"No especificado" }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 📅 FORMULARIO DE CITA -->
+        <div class="form-section">
+            <h3>📝 Datos de la Cita</h3>
             
             {% if form.errors %}
             <div class="alert alert-error">
-                <strong>Por favor corrige los siguientes errores:</strong>
-                {{ form.errors }}
+                <strong>❌ Por favor corrige los siguientes errores:</strong>
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
             </div>
             {% endif %}
             
             <div class="form-grid">
                 {% for field in form %}
-                <div class="form-group {% if field.field.widget.input_type == 'textarea' %}full-width{% endif %}">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.help_text %}
-                    <small class="help-text">{{ field.help_text }}</small>
-                    {% endif %}
-                    {% if field.errors %}
-                    <div class="field-errors">
-                        {{ field.errors }}
+                    {% if field.name != 'mascota' %}
+                    <div class="form-group {% if field.name == 'descripcionCita' %}full-width{% endif %}">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="help-text">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="field-errors">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
                     </div>
                     {% endif %}
-                </div>
                 {% endfor %}
             </div>
         </div>
@@ -71,18 +204,171 @@
 </section>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('mascota-search');
-        const dropdown = document.getElementById('mascota');
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('mascota-search');
+    const dropdown = document.getElementById('mascota');
+    const cargarBtn = document.getElementById('cargar-mascota-btn');
 
-        searchInput.addEventListener('input', function() {
-            const filter = searchInput.value.toLowerCase().replace(/\s+/g, '');
-            const options = dropdown.querySelectorAll('option');
-            options.forEach(option => {
-                const text = option.textContent.toLowerCase().replace(/\s+/g, '');
-                option.style.display = text.includes(filter) ? '' : 'none';
-            });
+    // 🔍 FILTRO DE BÚSQUEDA
+    searchInput.addEventListener('input', function() {
+        const filter = searchInput.value.toLowerCase().replace(/\s+/g, '');
+        dropdown.querySelectorAll('option').forEach(option => {
+            const text = option.textContent.toLowerCase().replace(/\s+/g, '');
+            option.style.display = text.includes(filter) ? '' : 'none';
         });
     });
+
+    // 🐾 CARGAR DATOS DE MASCOTA
+    cargarBtn.addEventListener('click', function() {
+        const selectedOption = dropdown.options[dropdown.selectedIndex];
+        if (!selectedOption.value) {
+            alert('Por favor, selecciona una mascota primero.');
+            return;
+        }
+        
+        // Recargar página con la mascota seleccionada
+        window.location.href = `?mascota=${selectedOption.value}`;
+    });
+
+    // 🎯 CARGAR AUTOMÁTICAMENTE SI YA HAY MASCOTA EN URL O EN LA CITA ACTUAL
+    if (dropdown.value && !window.location.search.includes('mascota=')) {
+        // Si hay una mascota seleccionada pero no está en la URL, cargar los datos
+        cargarBtn.click();
+    }
+});
 </script>
+
+<style>
+.form-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.field-errors {
+    color: #dc3545;
+    font-size: 0.875em;
+    margin-top: 5px;
+}
+
+.help-text {
+    color: #6c757d;
+    font-size: 0.875em;
+    margin-top: 5px;
+    display: block;
+}
+
+.info-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.info-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.info-section h4 {
+    color: #495057;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #3498db;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.info-item strong {
+    color: #495057;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+.info-content {
+    background: #f8f9fa;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border-left: 3px solid #17a2b8;
+    min-height: 20px;
+}
+
+.search-input, .searchable-dropdown {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.searchable-dropdown {
+    height: auto;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.alert.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid #f5c6cb;
+    margin-bottom: 15px;
+}
+
+.alert.alert-error ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Estilos para los campos del formulario */
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+
+select.form-control {
+    height: auto;
+}
+</style>
 {% endblock %}

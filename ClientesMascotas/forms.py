@@ -53,7 +53,7 @@ class ClienteUpdateForm(forms.ModelForm):
 class MascotaForm(forms.ModelForm):
     class Meta:
         model = Mascotas
-        fields = ['nombre', 'especie', 'raza', 'fechaNacimiento', 'peso', 'sexo', 'alergias', 'vive']
+        fields = ['nombre', 'especie', 'raza', 'fechaNacimiento', 'peso', 'sexo', 'alergias', 'alimento', 'vive']
         widgets = {
             'nombre': forms.TextInput(attrs={'placeholder': 'Ej. Firulais'}),
             'especie': forms.TextInput(attrs={'placeholder': 'Ej. Perro, Gato...'}),
@@ -62,6 +62,7 @@ class MascotaForm(forms.ModelForm):
             'peso': forms.NumberInput(attrs={'placeholder': 'Ej. 1 (kilogramos)'}),
             'sexo': forms.Select(attrs={'class': 'form-control'}),
             'alergias': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Alergias conocidas'}),
+            'alimento' : forms.Textarea(attrs={'rows': 3, 'placeholder': 'Tipo de alimento que consume'}),
             'vive': forms.CheckboxInput(attrs={'class': 'checkbox-grande'}),
         }
         labels = {
@@ -72,6 +73,7 @@ class MascotaForm(forms.ModelForm):
             'peso': 'Peso (kg)',
             'sexo': 'Sexo de la mascota',
             'alergias': 'Alergias conocidas',
+            'alimento': 'Tipo de alimento que consume',
             'vive': '¿Sigue con vida?',
         }
 
@@ -79,7 +81,7 @@ class MascotaForm(forms.ModelForm):
 class MascotaUpdateForm(forms.ModelForm):
     class Meta:
         model = Mascotas
-        fields = ['nombre', 'especie', 'raza', 'fechaNacimiento', 'peso', 'sexo', 'alergias', 'vive']
+        fields = ['nombre', 'especie', 'raza', 'fechaNacimiento', 'peso', 'sexo', 'alergias', 'alimento', 'vive']
         widgets = {
             'nombre': forms.TextInput(attrs={'placeholder': 'Ej. Firulais'}),
             'especie': forms.TextInput(attrs={'placeholder': 'Ej. Perro, Gato...'}),
@@ -88,6 +90,7 @@ class MascotaUpdateForm(forms.ModelForm):
             'peso': forms.NumberInput(attrs={'placeholder': 'Ej. 1 (kilogramos)'}),
             'sexo': forms.Select(attrs={'class': 'form-control'}),
             'alergias': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Alergias conocidas'}),
+            'alimento' : forms.Textarea(attrs={'rows': 3, 'placeholder': 'Tipo de alimento que consume'}),
             'vive': forms.CheckboxInput(attrs={'class': 'checkbox-grande'}),
         }
         labels = {
@@ -98,5 +101,6 @@ class MascotaUpdateForm(forms.ModelForm):
             'peso': 'Peso (kg)',
             'sexo': 'Sexo de la mascota',
             'alergias': 'Alergias conocidas',
+            'alimento': 'Tipo de alimento que consume',
             'vive': '¿Sigue con vida?',
         }
