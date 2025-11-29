@@ -13,4 +13,6 @@ urlpatterns = [
 
     path('detalleServicioGuarderia/<int:pk>/', views.servicio_guarderia_detalle, name='servicio_guarderia_detalle'),
 
+    path('guarderia/<int:guarderia_id>/pdf/', views.generar_pdf_guarderia, name='generar_pdf_guarderia'),
+
 ]

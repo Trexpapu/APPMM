@@ -53,11 +53,11 @@ class Hospitalizacion(models.Model):
     mascota = models.ForeignKey(Mascotas, on_delete=models.CASCADE)
 
     # Información del ingreso
-    motivoIngreso = models.TextField(blank=True)
+    motivo = models.TextField(blank=True)
     diagnostico = models.TextField(blank=True)
 
     # Datos médicos
-    estadoSaludPrevio = models.TextField(blank=True)
+    observaciones = models.TextField(blank=True)
     tratamientos = models.TextField(blank=True)
     evolucion = models.TextField(blank=True)
 
@@ -78,13 +78,6 @@ class Hospitalizacion(models.Model):
     # Fechas
     fechaEntrada = models.DateField()
     fechaSalida = models.DateField(blank=True, null=True)
-
-    # Alta
-    recomendacionesAlta = models.TextField(blank=True)
-
-    # Costos (opcional pero recomendado)
-    costoEstimado = models.FloatField(default=0)
-    costoFinal = models.FloatField(default=0)
 
     # Estado del paciente
     estado = models.CharField(

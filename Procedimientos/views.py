@@ -10,7 +10,15 @@ from .models import Operaciones
 from .forms import *
 from ClientesMascotas.models import Mascotas
 from django.contrib.auth.models import User
-
+from django.http import HttpResponse
+from io import BytesIO
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from django.conf import settings
+import os
 # Create your views here.
 @login_required
 def indexProcedimientos(request):
@@ -585,3 +593,257 @@ def eliminar_desparasitacion(request, pk):
     desparasitacion.delete()
     messages.success(request, "✅ Desparasitación eliminada exitosamente.")
     return redirect('historial_desparasitaciones')
+
+
+
+
+@login_required
+def generar_pdf_operacion(request, operacion_id):
+    """Generar PDF con los datos de la operación"""
+    operacion = get_object_or_404(Operaciones, id=operacion_id)
+    
+    # Crear el PDF en memoria
+    buffer = BytesIO()
+    pdf_doc = SimpleDocTemplate(
+        buffer, 
+        pagesize=A4, 
+        rightMargin=72, 
+        leftMargin=72, 
+        topMargin=100,  # Más espacio arriba para el logo
+        bottomMargin=18
+    )
+    styles = getSampleStyleSheet()
+    
+    # Estilos personalizados
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=16,
+        spaceAfter=30,
+        alignment=1,  # Centrado
+        textColor=colors.HexColor('#2c3e50'),
+    )
+    
+    heading_style = ParagraphStyle(
+        'CustomHeading',
+        parent=styles['Heading2'],
+        fontSize=12,
+        spaceAfter=12,
+        spaceBefore=12,
+        textColor=colors.HexColor('#2c3e50'),
+        borderColor=colors.HexColor('#3498db'),
+        borderWidth=1,
+        borderPadding=5,
+        backColor=colors.HexColor('#ecf0f1'),
+    )
+    
+    normal_style = styles['Normal']
+    normal_style.fontSize = 10
+    
+    # Contenido del PDF
+    story = []
+    
+    # Logo (si existe)
+    logo_path = os.path.join(settings.MEDIA_ROOT, 'logo.png')
+    if os.path.exists(logo_path):
+        try:
+            logo = Image(logo_path, width=1.5*inch, height=1*inch)
+            logo.hAlign = 'CENTER'
+            story.append(logo)
+            story.append(Spacer(1, 10))
+        except:
+            # Si hay error cargando la imagen, continuar sin logo
+            pass
+    
+    # Título
+    story.append(Paragraph("REPORTE DE OPERACIÓN MASCOTAS MORELIA", title_style))
+    story.append(Spacer(1, 20))
+    
+    # Información de la mascota
+    story.append(Paragraph("INFORMACIÓN DE LA MASCOTA", heading_style))
+    info_mascota_data = [
+        ['Nombre:', operacion.mascota.nombre],
+        ['Especie:', operacion.mascota.especie],
+        ['Raza:', operacion.mascota.raza or 'No especificada'],
+        ['Fecha de Nacimiento:', operacion.mascota.fechaNacimiento.strftime('%d/%m/%Y') if operacion.mascota.fechaNacimiento else 'No especificada'],
+        ['Peso:', f"{operacion.peso} kg"],
+        ['Sexo:', operacion.mascota.get_sexo_display()],
+    ]
+    
+    info_mascota_table = Table(info_mascota_data, colWidths=[2*inch, 4*inch])
+    info_mascota_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+        ('PADDING', (0, 0), (-1, -1), 6),
+    ]))
+    story.append(info_mascota_table)
+    story.append(Spacer(1, 20))
+    
+    # Información del dueño
+    story.append(Paragraph("INFORMACIÓN DEL PROPIETARIO", heading_style))
+    info_cliente_data = [
+        ['Nombre:', operacion.mascota.cliente.nombre],
+        ['Teléfono:', operacion.mascota.cliente.telefono or 'No especificado'],
+        ['Email:', operacion.mascota.cliente.email or 'No especificado'],
+    ]
+    
+    info_cliente_table = Table(info_cliente_data, colWidths=[2*inch, 4*inch])
+    info_cliente_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+        ('PADDING', (0, 0), (-1, -1), 6),
+    ]))
+    story.append(info_cliente_table)
+    story.append(Spacer(1, 20))
+    
+    # Datos de la operación
+    story.append(Paragraph("DATOS DE LA OPERACIÓN", heading_style))
+    
+    # Fechas y clínica
+    story.append(Paragraph("<b>FECHAS Y UBICACIÓN:</b>", normal_style))
+    story.append(Spacer(1, 5))
+    
+    fechas_data = [
+        ['Fecha de Entrada:', operacion.fechaEntrada.strftime('%d/%m/%Y %H:%M')],
+        ['Fecha de Salida:', operacion.fechaSalida.strftime('%d/%m/%Y %H:%M') if operacion.fechaSalida else 'Pendiente'],
+        ['Clínica Veterinaria:', operacion.clinicaVeterinaria],
+        ['Veterinario Responsable:', operacion.veterinario.get_full_name() or operacion.veterinario.username],
+    ]
+    
+    fechas_table = Table(fechas_data, colWidths=[2.5*inch, 3.5*inch])
+    fechas_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+        ('PADDING', (0, 0), (-1, -1), 4),
+    ]))
+    story.append(fechas_table)
+    story.append(Spacer(1, 12))
+    
+    # Detalles de la operación
+    story.append(Paragraph("<b>OPERACIÓN REALIZADA:</b>", normal_style))
+    story.append(Paragraph(operacion.operacion, normal_style))
+    story.append(Spacer(1, 8))
+    
+    if operacion.descripcion:
+        story.append(Paragraph("<b>DESCRIPCIÓN DETALLADA:</b>", normal_style))
+        story.append(Paragraph(operacion.descripcion, normal_style))
+        story.append(Spacer(1, 8))
+    
+    if operacion.estadoSaludPrevio:
+        story.append(Paragraph("<b>ESTADO DE SALUD PREVIO A LA OPERACIÓN:</b>", normal_style))
+        story.append(Paragraph(operacion.estadoSaludPrevio, normal_style))
+        story.append(Spacer(1, 8))
+    
+    if operacion.complicaciones:
+        story.append(Paragraph("<b>COMPLICACIONES DURANTE LA OPERACIÓN:</b>", normal_style))
+        story.append(Paragraph(operacion.complicaciones, normal_style))
+        story.append(Spacer(1, 8))
+    
+    story.append(Spacer(1, 20))
+    
+    # Términos y condiciones específicos para operaciones
+    story.append(Paragraph("TÉRMINOS Y CONDICIONES", heading_style))
+    
+    terminos_text = """
+    <para>
+    Por medio del presente documento, el propietario de la mascota acepta los siguientes términos y condiciones en relación con la operación realizada:
+    </para>
+    """
+    story.append(Paragraph(terminos_text, normal_style))
+    story.append(Spacer(1, 10))
+    
+    # Incisos específicos para operaciones
+    incisos = [
+        "El propietario autoriza la realización de la operación descrita en este documento bajo el consentimiento informado.",
+        "El propietario reconoce que ha sido informado sobre los riesgos y beneficios de la operación y ha aclarado todas sus dudas.",
+        "El propietario comprende que, aunque se toman todas las precauciones, existen riesgos inherentes a cualquier procedimiento quirúrgico.",
+        "El propietario se compromete a seguir las indicaciones postoperatorias proporcionadas por el veterinario, incluyendo administración de medicamentos, cuidados y controles.",
+        "El propietario autoriza a Mascotas Morelia a realizar los procedimientos adicionales que sean necesarios en caso de complicaciones durante la operación.",
+        "El propietario se hace responsable de los costos adicionales que puedan surgir por complicaciones o por la necesidad de procedimientos adicionales.",
+        "El propietario se compromete a llevar a la mascota a los controles postoperatorios en las fechas indicadas.",
+        "Mascotas Morelia no se hace responsable por complicaciones que surjan debido al incumplimiento de las indicaciones postoperatorias por parte del propietario.",
+        "El propietario declara que la información proporcionada sobre la salud de su mascota es veraz y completa.",
+        "El propietario autoriza el uso de anestesia y otros medicamentos necesarios para el procedimiento."
+    ]
+    
+    for i, inciso in enumerate(incisos, 1):
+        story.append(Paragraph(f"<b>{i}.</b> {inciso}", normal_style))
+        story.append(Spacer(1, 5))
+    
+    story.append(Spacer(1, 20))
+    
+    # Firma
+    story.append(Paragraph("CONSENTIMIENTO INFORMADO Y ACEPTACIÓN", heading_style))
+    
+    firma_text = """
+    <para>
+    El propietario declara haber leído y comprendido los términos y condiciones anteriores, acepta la realización de la operación descrita y se compromete a cumplir con las indicaciones postoperatorias.
+    </para>
+    """
+    story.append(Paragraph(firma_text, normal_style))
+    story.append(Spacer(1, 30))
+    
+    # Espacio para firma
+    firma_data = [
+        ['', ''],
+        ['_________________________', '_________________________'],
+        ['Nombre del Propietario', 'Firma del Propietario'],
+    ]
+    
+    firma_table = Table(firma_data, colWidths=[3*inch, 3*inch])
+    firma_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+    ]))
+    story.append(firma_table)
+    story.append(Spacer(1, 20))
+    
+    # Fecha y lugar
+    fecha_lugar = f"""
+    <para>
+    <b>Fecha:</b> {operacion.fechaEntrada.strftime('%d de %B de %Y')}<br/>
+    <b>Lugar:</b> {operacion.clinicaVeterinaria}<br/>
+    <b>Hora:</b> {operacion.fechaEntrada.strftime('%H:%M')}
+    </para>
+    """
+    story.append(Paragraph(fecha_lugar, normal_style))
+    
+    # Información del veterinario
+    story.append(Spacer(1, 20))
+    story.append(Paragraph("INFORMACIÓN DEL VETERINARIO RESPONSABLE", heading_style))
+    
+    vet_info = f"""
+    <para>
+    <b>Nombre:</b> {operacion.veterinario.get_full_name() or operacion.veterinario.username}<br/>
+    <b>Clínica:</b> {operacion.clinicaVeterinaria}<br/>
+    <b>Fecha de operación:</b> {operacion.fechaEntrada.strftime('%d/%m/%Y')}
+    </para>
+    """
+    story.append(Paragraph(vet_info, normal_style))
+    
+    # Generar el PDF
+    pdf_doc.build(story)
+    buffer.seek(0)
+    
+    # Crear respuesta
+    response = HttpResponse(buffer, content_type='application/pdf')
+    filename = f"operacion_{operacion.mascota.nombre}_{operacion.fechaEntrada.strftime('%Y%m%d')}.pdf"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response

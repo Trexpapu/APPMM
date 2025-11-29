@@ -1,12 +1,11 @@
 from django import forms
 from .models import *
-from django import forms
 from django.core.exceptions import ValidationError
 
 class DocumentosConsultaForm(forms.ModelForm):
     class Meta:
         model = DocumentosConsulta
-        fields = ['archivo', 'descripcion']  # ✅ Agregar archivo aquí
+        fields = ['archivo', 'descripcion']
         widgets = {
             'archivo': forms.FileInput(attrs={
                 'accept': 'image/*, .pdf, .doc, .docx, .txt'
@@ -17,215 +16,512 @@ class DocumentosConsultaForm(forms.ModelForm):
                 'class': 'form-control'
             }),
         }
-    labels = {
-        'archivo': 'Documento o imagen',
-        'descripcion': 'Descripción'
-    }
+        labels = {
+            'archivo': '📄 Documento o imagen',
+            'descripcion': '📝 Descripción'
+        }
 
 
-# forms.py
 class ConsultaMedicaForm(forms.ModelForm):
     class Meta:
         model = ConsultasMedicas
         fields = [
-            'motivoConsulta',
+            # SECCIÓN 1: INFORMACIÓN GENERAL Y PROCEDIMIENTO
+            'procedimiento',
+            'clinicaVeterinaria',
+            'veterinario',
+            
+            # SECCIÓN 2: ANAMNESIS E HISTORIAL
+            'anamnesicos',
+            
+            # SECCIÓN 3: EXAMEN FÍSICO GENERAL
+            'mucosas',
+            'porcentajeHidratacion',
             'temperatura',
             'pulso',
             'frecuenciaCardiaca',
-            'puntuacionCorporal',
+            'frecuenciaRespiratoria',
             'peso',
+            'puntuacionCorporal',
+            
+            # SECCIÓN 4: COMPORTAMIENTO Y ACTITUD
+            'actitudConPropietario',
+            'actitudConVeterinario',
+            
+            # SECCIÓN 5: HISTORIAL MÉDICO PREVIO
             'vacunas',
-            'ultimaDesparasitacion', 
-            'ultimoDesparasitante',
             'alergias',
-            'parasitos',
-            'agua',
+            'ultimaDesparasitacion',
+            'ultimoDesparasitante',
             'alimento',
-            'condicionesDeHogar',
+            'parasitos',
             'ectoparasitos',
-            'estudiosHechos',
-            'pronosticoSignos',
-            'sintomas',
-            'observaciones',
-            'diagnosticoDiferencial',
+            
+            # SECCIÓN 6: EXAMEN FÍSICO ESPECÍFICO
+            'examanesFisicosRealizados',
+            
+            # SECCIÓN 7: DIAGNÓSTICO
+            'listaPosiblesProblemas',
+            'listaProblemasReales',
             'diagnostico',
+            'pronostico',
+            
+            # SECCIÓN 8: TRATAMIENTO Y SEGUIMIENTO
             'tratamiento',
+            'estudiosHechos',
             'estudiosRecomendados',
             'evolucion',
-            'clinicaVeterinaria',
-            'veterinario',
+            'observaciones',
         ]
 
         widgets = {
-            'motivoConsulta': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Motivo de la consulta'}),
-            'temperatura': forms.TextInput(attrs={'placeholder': 'Ej. 38.5 °C'}),
-            'pulso': forms.TextInput(attrs={'placeholder': 'Ej. 100'}),
-            'frecuenciaCardiaca': forms.TextInput(attrs={'placeholder': 'Ej. 100 bpm'}),
-            'puntuacionCorporal': forms.TextInput(attrs={'placeholder': 'Ej. 5/9'}),
-            'peso': forms.NumberInput(attrs={'step': '0.1', 'placeholder': 'Peso en kg'}),
-            'vacunas': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Vacunas aplicadas', 'readonly': 'readonly', 'style': 'background-color: #f8f9fa;'}),
+            # SECCIÓN 1
+            'procedimiento': forms.Select(attrs={'class': 'form-control'}),
+            'clinicaVeterinaria': forms.Select(attrs={'class': 'form-control'}),
+            'veterinario': forms.Select(attrs={'class': 'form-control'}),
             
-            'ultimaDesparasitacion': forms.DateInput(attrs={'rows': 2, 'placeholder': 'Último fecha de desparasitación', 'readonly': 'readonly', 'style': 'background-color: #f8f9fa;'}),
+            # SECCIÓN 2: ANAMNESIS
+            'anamnesicos': forms.Textarea(attrs={
+                'rows': 4, 
+                'placeholder': 'Motivo de consulta, problema actual, dieta, enfermedades previas, cirugías, tratamientos recientes, convivencia con otros animales, viajes...',
+                'class': 'form-control'
+            }),
             
-            'ultimoDesparasitante': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Último desparasitante aplicado', 'readonly': 'readonly', 'style': 'background-color: #f8f9fa;'}),
-
-            'alergias': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Alergias conocidas'}),
-            'parasitos': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Parásitos detectados'}),
-            'agua': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Hábitos de consumo de agua'}),
-            'alimento': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Tipo de alimento'}),
-            'condicionesDeHogar': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Condiciones del hogar'}),
-            'ectoparasitos': forms.Textarea(attrs={'rows': 2, 'placeholder': '¿Ha tenido presencia de pulgas o garrapatas?'}),
-            'pronosticoSignos': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Pronóstico y signos clínicos'}),
-            'sintomas': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Síntomas observados'}),
-            'observaciones': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Observaciones del veterinario'}),
-            'diagnosticoDiferencial': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Diagnóstico diferencial'}),
-            'diagnostico': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Diagnóstico final'}),
-            'tratamiento': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Tratamiento prescrito'}),
-            'estudiosHechos': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Estudios realizados'}),
-            'evolucion': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Evolución del paciente'}),
-            'estudiosRecomendados': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Estudios recomendados'}),
-            'clinicaVeterinaria': forms.Select(),
-            'veterinario': forms.Select(),
+            # SECCIÓN 3: EXAMEN FÍSICO GENERAL
+            'mucosas': forms.Select(attrs={'class': 'form-control'}),
+            'porcentajeHidratacion': forms.TextInput(attrs={
+                'placeholder': 'Ej. 5-7% (ligera deshidratación)',
+                'class': 'form-control'
+            }),
+            'temperatura': forms.TextInput(attrs={
+                'placeholder': 'Ej. 38.5 °C',
+                'class': 'form-control'
+            }),
+            'pulso': forms.TextInput(attrs={
+                'placeholder': 'Ej. 120 lpm',
+                'class': 'form-control'
+            }),
+            'frecuenciaCardiaca': forms.TextInput(attrs={
+                'placeholder': 'Ej. 140 bpm',
+                'class': 'form-control'
+            }),
+            'frecuenciaRespiratoria': forms.TextInput(attrs={
+                'placeholder': 'Ej. 30 rpm',
+                'class': 'form-control'
+            }),
+            'peso': forms.NumberInput(attrs={
+                'step': '0.01', 
+                'placeholder': 'Peso en kg',
+                'class': 'form-control'
+            }),
+            'puntuacionCorporal': forms.Select(attrs={'class': 'form-control'}),
+            
+            # SECCIÓN 4: COMPORTAMIENTO
+            'actitudConPropietario': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Comportamiento con el propietario',
+                'class': 'form-control'
+            }),
+            'actitudConVeterinario': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Comportamiento durante el examen',
+                'class': 'form-control'
+            }),
+            
+            # SECCIÓN 5: HISTORIAL MÉDICO
+            'vacunas': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Vacunas aplicadas',
+                'class': 'form-control',
+                'readonly': 'readonly',
+                'style': 'background-color: #f8f9fa;'
+            }),
+            'alergias': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Alergias conocidas',
+                'class': 'form-control'
+            }),
+            'ultimaDesparasitacion': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control',
+                'readonly': 'readonly',
+                'style': 'background-color: #f8f9fa;'
+            }),
+            'ultimoDesparasitante': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Último desparasitante aplicado',
+                'class': 'form-control',
+                'readonly': 'readonly',
+                'style': 'background-color: #f8f9fa;'
+            }),
+            'alimento': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Tipo y cantidad de alimento',
+                'class': 'form-control'
+            }),
+            'parasitos': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Parásitos detectados',
+                'class': 'form-control'
+            }),
+            'ectoparasitos': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Presencia de pulgas, garrapatas, etc.',
+                'class': 'form-control'
+            }),
+            
+            # SECCIÓN 6: EXAMEN FÍSICO ESPECÍFICO
+            'examanesFisicosRealizados': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Exámenes físicos realizados y hallazgos',
+                'class': 'form-control'
+            }),
+            
+            # SECCIÓN 7: DIAGNÓSTICO
+            'listaPosiblesProblemas': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Lista de posibles problemas (diagnóstico diferencial)',
+                'class': 'form-control'
+            }),
+            'listaProblemasReales': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Lista de problemas reales identificados',
+                'class': 'form-control'
+            }),
+            'diagnostico': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Diagnóstico final',
+                'class': 'form-control'
+            }),
+            'pronostico': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Pronóstico del caso',
+                'class': 'form-control'
+            }),
+            
+            # SECCIÓN 8: TRATAMIENTO Y SEGUIMIENTO
+            'tratamiento': forms.Textarea(attrs={
+                'rows': 4,
+                'placeholder': 'Tratamiento prescrito, medicamentos, dosis, frecuencia...',
+                'class': 'form-control'
+            }),
+            'estudiosHechos': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Estudios de laboratorio o imagen realizados',
+                'class': 'form-control'
+            }),
+            'estudiosRecomendados': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Estudios recomendados para seguimiento',
+                'class': 'form-control'
+            }),
+            'evolucion': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Evolución del paciente durante la consulta',
+                'class': 'form-control'
+            }),
+            'observaciones': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Observaciones adicionales',
+                'class': 'form-control'
+            }),
         }
 
         labels = {
-            'motivoConsulta': 'Motivo de la consulta',
-            'temperatura': 'Temperatura',
-            'pulso': 'Pulso (LPM)',
-            'frecuenciaCardiaca': 'Frecuencia cardíaca',
-            'puntuacionCorporal': 'Puntuación corporal',
-            'peso': 'Peso (kg)',
-            'vacunas': 'Vacunas',
-            'ultimaDesparasitacion': 'Última fecha de desparasitación',
-            'ultimoDesparasitante': 'Último desparasitante aplicado',
-            'alergias': 'Alergias',
-            'parasitos': 'Parásitos',
-            'agua': 'Consumo de agua',
-            'alimento': 'Alimento',
-            'condicionesDeHogar': 'Condiciones del hogar',
-            'ectoparasitos': 'Ectoparásitos',
-            'pronosticoSignos': 'Pronóstico y signos clínicos',
-            'sintomas': 'Síntomas',
-            'observaciones': 'Observaciones',
-            'diagnosticoDiferencial': 'Diagnóstico diferencial',
-            'diagnostico': 'Diagnóstico final',
-            'tratamiento': 'Tratamiento',
-            'estudiosHechos': 'Estudios realizados',
-            'estudiosRecomendados': 'Estudios recomendados',
-            'evolucion': 'Evolución del paciente',
-            'clinicaVeterinaria': 'Clínica veterinaria',
-            'veterinario': 'Médico veterinario',
+            # SECCIÓN 1
+            'procedimiento': '🩺 Tipo de Procedimiento',
+            'clinicaVeterinaria': '🏥 Clínica Veterinaria',
+            'veterinario': '👨‍⚕️ Médico Veterinario',
+            
+            # SECCIÓN 2: ANAMNESIS
+            'anamnesicos': '📋 Anamnesis',
+            
+            # SECCIÓN 3: EXAMEN FÍSICO GENERAL
+            'mucosas': '👄 Mucosas',
+            'porcentajeHidratacion': '💧 Porcentaje de Hidratación',
+            'temperatura': '🌡️ Temperatura',
+            'pulso': '💓 Pulso (LPM)',
+            'frecuenciaCardiaca': '❤️ Frecuencia Cardíaca',
+            'frecuenciaRespiratoria': '🌬️ Frecuencia Respiratoria',
+            'peso': '⚖️ Peso (kg)',
+            'puntuacionCorporal': '📊 Puntuación Corporal',
+            
+            # SECCIÓN 4: COMPORTAMIENTO
+            'actitudConPropietario': '👤 Actitud con el Propietario',
+            'actitudConVeterinario': '👨‍⚕️ Actitud con el Veterinario',
+            
+            # SECCIÓN 5: HISTORIAL MÉDICO
+            'vacunas': '💉 Vacunas',
+            'alergias': '🤧 Alergias',
+            'ultimaDesparasitacion': '📅 Última Desparasitación',
+            'ultimoDesparasitante': '💊 Último Desparasitante',
+            'alimento': '🍖 Alimento',
+            'parasitos': '🪱 Parásitos Internos',
+            'ectoparasitos': '🐜 Ectoparásitos',
+            
+            # SECCIÓN 6: EXAMEN FÍSICO ESPECÍFICO
+            'examanesFisicosRealizados': '🔍 Exámenes Físicos Realizados',
+            
+            # SECCIÓN 7: DIAGNÓSTICO
+            'listaPosiblesProblemas': '❓ Posibles Problemas (Diferencial)',
+            'listaProblemasReales': '✅ Problemas Reales Identificados',
+            'diagnostico': '🩺 Diagnóstico Final',
+            'pronostico': '📈 Pronóstico',
+            
+            # SECCIÓN 8: TRATAMIENTO Y SEGUIMIENTO
+            'tratamiento': '💊 Tratamiento',
+            'estudiosHechos': '🔬 Estudios Realizados',
+            'estudiosRecomendados': '📋 Estudios Recomendados',
+            'evolucion': '📊 Evolución',
+            'observaciones': '📝 Observaciones',
+        }
+
+        help_texts = {
+            'anamnesicos': 'Se incluye el motivo de la consulta y el problema actual del paciente tal como la expresa el propietario, y otra información como Dieta, Enfermedades previas, Cirugías previas, Tratamientos recientes, si Convive con otros animales, Viajes recientes...',
+            'porcentajeHidratacion': '5%: leve, 6-8%: moderada, 10-12%: severa',
+            'puntuacionCorporal': 'Escala de 1 a 5, donde 1 es muy delgado y 5 es obeso',
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Hacer el campo vacunas readonly
-        self.fields['vacunas'].widget.attrs['readonly'] = True
-        self.fields['vacunas'].widget.attrs['style'] = 'background-color: #f8f9fa;'
+        # Hacer campos de solo lectura
+        readonly_fields = ['vacunas', 'ultimaDesparasitacion', 'ultimoDesparasitante']
+        for field in readonly_fields:
+            self.fields[field].widget.attrs['readonly'] = True
+            self.fields[field].widget.attrs['style'] = 'background-color: #f8f9fa;'
         
         # Establecer el veterinario actual como opción por defecto
         from django.contrib.auth import get_user_model
         User = get_user_model()
         self.fields['veterinario'].queryset = User.objects.filter(is_active=True)
 
+
 class ConsultaMedicaUpdateForm(forms.ModelForm):
     class Meta:
         model = ConsultasMedicas
         fields = [
-            'motivoConsulta',
+            # Mismos campos que el form de creación
+            'procedimiento',
+            'clinicaVeterinaria',
+            'veterinario',
+            'anamnesicos',
+            'mucosas',
+            'porcentajeHidratacion',
             'temperatura',
             'pulso',
             'frecuenciaCardiaca',
-            'puntuacionCorporal',
+            'frecuenciaRespiratoria',
             'peso',
+            'puntuacionCorporal',
+            'actitudConPropietario',
+            'actitudConVeterinario',
             'vacunas',
-            'ultimaDesparasitacion', 
-            'ultimoDesparasitante',
             'alergias',
-            'parasitos',
-            'agua',
+            'ultimaDesparasitacion',
+            'ultimoDesparasitante',
             'alimento',
-            'condicionesDeHogar',
+            'parasitos',
             'ectoparasitos',
-            'estudiosHechos',
-            'pronosticoSignos',
-            'sintomas',
-            'observaciones',
-            'diagnosticoDiferencial',
+            'examanesFisicosRealizados',
+            'listaPosiblesProblemas',
+            'listaProblemasReales',
             'diagnostico',
+            'pronostico',
             'tratamiento',
+            'estudiosHechos',
             'estudiosRecomendados',
             'evolucion',
-            'clinicaVeterinaria',
-            'veterinario',
+            'observaciones',
         ]
 
         widgets = {
-            'motivoConsulta': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Motivo de la consulta', 'class': 'form-control'}),
-            'temperatura': forms.TextInput(attrs={'placeholder': 'Ej. 38.5 °C', 'class': 'form-control'}),
-            'pulso': forms.TextInput(attrs={'placeholder': 'Ej. 100', 'class': 'form-control'}),
-            'frecuenciaCardiaca': forms.TextInput(attrs={'placeholder': 'Ej. 100 bpm', 'class': 'form-control'}),
-            'puntuacionCorporal': forms.TextInput(attrs={'placeholder': 'Ej. 5/9', 'class': 'form-control'}),
-            'peso': forms.NumberInput(attrs={'step': '0.01', 'placeholder': 'Peso en kg', 'class': 'form-control'}),
-            'vacunas': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Vacunas aplicadas', 'class': 'form-control', 'readonly': 'readonly', 'style': 'background-color: #f8f9fa;'}),
-            
-            'ultimaDesparasitacion': forms.DateInput(attrs={'rows': 2, 'placeholder': 'Último fecha de desparasitación', 'readonly': 'readonly', 'style': 'background-color: #f8f9fa;'}),
-            
-            'ultimoDesparasitante': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Último desparasitante aplicado', 'readonly': 'readonly', 'style': 'background-color: #f8f9fa;'}),
-
-            'alergias': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Alergias conocidas', 'class': 'form-control'}),
-            'parasitos': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Parásitos detectados', 'class': 'form-control'}),
-            'agua': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Hábitos de consumo de agua', 'class': 'form-control'}),
-            'alimento': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Tipo de alimento', 'class': 'form-control'}),
-            'condicionesDeHogar': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Condiciones del hogar', 'class': 'form-control'}),
-            'ectoparasitos': forms.Textarea(attrs={'rows': 2, 'placeholder': '¿Ha tenido presencia de pulgas o garrapatas?', 'class': 'form-control'}),
-            'pronosticoSignos': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Pronóstico y signos clínicos', 'class': 'form-control'}),
-            'sintomas': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Síntomas observados', 'class': 'form-control'}),
-            'observaciones': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Observaciones del veterinario', 'class': 'form-control'}),
-            'diagnosticoDiferencial': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Diagnóstico diferencial', 'class': 'form-control'}),
-            'diagnostico': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Diagnóstico final', 'class': 'form-control'}),
-            'tratamiento': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Tratamiento prescrito', 'class': 'form-control'}),
-            'estudiosHechos': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Estudios realizados', 'class': 'form-control'}),
-            'evolucion': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Evolución del paciente', 'class': 'form-control'}),
-            'estudiosRecomendados': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Estudios recomendados', 'class': 'form-control'}),
+            # Mismos widgets que el form de creación
+            'procedimiento': forms.Select(attrs={'class': 'form-control'}),
             'clinicaVeterinaria': forms.Select(attrs={'class': 'form-control'}),
             'veterinario': forms.Select(attrs={'class': 'form-control'}),
+            'anamnesicos': forms.Textarea(attrs={
+                'rows': 4, 
+                'placeholder': 'Motivo de consulta, problema actual, dieta, enfermedades previas, cirugías, tratamientos recientes, convivencia con otros animales, viajes...',
+                'class': 'form-control'
+            }),
+            'mucosas': forms.Select(attrs={'class': 'form-control'}),
+            'porcentajeHidratacion': forms.TextInput(attrs={
+                'placeholder': 'Ej. 5-7% (ligera deshidratación)',
+                'class': 'form-control'
+            }),
+            'temperatura': forms.TextInput(attrs={
+                'placeholder': 'Ej. 38.5 °C',
+                'class': 'form-control'
+            }),
+            'pulso': forms.TextInput(attrs={
+                'placeholder': 'Ej. 120 lpm',
+                'class': 'form-control'
+            }),
+            'frecuenciaCardiaca': forms.TextInput(attrs={
+                'placeholder': 'Ej. 140 bpm',
+                'class': 'form-control'
+            }),
+            'frecuenciaRespiratoria': forms.TextInput(attrs={
+                'placeholder': 'Ej. 30 rpm',
+                'class': 'form-control'
+            }),
+            'peso': forms.NumberInput(attrs={
+                'step': '0.01', 
+                'placeholder': 'Peso en kg',
+                'class': 'form-control'
+            }),
+            'puntuacionCorporal': forms.Select(attrs={'class': 'form-control'}),
+            'actitudConPropietario': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Comportamiento con el propietario',
+                'class': 'form-control'
+            }),
+            'actitudConVeterinario': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Comportamiento durante el examen',
+                'class': 'form-control'
+            }),
+            'vacunas': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Vacunas aplicadas',
+                'class': 'form-control',
+                'readonly': 'readonly',
+                'style': 'background-color: #f8f9fa;'
+            }),
+            'alergias': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Alergias conocidas',
+                'class': 'form-control'
+            }),
+            'ultimaDesparasitacion': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control',
+                'readonly': 'readonly',
+                'style': 'background-color: #f8f9fa;'
+            }),
+            'ultimoDesparasitante': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Último desparasitante aplicado',
+                'class': 'form-control',
+                'readonly': 'readonly',
+                'style': 'background-color: #f8f9fa;'
+            }),
+            'alimento': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Tipo y cantidad de alimento',
+                'class': 'form-control'
+            }),
+            'parasitos': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Parásitos detectados',
+                'class': 'form-control'
+            }),
+            'ectoparasitos': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Presencia de pulgas, garrapatas, etc.',
+                'class': 'form-control'
+            }),
+            'examanesFisicosRealizados': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Exámenes físicos realizados y hallazgos',
+                'class': 'form-control'
+            }),
+            'listaPosiblesProblemas': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Lista de posibles problemas (diagnóstico diferencial)',
+                'class': 'form-control'
+            }),
+            'listaProblemasReales': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Lista de problemas reales identificados',
+                'class': 'form-control'
+            }),
+            'diagnostico': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Diagnóstico final',
+                'class': 'form-control'
+            }),
+            'pronostico': forms.Textarea(attrs={
+                'rows': 2,
+                'placeholder': 'Pronóstico del caso',
+                'class': 'form-control'
+            }),
+            'tratamiento': forms.Textarea(attrs={
+                'rows': 4,
+                'placeholder': 'Tratamiento prescrito, medicamentos, dosis, frecuencia...',
+                'class': 'form-control'
+            }),
+            'estudiosHechos': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Estudios de laboratorio o imagen realizados',
+                'class': 'form-control'
+            }),
+            'estudiosRecomendados': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Estudios recomendados para seguimiento',
+                'class': 'form-control'
+            }),
+            'evolucion': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Evolución del paciente durante la consulta',
+                'class': 'form-control'
+            }),
+            'observaciones': forms.Textarea(attrs={
+                'rows': 3,
+                'placeholder': 'Observaciones adicionales',
+                'class': 'form-control'
+            }),
         }
 
         labels = {
-            'motivoConsulta': 'Motivo de la consulta',
-            'temperatura': 'Temperatura',
-            'pulso': 'Pulso (LPM)',
-            'frecuenciaCardiaca': 'Frecuencia cardíaca',
-            'puntuacionCorporal': 'Puntuación corporal',
-            'peso': 'Peso (kg)',
-            'vacunas': 'Vacunas',
-            'ultimaDesparasitacion': 'Última fecha de desparasitación',
-            'ultimoDesparasitante': 'Último desparasitante aplicado',
-            'alergias': 'Alergias',
-            'parasitos': 'Parásitos',
-            'agua': 'Consumo de agua',
-            'alimento': 'Alimento',
-            'condicionesDeHogar': 'Condiciones del hogar',
-            'ectoparasitos': 'Ectoparásitos',
-            'pronosticoSignos': 'Pronóstico y signos clínicos',
-            'sintomas': 'Síntomas',
-            'observaciones': 'Observaciones',
-            'diagnosticoDiferencial': 'Diagnóstico diferencial',
-            'diagnostico': 'Diagnóstico final',
-            'tratamiento': 'Tratamiento',
-            'estudiosHechos': 'Estudios realizados',
-            'estudiosRecomendados': 'Estudios recomendados',
-            'evolucion': 'Evolución del paciente',
-            'clinicaVeterinaria': 'Clínica veterinaria',
-            'veterinario': 'Médico veterinario',
+            # Mismas labels que el form de creación
+            'procedimiento': '🩺 Tipo de Procedimiento',
+            'clinicaVeterinaria': '🏥 Clínica Veterinaria',
+            'veterinario': '👨‍⚕️ Médico Veterinario',
+            'anamnesicos': '📋 Anamnesis',
+            'mucosas': '👄 Mucosas',
+            'porcentajeHidratacion': '💧 Porcentaje de Hidratación',
+            'temperatura': '🌡️ Temperatura',
+            'pulso': '💓 Pulso (LPM)',
+            'frecuenciaCardiaca': '❤️ Frecuencia Cardíaca',
+            'frecuenciaRespiratoria': '🌬️ Frecuencia Respiratoria',
+            'peso': '⚖️ Peso (kg)',
+            'puntuacionCorporal': '📊 Puntuación Corporal',
+            'actitudConPropietario': '👤 Actitud con el Propietario',
+            'actitudConVeterinario': '👨‍⚕️ Actitud con el Veterinario',
+            'vacunas': '💉 Vacunas',
+            'alergias': '🤧 Alergias',
+            'ultimaDesparasitacion': '📅 Última Desparasitación',
+            'ultimoDesparasitante': '💊 Último Desparasitante',
+            'alimento': '🍖 Alimento',
+            'parasitos': '🪱 Parásitos Internos',
+            'ectoparasitos': '🐜 Ectoparásitos',
+            'examanesFisicosRealizados': '🔍 Exámenes Físicos Realizados',
+            'listaPosiblesProblemas': '❓ Posibles Problemas (Diferencial)',
+            'listaProblemasReales': '✅ Problemas Reales Identificados',
+            'diagnostico': '🩺 Diagnóstico Final',
+            'pronostico': '📈 Pronóstico',
+            'tratamiento': '💊 Tratamiento',
+            'estudiosHechos': '🔬 Estudios Realizados',
+            'estudiosRecomendados': '📋 Estudios Recomendados',
+            'evolucion': '📊 Evolución',
+            'observaciones': '📝 Observaciones',
+        }
+
+        help_texts = {
+            'anamnesicos': 'Se incluye el motivo de la consulta y el problema actual del paciente tal como la expresa el propietario, y otra información como Dieta, Enfermedades previas, Cirugías previas, Tratamientos recientes, si Convive con otros animales, Viajes recientes...',
+            'porcentajeHidratacion': '5%: leve, 6-8%: moderada, 10-12%: severa',
+            'puntuacionCorporal': 'Escala de 1 a 5, donde 1 es muy delgado y 5 es obeso',
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Hacer el campo vacunas readonly
-        self.fields['vacunas'].widget.attrs['readonly'] = True
-        self.fields['vacunas'].widget.attrs['style'] = 'background-color: #f8f9fa;'
+        # Hacer campos de solo lectura
+        readonly_fields = ['vacunas', 'ultimaDesparasitacion', 'ultimoDesparasitante']
+        for field in readonly_fields:
+            self.fields[field].widget.attrs['readonly'] = True
+            self.fields[field].widget.attrs['style'] = 'background-color: #f8f9fa;'
+
 
 class DocumentoConsultaUpdateForm(forms.ModelForm):
     class Meta:
@@ -239,5 +535,5 @@ class DocumentoConsultaUpdateForm(forms.ModelForm):
             }),
         }
         labels = {
-            'descripcion': 'Descripción'
+            'descripcion': '📝 Descripción'
         }

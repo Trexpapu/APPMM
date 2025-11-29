@@ -10,27 +10,179 @@ class ConsultasMedicas(models.Model):
         ('Mascotas Morelia Salida Apatzingán', 'Mascotas Morelia Salida Apatzingán'),
         ('Mascotas Morelia Mano Huevona', 'Mascotas Morelia Mano Huevona'),
     ] 
+    PROCEDIMIENTOS = [
+        ('Consulta', 'Consulta'),
+        ('Seguimiento', 'Seguimiento'),
+        ('Cirugia', 'Cirugia'),
+
+    ]
+    PUNTUACION = [
+        ('1/5', '1/5'),
+        ('2/5', '2/5'),
+        ('3/5', '3/5'),
+        ('4/5', '4/5'),
+        ('5/5', '5/5'),
+
+    ]
+
+    MUCOSAS = [
+        ('ROSADAS', 'ROSADAS'),
+        ('CONGESTIONADAS', 'CONGESTIONADAS'),
+        ('CIANOTICAS', 'CIANOTICAS'),
+        ('PALIDAS', 'PALIDAS'),
+        ('ICTERICAS', 'ICTERICAS'),
+
+        ('NORMOCROMICAS', 'NORMOCROMICAS'),
+        ('HIPOCROMICAS', 'HIPOCROMICAS'),
+        ('SECAS', 'SECAS'),
+        ('HUMEDAS', 'HUMEDAS'),
+        ('TURGENTES', 'TURGENTES'),
+
+        ('HIPERTROFICAS', 'HIPERTROFICAS'),
+        ('ATROFICAS', 'ATROFICAS'),
+        ('ULCERADAS', 'ULCERADAS'),
+        ('HEMORRAGICAS', 'HEMORRAGICAS'),
+        ('PETEQUIALES', 'PETEQUIALES'),
+
+        ('ECCHIMOTICAS', 'ECCHIMOTICAS'),
+        ('EDEMATOSAS', 'EDEMATOSAS'),
+        ('FISURADAS', 'FISURADAS'),
+        ('FIBRINOSAS', 'FIBRINOSAS'),
+        ('PURULENTAS', 'PURULENTAS'),
+
+        ('NECROTICAS', 'NECROTICAS'),
+        ('GRANULOMATOSAS', 'GRANULOMATOSAS'),
+        ('PIGMENTADAS', 'PIGMENTADAS'),
+        ('DESCAMATIVAS', 'DESCAMATIVAS'),
+        ('LACERADAS', 'LACERADAS'),
+
+        ('ABRASIONADAS', 'ABRASIONADAS'),
+        ('CONTUSIONADAS', 'CONTUSIONADAS'),
+        ('PUNCTIFORMES', 'PUNCTIFORMES'),
+        ('LINEALES', 'LINEALES'),
+        ('ESTRELLADAS', 'ESTRELLADAS'),
+
+        ('IRREGULARES', 'IRREGULARES'),
+        ('REGULARES', 'REGULARES'),
+        ('SIMETRICAS', 'SIMETRICAS'),
+        ('ASIMETRICAS', 'ASIMETRICAS'),
+        ('DIFUSAS', 'DIFUSAS'),
+
+        ('LOCALIZADAS', 'LOCALIZADAS'),
+        ('GENERALIZADAS', 'GENERALIZADAS'),
+        ('UNILATERALES', 'UNILATERALES'),
+        ('BILATERALES', 'BILATERALES'),
+        ('MULTIFOCALES', 'MULTIFOCALES'),
+
+        ('FOCALES', 'FOCALES'),
+        ('CONFLUENTES', 'CONFLUENTES'),
+        ('DISCRETAS', 'DISCRETAS'),
+        ('PROFUNDAS', 'PROFUNDAS'),
+        ('SUPERFICIALES', 'SUPERFICIALES'),
+
+        ('AGUDAS', 'AGUDAS'),
+        ('CRONICAS', 'CRONICAS'),
+        ('RECURRENTES', 'RECURRENTES'),
+        ('PERSISTENTES', 'PERSISTENTES'),
+        ('PROGRESIVAS', 'PROGRESIVAS'),
+
+        ('REGRESIVAS', 'REGRESIVAS'),
+        ('ESTABLES', 'ESTABLES'),
+        ('INESTABLES', 'INESTABLES'),
+        ('REVERSIBLES', 'REVERSIBLES'),
+        ('IRREVERSIBLES', 'IRREVERSIBLES'),
+
+        ('BENIGNAS', 'BENIGNAS'),
+        ('MALIGNAS', 'MALIGNAS'),
+        ('PRIMARIAS', 'PRIMARIAS'),
+        ('SECUNDARIAS', 'SECUNDARIAS'),
+        ('IDIOPATICAS', 'IDIOPATICAS'),
+
+        ('TRAUMATICAS', 'TRAUMATICAS'),
+        ('INFECCIOSAS', 'INFECCIOSAS'),
+        ('INFLAMATORIAS', 'INFLAMATORIAS'),
+        ('DEGENERATIVAS', 'DEGENERATIVAS'),
+        ('CONGENITAS', 'CONGENITAS'),
+
+        ('ADQUIRIDAS', 'ADQUIRIDAS'),
+        ('HEREDITARIAS', 'HEREDITARIAS'),
+        ('ESPORADICAS', 'ESPORADICAS'),
+        ('ENDEMICAS', 'ENDEMICAS'),
+        ('EPIDEMICAS', 'EPIDEMICAS'),
+
+        ('PANDEMICAS', 'PANDEMICAS'),
+        ('ZOONOTICAS', 'ZOONOTICAS'),
+        ('ANTHROPONOTICAS', 'ANTHROPONOTICAS'),
+        ('VECTORIALES', 'VECTORIALES'),
+        ('CONTAGIOSAS', 'CONTAGIOSAS'),
+
+        ('NO_CONTAGIOSAS', 'NO CONTAGIOSAS'),
+        ('TRANSMISIBLES', 'TRANSMISIBLES'),
+        ('NO_TRANSMISIBLES', 'NO TRANSMISIBLES'),
+        ('CURABLES', 'CURABLES'),
+        ('INCURABLES', 'INCURABLES'),
+
+        ('MANEJABLES', 'MANEJABLES'),
+        ('NO_MANEJABLES', 'NO MANEJABLES'),
+        ('PREVENIBLES', 'PREVENIBLES'),
+        ('NO_PREVENIBLES', 'NO PREVENIBLES'),
+        ('DIAGNOSTICABLES', 'DIAGNOSTICABLES'),
+
+        ('NO_DIAGNOSTICABLES', 'NO DIAGNOSTICABLES'),
+        ('TRATABLES', 'TRATABLES'),
+        ('NO_TRATABLES', 'NO TRATABLES'),
+        ('MONITORIZABLES', 'MONITORIZABLES'),
+        ('NO_MONITORIZABLES', 'NO MONITORIZABLES'),
+
+        ('PREDICTIBLES', 'PREDICTIBLES'),
+        ('NO_PREDICTIBLES', 'NO PREDICTIBLES'),
+        ('CONTROLABLES', 'CONTROLABLES'),
+        ('NO_CONTROLABLES', 'NO CONTROLABLES'),
+
+        ('REVERSIBLES_TEMPORALMENTE', 'REVERSIBLES TEMPORALMENTE'),
+        ('IRREVERSIBLES_PERMANENTES', 'IRREVERSIBLES PERMANENTES'),
+        ('PROGRESIVAS_RAPIDAS', 'PROGRESIVAS RAPIDAS'),
+        ('PROGRESIVAS_LENTAS', 'PROGRESIVAS LENTAS'),
+        ('ESTABLES_LONGITUDINALES', 'ESTABLES LONGITUDINALES'),
+
+        ('INESTABLES_FLUCTUANTES', 'INESTABLES FLUCTUANTES'),
+    ]
+
     
     mascota = models.ForeignKey(Mascotas, on_delete=models.CASCADE)
-    motivoConsulta = models.TextField(blank=True)
+    anamnesicos = models.TextField(blank=True)
+    procedimiento = models.CharField(
+        max_length=255,
+        choices=PROCEDIMIENTOS,
+        default='Consulta'  # puedes poner un valor por defecto si quieres
+    )
+    mucosas = models.CharField(
+        max_length=1500,
+        choices=MUCOSAS,
+        default='ROSADAS'
+    )
+
+    porcentajeHidratacion = models.TextField( blank=True)
+    actitudConPropietario = models.TextField( blank=True)
+    actitudConVeterinario = models.TextField( blank=True)
     temperatura = models.TextField( blank=True)
     pulso = models.TextField(blank=True)
     frecuenciaCardiaca = models.TextField( blank=True)
+    frecuenciaRespiratoria = models.TextField( blank=True)
     puntuacionCorporal = models.TextField(blank=True)
+    examanesFisicosRealizados = models.TextField(blank=True)
     peso = models.FloatField()
     vacunas = models.TextField(blank=True)  
     alergias = models.TextField(blank=True)
     ultimaDesparasitacion = models.DateField(blank= True, null=True)
     ultimoDesparasitante = models.TextField(blank=True)
-    parasitos = models.TextField(blank=True)
-    agua = models.TextField(blank=True)
     alimento = models.TextField(blank=True)
-    condicionesDeHogar = models.TextField(blank=True)
+    parasitos = models.TextField(blank=True)
     ectoparasitos = models.TextField(blank=True)
-    pronosticoSignos = models.TextField(blank=True)
-    sintomas = models.TextField(blank=True) 
+    pronostico = models.TextField(blank=True)
     observaciones = models.TextField(blank=True)
-    diagnosticoDiferencial = models.TextField(blank=True) 
+    listaPosiblesProblemas = models.TextField(blank=True)
+    listaProblemasReales = models.TextField(blank=True)
     diagnostico = models.TextField(blank=True) 
     tratamiento = models.TextField(blank=True) 
     estudiosHechos = models.TextField(blank=True) 

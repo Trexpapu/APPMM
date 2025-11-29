@@ -10,7 +10,7 @@ urlpatterns = [
     path('operacion/detalle/<int:pk>/', views.detalle_operacion, name='detalle_operacion'),
     path('operacion/editar/<int:pk>/', views.editar_operacion, name='editar_operacion'),
     path('operacion/eliminar/<int:pk>/', views.eliminar_operacion, name='eliminar_operacion'),
-
+     path('operacion/<int:operacion_id>/pdf/', views.generar_pdf_operacion, name='generar_pdf_operacion'),
 
 
 

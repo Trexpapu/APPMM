@@ -155,10 +155,15 @@ def nueva_consulta(request):
                 'peso': mascota.peso,
                 'vacunas': mascota.vacunas,
                 'alergias': mascota.alergias,
-                'ultimaDesparasitacion': mascota.ultimaDesparasitacion, 
                 'ultimoDesparasitante': mascota.ultimoDesparasitante,
                 'alimento': mascota.alimento,
             })
+            
+            # 🔹 CORREGIDO: Formatear correctamente la fecha para el input type="date"
+            if mascota.ultimaDesparasitacion:
+                initial_data['ultimaDesparasitacion'] = mascota.ultimaDesparasitacion.strftime('%Y-%m-%d')
+            else:
+                initial_data['ultimaDesparasitacion'] = ''
             
             # 🔹 Preparar datos de la mascota para mostrar en el template
             datos_mascota = {
@@ -203,7 +208,7 @@ def nueva_consulta(request):
                 nConsulta.veterinario = request.user
                 nConsulta.save()
 
-                # 🐾 Actualizar datos de la mascota (solo peso y alergias)
+                # 🐾 Actualizar datos de la mascota (solo peso, alergias y alimento)
                 mascota = Mascotas.objects.get(pk=mascota_id)
                 mascota.peso = form.cleaned_data.get('peso') or mascota.peso
                 mascota.alergias = form.cleaned_data.get('alergias') or mascota.alergias
@@ -249,7 +254,6 @@ def nueva_consulta(request):
             'datos_mascota': datos_mascota,
         }
     )
-
 
 @login_required
 def ver_consultas(request):

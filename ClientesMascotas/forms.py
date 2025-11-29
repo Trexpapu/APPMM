@@ -16,16 +16,16 @@ class ClienteForm(forms.ModelForm):
             }),
         }
         labels = {
-            'nombre': 'Nombre completo',
-            'email': 'Correo electrónico',
-            'telefono': 'Número de teléfono',
-            'direccion': 'Dirección del cliente',
+            'nombre': '👤 Nombre completo',
+            'email': '📧 Correo electrónico',
+            'telefono': '📞 Número de teléfono',
+            'direccion': '🏠 Dirección del cliente',
         }
 
     def clean_telefono(self):
         telefono = self.cleaned_data['telefono'].replace(' ', '')
         if not telefono.isdigit():
-            raise forms.ValidationError("El número de teléfono solo puede contener dígitos.")
+            raise forms.ValidationError("❌ El número de teléfono solo puede contener dígitos.")
         return telefono
 
 
@@ -43,10 +43,10 @@ class ClienteUpdateForm(forms.ModelForm):
             }),
         }
         labels = {
-            'nombre': 'Nombre completo',
-            'email': 'Correo electrónico',
-            'telefono': 'Número de teléfono',
-            'direccion': 'Dirección del cliente',
+            'nombre': '👤 Nombre completo',
+            'email': '📧 Correo electrónico',
+            'telefono': '📞 Número de teléfono',
+            'direccion': '🏠 Dirección del cliente',
         }
 
 
@@ -66,15 +66,15 @@ class MascotaForm(forms.ModelForm):
             'vive': forms.CheckboxInput(attrs={'class': 'checkbox-grande'}),
         }
         labels = {
-            'nombre': 'Nombre de la mascota',
-            'especie': 'Especie',
-            'raza': 'Raza',
-            'fechaNacimiento': 'Fecha de nacimiento',
-            'peso': 'Peso (kg)',
-            'sexo': 'Sexo de la mascota',
-            'alergias': 'Alergias conocidas',
-            'alimento': 'Tipo de alimento que consume',
-            'vive': '¿Sigue con vida?',
+            'nombre': '🐕 Nombre de la mascota',
+            'especie': '🐾 Especie',
+            'raza': '🎯 Raza',
+            'fechaNacimiento': '📅 Fecha de nacimiento',
+            'peso': '⚖️ Peso (kg)',
+            'sexo': '⚧️ Sexo de la mascota',
+            'alergias': '🤧 Alergias conocidas',
+            'alimento': '🍖 Tipo de alimento que consume',
+            'vive': '❤️ ¿Sigue con vida?',
         }
 
 
@@ -94,13 +94,13 @@ class MascotaUpdateForm(forms.ModelForm):
             'vive': forms.CheckboxInput(attrs={'class': 'checkbox-grande'}),
         }
         labels = {
-            'nombre': 'Nombre de la mascota',
-            'especie': 'Especie',
-            'raza': 'Raza',
-            'fechaNacimiento': 'Fecha de nacimiento',
-            'peso': 'Peso (kg)',
-            'sexo': 'Sexo de la mascota',
-            'alergias': 'Alergias conocidas',
-            'alimento': 'Tipo de alimento que consume',
-            'vive': '¿Sigue con vida?',
+            'nombre': '🐕 Nombre de la mascota',
+            'especie': '🐾 Especie',
+            'raza': '🎯 Raza',
+            'fechaNacimiento': '📅 Fecha de nacimiento',
+            'peso': '⚖️ Peso (kg)',
+            'sexo': '⚧️ Sexo de la mascota',
+            'alergias': '🤧 Alergias conocidas',
+            'alimento': '🍖 Tipo de alimento que consume',
+            'vive': '❤️ ¿Sigue con vida?',
         }

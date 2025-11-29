@@ -7,6 +7,15 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from Procedimientos.views import encode_image_to_base64
 from django.db.models import Q
+from django.http import HttpResponse
+from io import BytesIO
+from reportlab.lib.pagesizes import A4
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from django.conf import settings
+import os
 # Create your views here.
 @login_required
 def index_guarderia_hospitalizacion(request):
@@ -243,3 +252,266 @@ def servicio_guarderia_detalle(request, pk):
         'guarderia': guarderia,
         'datos_mascota': datos_mascota,
     })
+
+
+
+
+@login_required
+def generar_pdf_guarderia(request, guarderia_id):
+    """Generar PDF con los datos del servicio de guardería"""
+    guarderia = get_object_or_404(Guarderia, id=guarderia_id)
+    
+    # Crear el PDF en memoria
+    buffer = BytesIO()
+    pdf_doc = SimpleDocTemplate(
+        buffer, 
+        pagesize=A4, 
+        rightMargin=72, 
+        leftMargin=72, 
+        topMargin=100,  # Más espacio arriba para el logo
+        bottomMargin=18
+    )
+    styles = getSampleStyleSheet()
+    
+    # Estilos personalizados
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=16,
+        spaceAfter=30,
+        alignment=1,  # Centrado
+        textColor=colors.HexColor('#2c3e50'),
+    )
+    
+    heading_style = ParagraphStyle(
+        'CustomHeading',
+        parent=styles['Heading2'],
+        fontSize=12,
+        spaceAfter=12,
+        spaceBefore=12,
+        textColor=colors.HexColor('#2c3e50'),
+        borderColor=colors.HexColor('#3498db'),
+        borderWidth=1,
+        borderPadding=5,
+        backColor=colors.HexColor('#ecf0f1'),
+    )
+    
+    normal_style = styles['Normal']
+    normal_style.fontSize = 10
+    
+    # Contenido del PDF
+    story = []
+    
+    # Logo (si existe)
+    logo_path = os.path.join(settings.MEDIA_ROOT, 'logo.png')  # Ajusta la ruta según donde tengas tu logo
+    if os.path.exists(logo_path):
+        try:
+            logo = Image(logo_path, width=1.5*inch, height=1*inch)
+            logo.hAlign = 'CENTER'
+            story.append(logo)
+            story.append(Spacer(1, 10))
+        except:
+            # Si hay error cargando la imagen, continuar sin logo
+            pass
+    
+    # Título
+    story.append(Paragraph("SERVICIO DE GUARDERÍA MASCOTAS MORELIA", title_style))
+    story.append(Spacer(1, 20))
+    
+    # Información de la mascota
+    story.append(Paragraph("INFORMACIÓN DE LA MASCOTA", heading_style))
+    info_mascota_data = [
+        ['Nombre:', guarderia.mascota.nombre],
+        ['Especie:', guarderia.mascota.especie],
+        ['Raza:', guarderia.mascota.raza or 'No especificada'],
+        ['Fecha de Nacimiento:', guarderia.mascota.fechaNacimiento.strftime('%d/%m/%Y') if guarderia.mascota.fechaNacimiento else 'No especificada'],
+        ['Peso:', f"{guarderia.mascota.peso} kg" if guarderia.mascota.peso else 'No especificado'],
+        ['Sexo:', guarderia.mascota.get_sexo_display()],
+    ]
+    
+    info_mascota_table = Table(info_mascota_data, colWidths=[2*inch, 4*inch])
+    info_mascota_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+        ('PADDING', (0, 0), (-1, -1), 6),
+    ]))
+    story.append(info_mascota_table)
+    story.append(Spacer(1, 20))
+    
+    # Información del dueño
+    story.append(Paragraph("INFORMACIÓN DEL PROPIETARIO", heading_style))
+    info_cliente_data = [
+        ['Nombre:', guarderia.mascota.cliente.nombre],
+        ['Teléfono:', guarderia.mascota.cliente.telefono or 'No especificado'],
+        ['Email:', guarderia.mascota.cliente.email or 'No especificado'],
+    ]
+    
+    info_cliente_table = Table(info_cliente_data, colWidths=[2*inch, 4*inch])
+    info_cliente_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+        ('PADDING', (0, 0), (-1, -1), 6),
+    ]))
+    story.append(info_cliente_table)
+    story.append(Spacer(1, 20))
+    
+    # Datos del servicio de guardería
+    story.append(Paragraph("DATOS DEL SERVICIO DE GUARDERÍA", heading_style))
+    
+    # Fechas y clínica
+    story.append(Paragraph("<b>FECHAS Y UBICACIÓN:</b>", normal_style))
+    story.append(Spacer(1, 5))
+    
+    fechas_data = [
+        ['Fecha de Entrada:', guarderia.fechaEntrada.strftime('%d/%m/%Y')],
+        ['Fecha de Salida Programada:', guarderia.fechaSalidaProgramada.strftime('%d/%m/%Y') if guarderia.fechaSalidaProgramada else 'No especificada'],
+        ['Clínica Veterinaria:', guarderia.clinicaVeterinaria],
+        ['Estado del Servicio:', guarderia.estado],
+    ]
+    
+    fechas_table = Table(fechas_data, colWidths=[2.5*inch, 3.5*inch])
+    fechas_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+        ('PADDING', (0, 0), (-1, -1), 4),
+    ]))
+    story.append(fechas_table)
+    story.append(Spacer(1, 12))
+    
+    # Información de alimentación y salud
+    if guarderia.alimento:
+        story.append(Paragraph("<b>ALIMENTACIÓN PROPORCIONADA:</b>", normal_style))
+        story.append(Paragraph(guarderia.alimento, normal_style))
+        story.append(Spacer(1, 8))
+    
+    if guarderia.estadoSalud:
+        story.append(Paragraph("<b>ESTADO DE SALUD AL INGRESO:</b>", normal_style))
+        story.append(Paragraph(guarderia.estadoSalud, normal_style))
+        story.append(Spacer(1, 8))
+    
+    if guarderia.tratamientos:
+        story.append(Paragraph("<b>TRATAMIENTOS REQUERIDOS:</b>", normal_style))
+        story.append(Paragraph(guarderia.tratamientos, normal_style))
+        story.append(Spacer(1, 8))
+    
+    if guarderia.accesoriosRecibidos:
+        story.append(Paragraph("<b>ACCESORIOS RECIBIDOS:</b>", normal_style))
+        story.append(Paragraph(guarderia.accesoriosRecibidos, normal_style))
+        story.append(Spacer(1, 8))
+    
+    if guarderia.otrosDatos:
+        story.append(Paragraph("<b>OTROS DATOS RELEVANTES:</b>", normal_style))
+        story.append(Paragraph(guarderia.otrosDatos, normal_style))
+        story.append(Spacer(1, 8))
+    
+    # Información de pagos
+    story.append(Paragraph("<b>INFORMACIÓN DE PAGOS:</b>", normal_style))
+    story.append(Spacer(1, 5))
+    
+    pagos_data = [
+        ['Pagado:', f"${guarderia.pagado}"],
+        ['Pago Total:', f"${guarderia.pagoTotal}"],
+    ]
+    
+    pagos_table = Table(pagos_data, colWidths=[2.5*inch, 3.5*inch])
+    pagos_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+        ('PADDING', (0, 0), (-1, -1), 4),
+    ]))
+    story.append(pagos_table)
+    story.append(Spacer(1, 20))
+    
+    # Términos y condiciones
+    story.append(Paragraph("TÉRMINOS Y CONDICIONES", heading_style))
+    
+    terminos_text = """
+    <para>
+    Por medio del presente documento, el propietario de la mascota acepta los siguientes términos y condiciones durante el servicio de guardería:
+    </para>
+    """
+    story.append(Paragraph(terminos_text, normal_style))
+    story.append(Spacer(1, 10))
+    
+    # Incisos
+    incisos = [
+        "La mascota será atendida bajo el cuidado y supervisión del personal calificado de Mascotas Morelia.",
+        "El propietario declara que la mascota se encuentra en buen estado de salud al momento del ingreso, salvo lo indicado en el apartado correspondiente.",
+        "En caso de emergencia médica, Mascotas Morelia se reserva el derecho de proporcionar la atención veterinaria necesaria, cuyos costos serán asumidos por el propietario.",
+        "El propietario autoriza a Mascotas Morelia a administrar los tratamientos y medicamentos indicados en este documento.",
+        "Mascotas Morelia no se hace responsable por objetos personales (juguetes, cobijas, etc.) que puedan sufrir daño durante la estancia.",
+        "El horario de recolección de mascotas es de 9:00 am a 8:00 pm. Recoger a la mascota fuera de este horario podría generar cargos adicionales.",
+        "El pago del servicio debe ser liquidado en su totalidad al momento de la recolección de la mascota.",
+        "En caso de no recoger a la mascota en la fecha acordada sin previo aviso, se aplicarán cargos por día adicional.",
+        "El propietario se compromete a proporcionar información veraz sobre el estado de salud, comportamiento y necesidades especiales de su mascota."
+    ]
+    
+    for i, inciso in enumerate(incisos, 1):
+        story.append(Paragraph(f"<b>{i}.</b> {inciso}", normal_style))
+        story.append(Spacer(1, 5))
+    
+    story.append(Spacer(1, 20))
+    
+    # Firma
+    story.append(Paragraph("CONFORMIDAD Y ACEPTACIÓN", heading_style))
+    
+    firma_text = """
+    <para>
+    El propietario declara haber leído y comprendido los términos y condiciones anteriores, y acepta cumplir con lo establecido en este documento.
+    </para>
+    """
+    story.append(Paragraph(firma_text, normal_style))
+    story.append(Spacer(1, 30))
+    
+    # Espacio para firma
+    firma_data = [
+        ['', ''],
+        ['_________________________', '_________________________'],
+        ['Nombre del Propietario', 'Firma del Propietario'],
+    ]
+    
+    firma_table = Table(firma_data, colWidths=[3*inch, 3*inch])
+    firma_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+    ]))
+    story.append(firma_table)
+    story.append(Spacer(1, 20))
+    
+    # Fecha y lugar
+    fecha_lugar = f"""
+    <para>
+    <b>Fecha:</b> {guarderia.fechaEntrada.strftime('%d de %B de %Y')}<br/>
+    <b>Lugar:</b> {guarderia.clinicaVeterinaria}
+    </para>
+    """
+    story.append(Paragraph(fecha_lugar, normal_style))
+    
+    # Generar el PDF
+    pdf_doc.build(story)
+    buffer.seek(0)
+    
+    # Crear respuesta
+    response = HttpResponse(buffer, content_type='application/pdf')
+    filename = f"guarderia_{guarderia.mascota.nombre}_{guarderia.fechaEntrada.strftime('%Y%m%d')}.pdf"
+    response['Content-Disposition'] = f'attachment; filename="{filename}"'
+    
+    return response

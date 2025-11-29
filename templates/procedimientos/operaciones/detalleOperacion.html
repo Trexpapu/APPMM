@@ -10,6 +10,9 @@
             <a href="{% url 'editar_operacion' operacion.pk %}" class="btn-home" style="background: #ffc107; color: black;">
                 ✏️ Editar
             </a>
+            <a href="{% url 'generar_pdf_operacion' operacion.pk %}" class="btn-home" style="background: #dc3545;">
+                📄 Descargar PDF
+            </a>
         </div>
     </div>
 
@@ -160,6 +163,9 @@
     <div class="action-buttons" style="margin-top: 30px;">
         <a href="{% url 'editar_operacion' operacion.pk %}" class="btn-home" style="background: #ffc107; color: black; padding: 12px 24px;">
             ✏️ Editar Operación
+        </a>
+        <a href="{% url 'historial_operaciones' %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
+            📋 Volver al Listado
         </a>
     </div>
 </section>
