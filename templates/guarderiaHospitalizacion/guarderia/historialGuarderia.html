@@ -96,6 +96,33 @@
                     </div>
                 </div>
 
+                <!-- Filtro por Estado -->
+                <div class="filtro-group">
+                    <label for="q_estado" class="filtro-label">
+                        📊 Estado
+                    </label>
+                    <div class="filtro-input-container">
+                        <select id="q_estado" name="q_estado" class="filtro-input">
+                            <option value="">Todos los estados</option>
+                            {% for estado in estados %}
+                            <option value="{{ estado.0 }}" {% if query_estado == estado.0 %}selected{% endif %}>
+                                {{ estado.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if query_estado %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_estado').value = ''; this.form.submit();"
+                            title="Limpiar filtro de estado"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
                 <!-- Filtro por Fecha de Entrada -->
                 <div class="filtro-group">
                     <label for="q_fecha_entrada" class="filtro-label">
@@ -145,7 +172,8 @@
             {% if query_cliente %}para cliente: "<strong>{{ query_cliente }}</strong>"{% endif %}
             {% if query_mascota %}{% if query_cliente %}y {% endif %}mascota: "<strong>{{ query_mascota }}</strong>"{% endif %}
             {% if query_veterinaria %}{% if query_cliente or query_mascota %}en {% else %}en {% endif %}clínica: "<strong>{{ query_veterinaria }}</strong>"{% endif %}
-            {% if query_fecha_entrada %}{% if query_cliente or query_mascota or query_veterinaria %}el {% else %}el {% endif %}<strong>{{ query_fecha_entrada }}</strong>{% endif %}
+            {% if query_estado %}{% if query_cliente or query_mascota or query_veterinaria %}con estado: "<strong>{{ query_estado }}</strong>"{% else %}con estado: "<strong>{{ query_estado }}</strong>"{% endif %}{% endif %}
+            {% if query_fecha_entrada %}{% if query_cliente or query_mascota or query_veterinaria or query_estado %}el {% else %}el {% endif %}<strong>{{ query_fecha_entrada }}</strong>{% endif %}
         </p>
     </div>
     {% else %}
@@ -164,6 +192,7 @@
                     <th>🎒 Accesorios</th>
                     <th>💓 Estado Salud</th>
                     <th>🏥 Clínica</th>
+                    <th>📊 Estado</th>
                     <th>📅 Fecha Entrada</th>
                     <th>📅 Fecha Salida Prog.</th>
                     <th>📅 Fecha Salida Real</th>
@@ -225,6 +254,11 @@
                         {% endif %}
                     </td>
                     <td>{{ guarderia.clinicaVeterinaria }}</td>
+                    <td>
+                        <span class="estado-badge estado-{{ guarderia.estado|lower|cut:' ' }}">
+                            {{ guarderia.estado }}
+                        </span>
+                    </td>
                     <td>{{ guarderia.fechaEntrada }}</td>
                     <td>
                         {% if guarderia.fechaSalidaProgramada %}
@@ -248,7 +282,6 @@
                     </td>
                     <td>
                         <div class="action-buttons compact">
-
                             <a href="{% url 'servicio_guarderia_detalle' guarderia.pk %}" 
                                class="btn-home" style="background: #17a2b8; padding: 5px 10px;"
                                title="Ver detalles">
@@ -272,7 +305,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="12" class="no-data">
+                    <td colspan="13" class="no-data">
                         {% if filtros_activos %}
                             🔍 No se encontraron servicios de guardería que coincidan con los filtros aplicados.
                             <a href="{% url 'historial-guarderia' %}" style="color: #3498db; text-decoration: none; margin-left: 10px;">
@@ -392,5 +425,16 @@
     font-style: italic;
     padding: 20px;
 }
+
+/* Estilos para los badges de estado */
+.estado-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+
 </style>
 {% endblock %}

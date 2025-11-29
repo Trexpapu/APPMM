@@ -93,6 +93,7 @@ def historial_guarderia(request):
     query_mascota = request.GET.get('q_mascota', '').strip().lower()
     query_veterinaria = request.GET.get('q_veterinaria', '')
     query_fecha_entrada = request.GET.get('q_fecha_entrada', '')
+    query_estado = request.GET.get('q_estado', '')  # Nuevo filtro por estado
     
     # Aplicar filtros combinados
     if query_cliente:
@@ -115,19 +116,25 @@ def historial_guarderia(request):
     if query_fecha_entrada:
         guarderias = guarderias.filter(fechaEntrada=query_fecha_entrada)
     
+    if query_estado:  # Nuevo filtro por estado
+        guarderias = guarderias.filter(estado=query_estado)
+    
     # Datos para los filtros
     clinicas = Guarderia.CLINICAS
+    estados = Guarderia.ESTADOS  # Obtenemos las opciones de estado del modelo
     
     # Determinar si hay filtros activos
-    filtros_activos = any([query_cliente, query_mascota, query_veterinaria, query_fecha_entrada])
+    filtros_activos = any([query_cliente, query_mascota, query_veterinaria, query_fecha_entrada, query_estado])
     
     return render(request, 'guarderiaHospitalizacion/guarderia/historialGuarderia.html', {
         'guarderias': guarderias,
         'clinicas': clinicas,
+        'estados': estados,  # Pasamos los estados al contexto
         'query_cliente': query_cliente,
         'query_mascota': query_mascota,
         'query_veterinaria': query_veterinaria,
         'query_fecha_entrada': query_fecha_entrada,
+        'query_estado': query_estado,  # Pasamos el estado seleccionado
         'filtros_activos': filtros_activos
     })
 

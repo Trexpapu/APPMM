@@ -3,7 +3,150 @@ from .models import *
 from ClientesMascotas.models import Mascotas
 from django.contrib.auth.models import User
 
+class HospitalizacionForm(forms.ModelForm):
+    class Meta:
+        model = Hospitalizacion
+        fields = [
+            'mascota',
+            'diagnostico',
+            'tratamientos',
+            'otrosDatos',
+            'clinicaVeterinaria',
+            'fotoAntes',
+            'fotoDespues',
+            'fechaEntrada',
+            'fechaSalida',
+        ]
+        widgets = {
+            'fechaEntrada': forms.DateInput(attrs={
+                'type': 'date', 
+                'class': 'form-control'
+            }),
+            'fechaSalida': forms.DateInput(attrs={
+                'type': 'date', 
+                'class': 'form-control'
+            }),
+            'diagnostico': forms.Textarea(attrs={
+                'rows': 3,
+                'class': 'form-control',
+                'placeholder': 'Diagnóstico médico...'
+            }),
+            'tratamientos': forms.Textarea(attrs={
+                'rows': 3,
+                'class': 'form-control',
+                'placeholder': 'Tratamientos médicos aplicados...'
+            }),
+            'otrosDatos': forms.Textarea(attrs={
+                'rows': 3,
+                'class': 'form-control',
+                'placeholder': 'Otros datos relevantes...'
+            }),
+            'clinicaVeterinaria': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'mascota': forms.Select(attrs={
+                'class': 'form-control',
+                'style': 'display: none;'
+            }),
+            'fotoAntes': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+            }),
+            'fotoDespues': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+            }),
 
+        }
+        labels = {
+            'mascota': '🐕 Mascota',
+            'diagnostico': '🩺 Diagnóstico',
+            'tratamientos': '💊 Tratamientos',
+            'otrosDatos': '📝 Otros Datos',
+            'clinicaVeterinaria': '🏥 Clínica Veterinaria',
+            'fotoAntes': '🖼️ Foto Antes',
+            'fotoDespues': '🖼️ Foto Después',
+            'fechaEntrada': '📅 Fecha de Entrada',
+            'fechaSalida': '📅 Fecha de Salida',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['mascota'].queryset = Mascotas.objects.all().select_related('cliente')
+        self.fields['fotoAntes'].required = False
+        self.fields['fotoDespues'].required = False
+class HospitalizacionUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Hospitalizacion
+        fields = [
+            'mascota',
+            'diagnostico',
+            'tratamientos',
+            'otrosDatos',
+            'clinicaVeterinaria',
+            'fotoAntes',
+            'fotoDespues',
+            'fechaEntrada',
+            'fechaSalida',
+        ]
+        widgets = {
+            'fechaEntrada': forms.DateInput(attrs={
+                'type': 'date', 
+                'class': 'form-control'
+            }),
+            'fechaSalida': forms.DateInput(attrs={
+                'type': 'date', 
+                'class': 'form-control'
+            }),
+            'diagnostico': forms.Textarea(attrs={
+                'rows': 3,
+                'class': 'form-control',
+                'placeholder': 'Diagnóstico médico...'
+            }),
+            'tratamientos': forms.Textarea(attrs={
+                'rows': 3,
+                'class': 'form-control',
+                'placeholder': 'Tratamientos médicos aplicados...'
+            }),
+            'otrosDatos': forms.Textarea(attrs={
+                'rows': 3,
+                'class': 'form-control',
+                'placeholder': 'Otros datos relevantes...'
+            }),
+            'clinicaVeterinaria': forms.Select(attrs={
+                'class': 'form-control'
+            }),
+            'mascota': forms.Select(attrs={
+                'class': 'form-control',
+                'style': 'display: none;'
+            }),
+            'fotoAntes': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+            }),
+            'fotoDespues': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+            }),
+
+        }
+        labels = {
+            'mascota': '🐕 Mascota',
+            'diagnostico': '🩺 Diagnóstico',
+            'tratamientos': '💊 Tratamientos',
+            'otrosDatos': '📝 Otros Datos',
+            'clinicaVeterinaria': '🏥 Clínica Veterinaria',
+            'fotoAntes': '🖼️ Foto Antes',
+            'fotoDespues': '🖼️ Foto Después',
+            'fechaEntrada': '📅 Fecha de Entrada',
+            'fechaSalida': '📅 Fecha de Salida',
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['mascota'].queryset = Mascotas.objects.all().select_related('cliente')
+        self.fields['fotoAntes'].required = False
+        self.fields['fotoDespues'].required = False
 
 class GuarderiaForm(forms.ModelForm):
     class Meta:
@@ -16,6 +159,7 @@ class GuarderiaForm(forms.ModelForm):
             'tratamientos',
             'otrosDatos',
             'clinicaVeterinaria',
+            'estado',
             'fechaEntrada',
             'fechaSalidaProgramada',
             'fechaSalidaReal',
@@ -83,6 +227,9 @@ class GuarderiaForm(forms.ModelForm):
             'clinicaVeterinaria': forms.Select(attrs={
                 'class': 'form-control'
             }),
+            'estado': forms.Select(attrs={
+                'class': 'form-control'
+            }),
             'mascota': forms.Select(attrs={
                 'class': 'form-control',
                 'style': 'display: none;'
@@ -96,6 +243,7 @@ class GuarderiaForm(forms.ModelForm):
             'tratamientos': '💊 Tratamientos',
             'otrosDatos': '📝 Otros Datos',
             'clinicaVeterinaria': '🏥 Clínica Veterinaria',
+            'estado': '📋 Estado',
             'fechaEntrada': '📅 Fecha de Entrada',
             'fechaSalidaProgramada': '📅 Fecha de Salida Programada',
             'fechaSalidaReal': '📅 Fecha de Salida Real',
@@ -128,6 +276,7 @@ class GuarderiaUpdateForm(forms.ModelForm):
             'tratamientos',
             'otrosDatos',
             'clinicaVeterinaria',
+            'estado',
             'fechaEntrada',
             'fechaSalidaProgramada',
             'fechaSalidaReal',
@@ -187,6 +336,9 @@ class GuarderiaUpdateForm(forms.ModelForm):
             'clinicaVeterinaria': forms.Select(attrs={
                 'class': 'form-control'
             }),
+            'estado': forms.Select(attrs={
+                'class': 'form-control'
+            }),
             'mascota': forms.Select(attrs={
                 'class': 'form-control',
                 'style': 'display: none;'
@@ -200,6 +352,7 @@ class GuarderiaUpdateForm(forms.ModelForm):
             'tratamientos': '💊 Tratamientos',
             'otrosDatos': '📝 Otros Datos',
             'clinicaVeterinaria': '🏥 Clínica Veterinaria',
+            'estado': '📋 Estado',
             'fechaEntrada': '📅 Fecha de Entrada',
             'fechaSalidaProgramada': '📅 Fecha de Salida Programada',
             'fechaSalidaReal': '📅 Fecha de Salida Real',

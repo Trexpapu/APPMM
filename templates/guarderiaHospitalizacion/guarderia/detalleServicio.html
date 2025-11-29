@@ -104,6 +104,17 @@
         </div>
 
         <div class="form-section">
+            <h3>✅ Estado de la mascota</h3>
+            <div class="description-content">
+                {% if guarderia.estado %}
+                    {{ guarderia.estado|linebreaks }}
+                {% else %}
+                    <p class="no-data">No hay estadi registrado.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-section">
             <h3>💓 Estado de Salud</h3>
             <div class="description-content">
                 {% if guarderia.estadoSalud %}
