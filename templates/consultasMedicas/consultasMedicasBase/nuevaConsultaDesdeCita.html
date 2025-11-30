@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Cargar campos de desparasitación automáticamente
     if (ultimaDesparasitacionField) {
-        ultimaDesparasitacionField.value = "{{ mascota.ultimaDesparasitacion }}" || '';
+        ultimaDesparasitacionField.value = "{{ mascota.ultimaDesparasitacion|date:'Y-m-d' }}" || '';
     }
     if (ultimoDesparasitanteField) {
         ultimoDesparasitanteField.value = "{{ mascota.ultimoDesparasitante|escapejs }}" || '';

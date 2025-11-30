@@ -6,7 +6,7 @@
 <section class="container">
     <!-- Header con acciones -->
     <div class="header-actions">
-        <h2>Consulta Médica - {{ consulta.mascota.nombre }}</h2>
+        <h2>Detalle Consulta Médica - {{ consulta.mascota.nombre }}</h2>
         <div class="action-buttons">
             <a href="{% url 'generar_pdf_consulta' consulta.id %}" class="btn-home" style="background: #dc3545;">
                 📄 Descargar PDF
@@ -37,7 +37,7 @@
                 <strong>Propietario:</strong> {{ consulta.mascota.cliente.nombre }}
             </div>
             <div class="info-item">
-                <strong>Fecha de consulta:</strong> {{ consulta.fechaConsulta|date:"d/m/Y H:i" }}
+                <strong>Fecha de consulta:</strong> {{ consulta.fechaConsulta }}
             </div>
             <div class="info-item">
                 <strong>Veterinario:</strong> {{ consulta.veterinario.get_full_name|default:consulta.veterinario.username }}
@@ -45,20 +45,23 @@
             <div class="info-item">
                 <strong>Clínica:</strong> {{ consulta.clinicaVeterinaria }}
             </div>
+            <div class="info-item">
+                <strong>Procedimiento:</strong> {{ consulta.procedimiento }}
+            </div>
         </div>
     </div>
 
-    <!-- Motivo de consulta -->
-    {% if consulta.motivoConsulta %}
+    <!-- Anamnesis -->
+    {% if consulta.anamnesicos %}
     <div class="form-section">
-        <h3>🎯 Motivo de Consulta</h3>
+        <h3>📝 Anamnesis</h3>
         <div class="content-box">
-            {{ consulta.motivoConsulta|linebreaks }}
+            {{ consulta.anamnesicos|linebreaks }}
         </div>
     </div>
     {% endif %}
 
-    <!-- Signos vitales -->
+    <!-- Signos vitales y examen físico -->
     <div class="form-section">
         <h3>❤️ Signos Vitales y Examen Físico</h3>
         <div class="info-grid compact">
@@ -77,6 +80,11 @@
                 <strong>Frecuencia cardíaca:</strong> {{ consulta.frecuenciaCardiaca }}
             </div>
             {% endif %}
+            {% if consulta.frecuenciaRespiratoria %}
+            <div class="info-item">
+                <strong>Frecuencia respiratoria:</strong> {{ consulta.frecuenciaRespiratoria }}
+            </div>
+            {% endif %}
             {% if consulta.puntuacionCorporal %}
             <div class="info-item">
                 <strong>Puntuación corporal:</strong> {{ consulta.puntuacionCorporal }}
@@ -85,11 +93,37 @@
             <div class="info-item">
                 <strong>Peso:</strong> {{ consulta.peso }} kg
             </div>
+            {% if consulta.mucosas %}
+            <div class="info-item">
+                <strong>Mucosas:</strong> {{ consulta.mucosas }}
+            </div>
+            {% endif %}
+            {% if consulta.porcentajeHidratacion %}
+            <div class="info-item">
+                <strong>Porcentaje de hidratación:</strong> {{ consulta.porcentajeHidratacion }}
+            </div>
+            {% endif %}
+            {% if consulta.actitudConPropietario %}
+            <div class="info-item">
+                <strong>Actitud con propietario:</strong> {{ consulta.actitudConPropietario }}
+            </div>
+            {% endif %}
+            {% if consulta.actitudConVeterinario %}
+            <div class="info-item">
+                <strong>Actitud con veterinario:</strong> {{ consulta.actitudConVeterinario }}
+            </div>
+            {% endif %}
+            {% if consulta.examanesFisicosRealizados %}
+            <div class="info-item full-width">
+                <strong>Exámenes físicos realizados:</strong><br>
+                {{ consulta.examanesFisicosRealizados|linebreaks }}
+            </div>
+            {% endif %}
         </div>
     </div>
 
     <!-- Historial médico -->
-    {% if consulta.vacunas or consulta.alergias or consulta.parasitos %}
+    {% if consulta.vacunas or consulta.alergias or consulta.parasitos or consulta.ultimaDesparasitacion or consulta.ultimoDesparasitante %}
     <div class="form-section">
         <h3>📊 Historial Médico</h3>
         <div class="info-grid">
@@ -106,15 +140,14 @@
             </div>
             {% endif %}
             {% if consulta.ultimaDesparasitacion %}
-            <div class="info-item full-width">
-                <strong>Fecha de la última desparasitación aplicada:</strong><br>
-                {{ consulta.ultimaDesparasitacion|linebreaks }}
+            <div class="info-item">
+                <strong>Última desparasitación:</strong><br>
+                {{ consulta.ultimaDesparasitacion }}
             </div>
             {% endif %}
-            
             {% if consulta.ultimoDesparasitante %}
-            <div class="info-item full-width">
-                <strong>último desparasitante aplicado:</strong><br>
+            <div class="info-item">
+                <strong>Último desparasitante:</strong><br>
                 {{ consulta.ultimoDesparasitante|linebreaks }}
             </div>
             {% endif %}
@@ -129,24 +162,13 @@
     {% endif %}
 
     <!-- Condiciones y hábitos -->
-    {% if consulta.agua or consulta.alimento or consulta.condicionesDeHogar or consulta.ectoparasitos %}
+    {% if consulta.alimento or consulta.ectoparasitos %}
     <div class="form-section">
         <h3>🏠 Condiciones y Hábitos</h3>
         <div class="info-grid">
-            {% if consulta.agua %}
-            <div class="info-item">
-                <strong>Consumo de agua:</strong> {{ consulta.agua }}
-            </div>
-            {% endif %}
             {% if consulta.alimento %}
             <div class="info-item">
                 <strong>Alimento:</strong> {{ consulta.alimento }}
-            </div>
-            {% endif %}
-            {% if consulta.condicionesDeHogar %}
-            <div class="info-item full-width">
-                <strong>Condiciones del hogar:</strong><br>
-                {{ consulta.condicionesDeHogar|linebreaks }}
             </div>
             {% endif %}
             {% if consulta.ectoparasitos %}
@@ -160,14 +182,20 @@
     {% endif %}
 
     <!-- Diagnóstico y tratamiento -->
-    {% if consulta.sintomas or consulta.diagnostico or consulta.tratamiento %}
+    {% if consulta.diagnostico or consulta.tratamiento or consulta.pronostico or consulta.listaPosiblesProblemas or consulta.listaProblemasReales %}
     <div class="form-section">
         <h3>🩺 Diagnóstico y Tratamiento</h3>
         <div class="info-grid">
-            {% if consulta.sintomas %}
+            {% if consulta.listaPosiblesProblemas %}
             <div class="info-item full-width">
-                <strong>Síntomas:</strong><br>
-                {{ consulta.sintomas|linebreaks }}
+                <strong>Lista de posibles problemas:</strong><br>
+                {{ consulta.listaPosiblesProblemas|linebreaks }}
+            </div>
+            {% endif %}
+            {% if consulta.listaProblemasReales %}
+            <div class="info-item full-width">
+                <strong>Lista de problemas reales:</strong><br>
+                {{ consulta.listaProblemasReales|linebreaks }}
             </div>
             {% endif %}
             {% if consulta.diagnostico %}
@@ -180,6 +208,12 @@
             <div class="info-item full-width">
                 <strong>Tratamiento:</strong><br>
                 {{ consulta.tratamiento|linebreaks }}
+            </div>
+            {% endif %}
+            {% if consulta.pronostico %}
+            <div class="info-item full-width">
+                <strong>Pronóstico:</strong><br>
+                {{ consulta.pronostico|linebreaks }}
             </div>
             {% endif %}
         </div>
@@ -267,6 +301,7 @@
 </section>
 
 <style>
+/* El CSS permanece igual */
 .header-actions {
     display: flex;
     justify-content: space-between;

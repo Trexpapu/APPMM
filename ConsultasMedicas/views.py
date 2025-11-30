@@ -15,11 +15,12 @@ import os
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
 from reportlab.lib.units import inch
 from reportlab.lib import colors
 from io import BytesIO
-import textwrap
+from django.utils import timezone
+
 # Create your views here.
 @login_required
 def indexInicioConsultas(request):
@@ -131,8 +132,6 @@ def nueva_consulta_desde_cita(request, mascota_id):
     )
 
 
-
-
 @login_required
 def nueva_consulta(request):
     """
@@ -155,15 +154,10 @@ def nueva_consulta(request):
                 'peso': mascota.peso,
                 'vacunas': mascota.vacunas,
                 'alergias': mascota.alergias,
+                'ultimaDesparasitacion': mascota.ultimaDesparasitacion, 
                 'ultimoDesparasitante': mascota.ultimoDesparasitante,
                 'alimento': mascota.alimento,
             })
-            
-            # 🔹 CORREGIDO: Formatear correctamente la fecha para el input type="date"
-            if mascota.ultimaDesparasitacion:
-                initial_data['ultimaDesparasitacion'] = mascota.ultimaDesparasitacion.strftime('%Y-%m-%d')
-            else:
-                initial_data['ultimaDesparasitacion'] = ''
             
             # 🔹 Preparar datos de la mascota para mostrar en el template
             datos_mascota = {
@@ -208,7 +202,7 @@ def nueva_consulta(request):
                 nConsulta.veterinario = request.user
                 nConsulta.save()
 
-                # 🐾 Actualizar datos de la mascota (solo peso, alergias y alimento)
+                # 🐾 Actualizar datos de la mascota (solo peso y alergias)
                 mascota = Mascotas.objects.get(pk=mascota_id)
                 mascota.peso = form.cleaned_data.get('peso') or mascota.peso
                 mascota.alergias = form.cleaned_data.get('alergias') or mascota.alergias
@@ -254,6 +248,8 @@ def nueva_consulta(request):
             'datos_mascota': datos_mascota,
         }
     )
+
+
 
 @login_required
 def ver_consultas(request):
@@ -371,216 +367,6 @@ def descargar_documento(request, documento_id):
 
 
 
-@login_required
-def generar_pdf_consulta(request, consulta_id):
-    """Generar PDF con los datos de la consulta médica"""
-    consulta = get_object_or_404(ConsultasMedicas, id=consulta_id)
-    documentos = DocumentosConsulta.objects.filter(consulta=consulta)
-    
-    # Crear el PDF en memoria
-    buffer = BytesIO()
-    pdf_doc = SimpleDocTemplate(buffer, pagesize=A4, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=18)  # 🔥 Cambiado a pdf_doc
-    styles = getSampleStyleSheet()
-    
-    # Estilos personalizados
-    title_style = ParagraphStyle(
-        'CustomTitle',
-        parent=styles['Heading1'],
-        fontSize=16,
-        spaceAfter=30,
-        alignment=1,  # Centrado
-    )
-    
-    heading_style = ParagraphStyle(
-        'CustomHeading',
-        parent=styles['Heading2'],
-        fontSize=12,
-        spaceAfter=12,
-        spaceBefore=12,
-        textColor=colors.HexColor('#2c3e50'),
-    )
-    
-    normal_style = styles['Normal']
-    
-    # Contenido del PDF
-    story = []
-    
-    # Título
-    story.append(Paragraph("CONSULTA MÉDICA VETERINARIA MASCOTAS MORELIA", title_style))
-    story.append(Spacer(1, 20))
-    
-    # Información básica
-    story.append(Paragraph("INFORMACIÓN GENERAL", heading_style))
-    info_data = [
-        ['Mascota:', consulta.mascota.nombre],
-        ['Especie:', consulta.mascota.especie],
-        ['Raza:', consulta.mascota.raza],
-        ['Sexo:', consulta.mascota.sexo],
-        ['Propietario:', consulta.mascota.cliente.nombre],
-        ['Fecha de consulta:', consulta.fechaConsulta.strftime('%d/%m/%Y %H:%M')],
-        ['Veterinario:', consulta.veterinario.get_full_name() or consulta.veterinario.username],
-        ['Clínica:', consulta.clinicaVeterinaria],
-    ]
-    
-    info_table = Table(info_data, colWidths=[2*inch, 4*inch])
-    info_table.setStyle(TableStyle([
-        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-        ('FONTSIZE', (0, 0), (-1, -1), 10),
-        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
-        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
-        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-        ('ALIGN', (1, 0), (1, -1), 'LEFT'),
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
-        ('PADDING', (0, 0), (-1, -1), 6),
-    ]))
-    story.append(info_table)
-    story.append(Spacer(1, 20))
-    
-    # Motivo de consulta
-    if consulta.motivoConsulta:
-        story.append(Paragraph("MOTIVO DE CONSULTA", heading_style))
-        story.append(Paragraph(consulta.motivoConsulta, normal_style))
-        story.append(Spacer(1, 12))
-    
-    # Signos vitales
-    story.append(Paragraph("SIGNOS VITALES Y EXAMEN FÍSICO", heading_style))
-    signos_data = []
-    if consulta.temperatura:
-        signos_data.append(['Temperatura:', consulta.temperatura])
-    if consulta.pulso:
-        signos_data.append(['Pulso:', consulta.pulso])
-    if consulta.frecuenciaCardiaca:
-        signos_data.append(['Frecuencia cardíaca:', consulta.frecuenciaCardiaca])
-    if consulta.puntuacionCorporal:
-        signos_data.append(['Puntuación corporal:', consulta.puntuacionCorporal])
-    signos_data.append(['Peso:', f"{consulta.peso} kg"])
-    
-    if signos_data:
-        signos_table = Table(signos_data, colWidths=[2*inch, 4*inch])
-        signos_table.setStyle(TableStyle([
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 9),
-            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
-            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
-            ('PADDING', (0, 0), (-1, -1), 4),
-        ]))
-        story.append(signos_table)
-        story.append(Spacer(1, 12))
-    
-    # Historial médico
-    historial_data = []
-    if consulta.vacunas:
-        historial_data.append(['Vacunas:', consulta.vacunas])
-    if consulta.ultimaDesparasitacion:
-        historial_data.append(['Fecha de la última desparasitación aplicada:', consulta.ultimaDesparasitacion])
-    if consulta.ultimoDesparasitante:
-        historial_data.append(['Último desparasitante aplicado:', consulta.ultimoDesparasitante])
-    if consulta.alergias:
-        historial_data.append(['Alergias:', consulta.alergias])
-    if consulta.parasitos:
-        historial_data.append(['Parásitos:', consulta.parasitos])
-    
-    if historial_data:
-        story.append(Paragraph("HISTORIAL MÉDICO", heading_style))
-        for item in historial_data:
-            story.append(Paragraph(f"<b>{item[0]}</b> {item[1]}", normal_style))
-        story.append(Spacer(1, 12))
-    
-    # Condiciones y hábitos
-    condiciones_data = []
-    if consulta.agua:
-        condiciones_data.append(['Consumo de agua:', consulta.agua])
-    if consulta.alimento:
-        condiciones_data.append(['Alimento:', consulta.alimento])
-    if consulta.condicionesDeHogar:
-        condiciones_data.append(['Condiciones del hogar:', consulta.condicionesDeHogar])
-    if consulta.ectoparasitos:
-        condiciones_data.append(['Ectoparásitos:', consulta.ectoparasitos])
-    
-    if condiciones_data:
-        story.append(Paragraph("CONDICIONES Y HÁBITOS", heading_style))
-        condiciones_table = Table(condiciones_data, colWidths=[2*inch, 4*inch])
-        condiciones_table.setStyle(TableStyle([
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 9),
-            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
-            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
-            ('PADDING', (0, 0), (-1, -1), 4),
-        ]))
-        story.append(condiciones_table)
-        story.append(Spacer(1, 12))
-    
-    # Diagnóstico y tratamiento
-    if consulta.sintomas:
-        story.append(Paragraph("SÍNTOMAS", heading_style))
-        story.append(Paragraph(consulta.sintomas, normal_style))
-        story.append(Spacer(1, 12))
-    
-    if consulta.diagnostico:
-        story.append(Paragraph("DIAGNÓSTICO", heading_style))
-        story.append(Paragraph(consulta.diagnostico, normal_style))
-        story.append(Spacer(1, 12))
-    
-    if consulta.tratamiento:
-        story.append(Paragraph("TRATAMIENTO", heading_style))
-        story.append(Paragraph(consulta.tratamiento, normal_style))
-        story.append(Spacer(1, 12))
-    
-    # Estudios
-    if consulta.estudiosHechos or consulta.estudiosRecomendados:
-        story.append(Paragraph("ESTUDIOS", heading_style))
-        if consulta.estudiosHechos:
-            story.append(Paragraph("<b>Realizados:</b>", normal_style))
-            story.append(Paragraph(consulta.estudiosHechos, normal_style))
-        if consulta.estudiosRecomendados:
-            story.append(Paragraph("<b>Recomendados:</b>", normal_style))
-            story.append(Paragraph(consulta.estudiosRecomendados, normal_style))
-        story.append(Spacer(1, 12))
-    
-    # Observaciones y evolución
-    if consulta.observaciones:
-        story.append(Paragraph("OBSERVACIONES", heading_style))
-        story.append(Paragraph(consulta.observaciones, normal_style))
-        story.append(Spacer(1, 12))
-    
-    if consulta.evolucion:
-        story.append(Paragraph("EVOLUCIÓN", heading_style))
-        story.append(Paragraph(consulta.evolucion, normal_style))
-        story.append(Spacer(1, 12))
-    
-    # Documentos adjuntos
-    if documentos.exists():
-        story.append(Paragraph("DOCUMENTOS ADJUNTOS", heading_style))
-        docs_data = [['Descripción', 'Fecha']]
-        for documento_obj in documentos:  # 🔥 Cambiado a documento_obj para evitar conflicto
-            docs_data.append([
-                documento_obj.descripcion or 'Sin descripción', 
-                documento_obj.fecha.strftime('%d/%m/%Y')
-            ])
-        
-        docs_table = Table(docs_data, colWidths=[4*inch, 2*inch])
-        docs_table.setStyle(TableStyle([
-            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 0), (-1, -1), 9),
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2c3e50')),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
-            ('PADDING', (0, 0), (-1, -1), 6),
-        ]))
-        story.append(docs_table)
-    
-    # Generar el PDF
-    pdf_doc.build(story)  # 🔥 Usando pdf_doc en lugar de doc
-    buffer.seek(0)
-    
-    # Crear respuesta
-    response = HttpResponse(buffer, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="consulta_{consulta.mascota.nombre}_{consulta.fechaConsulta.strftime("%Y%m%d")}.pdf"'
-    
-    return response
-
 
 @login_required
 def editar_consulta(request, consulta_id):
@@ -676,3 +462,270 @@ def borrar_consulta(request, pk):
     consulta = get_object_or_404(ConsultasMedicas, pk=pk)
     consulta.delete()
     return redirect('ver-consultas')
+
+
+
+@login_required
+def generar_pdf_consulta(request, consulta_id):
+    """Generar PDF con los datos de la consulta médica"""
+    consulta = get_object_or_404(ConsultasMedicas, id=consulta_id)
+    documentos = DocumentosConsulta.objects.filter(consulta=consulta)
+    
+    # Crear el PDF en memoria
+    buffer = BytesIO()
+    pdf_doc = SimpleDocTemplate(
+        buffer, 
+        pagesize=A4, 
+        rightMargin=72, 
+        leftMargin=72, 
+        topMargin=100,  # Más espacio arriba para el logo
+        bottomMargin=18
+    )
+    styles = getSampleStyleSheet()
+    
+    # Estilos personalizados
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=16,
+        spaceAfter=30,
+        alignment=1,  # Centrado
+        textColor=colors.HexColor('#2c3e50'),
+    )
+    
+    heading_style = ParagraphStyle(
+        'CustomHeading',
+        parent=styles['Heading2'],
+        fontSize=12,
+        spaceAfter=12,
+        spaceBefore=12,
+        textColor=colors.HexColor('#2c3e50'),
+        borderColor=colors.HexColor('#3498db'),
+        borderWidth=1,
+        borderPadding=5,
+        backColor=colors.HexColor('#ecf0f1'),
+    )
+    
+    normal_style = styles['Normal']
+    normal_style.fontSize = 10
+    
+    # Contenido del PDF
+    story = []
+    
+    # Logo (si existe)
+    logo_path = os.path.join(settings.MEDIA_ROOT, 'logo.png')
+    if os.path.exists(logo_path):
+        try:
+            logo = Image(logo_path, width=1.5*inch, height=1*inch)
+            logo.hAlign = 'CENTER'
+            story.append(logo)
+            story.append(Spacer(1, 10))
+        except:
+            # Si hay error cargando la imagen, continuar sin logo
+            pass
+    
+    # Título
+    story.append(Paragraph("CONSULTA MÉDICA VETERINARIA MASCOTAS MORELIA", title_style))
+    story.append(Spacer(1, 20))
+    
+    # Información básica
+    story.append(Paragraph("INFORMACIÓN GENERAL", heading_style))
+    info_data = [
+        ['Mascota:', consulta.mascota.nombre],
+        ['Especie:', consulta.mascota.especie],
+        ['Raza:', consulta.mascota.raza],
+        ['Sexo:', consulta.mascota.sexo],
+        ['Propietario:', consulta.mascota.cliente.nombre],
+        ['Fecha de consulta:', timezone.localtime(consulta.fechaConsulta).strftime('%d/%m/%Y %H:%M')],
+        ['Veterinario:', consulta.veterinario.get_full_name() or consulta.veterinario.username],
+        ['Clínica:', consulta.clinicaVeterinaria],
+        ['Procedimiento:', consulta.procedimiento],
+    ]
+    
+    info_table = Table(info_data, colWidths=[2*inch, 4*inch])
+    info_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+        ('PADDING', (0, 0), (-1, -1), 6),
+    ]))
+    story.append(info_table)
+    story.append(Spacer(1, 20))
+    
+    # Anamnesis
+    if consulta.anamnesicos:
+        story.append(Paragraph("ANAMNESIS", heading_style))
+        story.append(Paragraph(consulta.anamnesicos, normal_style))
+        story.append(Spacer(1, 12))
+    
+    # Signos vitales y examen físico
+    story.append(Paragraph("SIGNOS VITALES Y EXAMEN FÍSICO", heading_style))
+    signos_data = []
+    if consulta.temperatura:
+        signos_data.append(['Temperatura:', consulta.temperatura])
+    if consulta.pulso:
+        signos_data.append(['Pulso:', consulta.pulso])
+    if consulta.frecuenciaCardiaca:
+        signos_data.append(['Frecuencia cardíaca:', consulta.frecuenciaCardiaca])
+    if consulta.frecuenciaRespiratoria:
+        signos_data.append(['Frecuencia respiratoria:', consulta.frecuenciaRespiratoria])
+    if consulta.puntuacionCorporal:
+        signos_data.append(['Puntuación corporal:', consulta.puntuacionCorporal])
+    if consulta.mucosas:
+        signos_data.append(['Mucosas:', consulta.mucosas])
+    if consulta.porcentajeHidratacion:
+        signos_data.append(['Porcentaje de hidratación:', consulta.porcentajeHidratacion])
+    if consulta.actitudConPropietario:
+        signos_data.append(['Actitud con propietario:', consulta.actitudConPropietario])
+    if consulta.actitudConVeterinario:
+        signos_data.append(['Actitud con veterinario:', consulta.actitudConVeterinario])
+    
+    signos_data.append(['Peso:', f"{consulta.peso} kg"])
+    
+    if signos_data:
+        signos_table = Table(signos_data, colWidths=[2.5*inch, 3.5*inch])
+        signos_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
+            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+            ('PADDING', (0, 0), (-1, -1), 4),
+        ]))
+        story.append(signos_table)
+        story.append(Spacer(1, 8))
+    
+    if consulta.examanesFisicosRealizados:
+        story.append(Paragraph("<b>Exámenes Físicos Realizados:</b>", normal_style))
+        story.append(Paragraph(consulta.examanesFisicosRealizados, normal_style))
+        story.append(Spacer(1, 12))
+    
+    # Historial médico
+    historial_data = []
+    if consulta.vacunas:
+        historial_data.append(['Vacunas:', consulta.vacunas])
+    if consulta.alergias:
+        historial_data.append(['Alergias:', consulta.alergias])
+    if consulta.ultimaDesparasitacion:
+        historial_data.append(['Última desparasitación:', consulta.ultimaDesparasitacion.strftime('%d/%m/%Y')])
+    if consulta.ultimoDesparasitante:
+        historial_data.append(['Último desparasitante:', consulta.ultimoDesparasitante])
+    if consulta.parasitos:
+        historial_data.append(['Parásitos:', consulta.parasitos])
+    
+    if historial_data:
+        story.append(Paragraph("HISTORIAL MÉDICO", heading_style))
+        historial_table = Table(historial_data, colWidths=[2.5*inch, 3.5*inch])
+        historial_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
+            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+            ('PADDING', (0, 0), (-1, -1), 4),
+        ]))
+        story.append(historial_table)
+        story.append(Spacer(1, 12))
+    
+    # Condiciones y hábitos
+    condiciones_data = []
+    if consulta.alimento:
+        condiciones_data.append(['Alimento:', consulta.alimento])
+    if consulta.ectoparasitos:
+        condiciones_data.append(['Ectoparásitos:', consulta.ectoparasitos])
+    
+    if condiciones_data:
+        story.append(Paragraph("ALIMENTACIÓN", heading_style))
+        condiciones_table = Table(condiciones_data, colWidths=[2.5*inch, 3.5*inch])
+        condiciones_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#f8f9fa')),
+            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+            ('PADDING', (0, 0), (-1, -1), 4),
+        ]))
+        story.append(condiciones_table)
+        story.append(Spacer(1, 12))
+    
+    # Diagnóstico y tratamiento
+    if consulta.listaPosiblesProblemas:
+        story.append(Paragraph("LISTA DE POSIBLES PROBLEMAS", heading_style))
+        story.append(Paragraph(consulta.listaPosiblesProblemas, normal_style))
+        story.append(Spacer(1, 12))
+    
+    if consulta.listaProblemasReales:
+        story.append(Paragraph("LISTA DE PROBLEMAS REALES", heading_style))
+        story.append(Paragraph(consulta.listaProblemasReales, normal_style))
+        story.append(Spacer(1, 12))
+    
+    if consulta.diagnostico:
+        story.append(Paragraph("DIAGNÓSTICO", heading_style))
+        story.append(Paragraph(consulta.diagnostico, normal_style))
+        story.append(Spacer(1, 12))
+    
+    if consulta.tratamiento:
+        story.append(Paragraph("TRATAMIENTO", heading_style))
+        story.append(Paragraph(consulta.tratamiento, normal_style))
+        story.append(Spacer(1, 12))
+    
+    if consulta.pronostico:
+        story.append(Paragraph("PRONÓSTICO", heading_style))
+        story.append(Paragraph(consulta.pronostico, normal_style))
+        story.append(Spacer(1, 12))
+    
+    # Estudios
+    if consulta.estudiosHechos or consulta.estudiosRecomendados:
+        story.append(Paragraph("ESTUDIOS", heading_style))
+        if consulta.estudiosHechos:
+            story.append(Paragraph("<b>Realizados:</b>", normal_style))
+            story.append(Paragraph(consulta.estudiosHechos, normal_style))
+        if consulta.estudiosRecomendados:
+            story.append(Paragraph("<b>Recomendados:</b>", normal_style))
+            story.append(Paragraph(consulta.estudiosRecomendados, normal_style))
+        story.append(Spacer(1, 12))
+    
+    # Observaciones y evolución
+    if consulta.observaciones:
+        story.append(Paragraph("OBSERVACIONES", heading_style))
+        story.append(Paragraph(consulta.observaciones, normal_style))
+        story.append(Spacer(1, 12))
+    
+    if consulta.evolucion:
+        story.append(Paragraph("EVOLUCIÓN", heading_style))
+        story.append(Paragraph(consulta.evolucion, normal_style))
+        story.append(Spacer(1, 12))
+    
+    # Documentos adjuntos
+    if documentos.exists():
+        story.append(Paragraph("DOCUMENTOS ADJUNTOS", heading_style))
+        docs_data = [['Descripción', 'Fecha']]
+        for documento in documentos:
+            docs_data.append([
+                documento.descripcion or 'Sin descripción', 
+                documento.fecha.strftime('%d/%m/%Y')
+            ])
+        
+        docs_table = Table(docs_data, colWidths=[4*inch, 2*inch])
+        docs_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2c3e50')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#dee2e6')),
+            ('PADDING', (0, 0), (-1, -1), 6),
+        ]))
+        story.append(docs_table)
+    
+    # Generar el PDF
+    pdf_doc.build(story)
+    buffer.seek(0)
+    
+    # Crear respuesta
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="consulta_{consulta.mascota.nombre}_{consulta.fechaConsulta.strftime("%Y%m%d")}.pdf"'
+    
+    return response

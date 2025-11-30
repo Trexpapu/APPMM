@@ -169,7 +169,11 @@ class ConsultasMedicas(models.Model):
     pulso = models.TextField(blank=True)
     frecuenciaCardiaca = models.TextField( blank=True)
     frecuenciaRespiratoria = models.TextField( blank=True)
-    puntuacionCorporal = models.TextField(blank=True)
+    puntuacionCorporal = models.CharField(
+        max_length=255,
+        choices=PUNTUACION,
+        default='1/5'
+    )
     examanesFisicosRealizados = models.TextField(blank=True)
     peso = models.FloatField()
     vacunas = models.TextField(blank=True)  

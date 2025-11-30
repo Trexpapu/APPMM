@@ -8,7 +8,7 @@ urlpatterns = [
     path('CrearNuevaConsultaCita/<int:mascota_id>/', views.nueva_consulta_desde_cita, name='nueva-consulta-desde-cita'),
     path('VerConsultas/', views.ver_consultas, name='ver-consultas'),
     # Detalle de consulta
-    path('consulta/<int:consulta_id>/', views.detalle_consulta, name='detalle-consulta'),
+    path('consulta/<int:consulta_id>/detalle', views.detalle_consulta, name='detalle-consulta'),
     # Descargar documento
     path('documento/<int:documento_id>/descargar/', views.descargar_documento, name='descargar_documento'),
     # Generar PDF
