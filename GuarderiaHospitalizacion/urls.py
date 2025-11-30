@@ -9,7 +9,7 @@ urlpatterns = [
 
     path('editarServicioGuarderia/<int:pk>/', views.servicio_guarderia_editar, name='servicio_guarderia_editar'),
 
-    path('eliminarServicioGuarderia/<int:pk>/', views.servicio_guarderia_crear, name='servicio_guarderia_eliminar'),   
+    path('eliminarServicioGuarderia/<int:pk>/', views.servicio_guarderia_eliminar, name='servicio_guarderia_eliminar'),   
 
     path('detalleServicioGuarderia/<int:pk>/', views.servicio_guarderia_detalle, name='servicio_guarderia_detalle'),
 

@@ -251,6 +251,7 @@ def nueva_consulta(request):
 
 
 
+
 @login_required
 def ver_consultas(request):
     """View that renders a table with all consultations and related info."""
@@ -265,6 +266,7 @@ def ver_consultas(request):
     query_fecha = request.GET.get('q_fecha', '').strip()
     query_veterinario = request.GET.get('q_veterinario', '').strip()
     query_veterinaria = request.GET.get('q_veterinaria', '').strip()
+    query_procedimiento = request.GET.get('q_procedimiento', '').strip()  # Nuevo filtro
     
     # Aplicar filtros
     if query_cliente:
@@ -294,13 +296,17 @@ def ver_consultas(request):
     
     if query_veterinaria:
         consultas = consultas.filter(clinicaVeterinaria=query_veterinaria)
+        
+    if query_procedimiento:
+        consultas = consultas.filter(procedimiento=query_procedimiento)
     
     # Obtener datos para los dropdowns
     veterinarios = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
     clinicas = ConsultasMedicas.CLINICAS
+    procedimientos = ConsultasMedicas.PROCEDIMIENTOS  # Nuevo: obtener tipos de procedimiento
     
     # Verificar si hay filtros activos
-    filtros_activos = any([query_cliente, query_mascota, query_fecha, query_veterinario, query_veterinaria])
+    filtros_activos = any([query_cliente, query_mascota, query_fecha, query_veterinario, query_veterinaria, query_procedimiento])
     
     # Obtener objetos para mostrar en los resultados
     veterinario_seleccionado = None
@@ -311,6 +317,7 @@ def ver_consultas(request):
             pass
     
     veterinaria_seleccionada = query_veterinaria
+    procedimiento_seleccionado = query_procedimiento
     
     # Ordenar de la más nueva a la más vieja
     consultas = consultas.order_by('-fechaConsulta')
@@ -322,11 +329,14 @@ def ver_consultas(request):
         'query_fecha': query_fecha,
         'query_veterinario': query_veterinario,
         'query_veterinaria': query_veterinaria,
+        'query_procedimiento': query_procedimiento,  # Nuevo
         'veterinarios': veterinarios,
         'clinicas': clinicas,
+        'procedimientos': procedimientos,  # Nuevo
         'filtros_activos': filtros_activos,
         'veterinario_seleccionado': veterinario_seleccionado,
         'veterinaria_seleccionada': veterinaria_seleccionada,
+        'procedimiento_seleccionado': procedimiento_seleccionado,  # Nuevo
     }
     
     return render(
@@ -334,7 +344,6 @@ def ver_consultas(request):
         'consultasMedicas/consultasMedicasBase/verConsultas.html',
         context
     )
-
 
 
 

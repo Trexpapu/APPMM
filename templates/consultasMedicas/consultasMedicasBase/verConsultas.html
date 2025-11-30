@@ -159,6 +159,37 @@
                     </div>
                 </div>
 
+                <!-- Filtro por Procedimiento (Tipo de Consulta) -->
+                <div class="filtro-group">
+                    <label for="q_procedimiento" class="filtro-label">
+                        🩺 Tipo de Consulta
+                    </label>
+                    <div class="filtro-input-container">
+                        <select 
+                            id="q_procedimiento" 
+                            name="q_procedimiento" 
+                            class="filtro-input"
+                        >
+                            <option value="">Todos los tipos</option>
+                            {% for proc in procedimientos %}
+                            <option value="{{ proc.0 }}" {% if query_procedimiento == proc.0 %}selected{% endif %}>
+                                {{ proc.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if query_procedimiento %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_procedimiento').value = ''; this.form.submit();"
+                            title="Limpiar filtro de procedimiento"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
                 <!-- Botones de acción -->
                 <div class="filtro-actions">
                     <button type="submit" class="btn-home filtro-submit">
@@ -194,6 +225,9 @@
             {% if query_veterinaria %}
                 {% if query_cliente or query_mascota or query_fecha or query_veterinario %}y {% endif %}clínica: "<strong>{{ veterinaria_seleccionada }}</strong>"
             {% endif %}
+            {% if query_procedimiento %}
+                {% if query_cliente or query_mascota or query_fecha or query_veterinario or query_veterinaria %}y {% endif %}tipo: "<strong>{{ procedimiento_seleccionado }}</strong>"
+            {% endif %}
         </p>
     </div>
     {% else %}
@@ -212,7 +246,7 @@
                     <th>🐕 Mascota</th>
                     <th>🔬 Especie</th>
                     <th>🎯 Raza</th>
-                    <th>📝 Motivo</th>
+                    <th>🩺 Tipo de Consulta</th>  <!-- Cambiado de Motivo a Tipo de Consulta -->
                     <th>📅 Fecha</th>
                     <th>👨‍⚕️ Veterinario</th>
                     <th>🏥 Clínica</th>
@@ -249,13 +283,8 @@
                     <td>{{ consulta.mascota.especie|default:"-" }}</td>
                     <td>{{ consulta.mascota.raza|default:"-" }}</td>
                     <td>
-                        {% if consulta.motivoConsulta %}
-                            <div class="truncate-text" title="{{ consulta.motivoConsulta }}">
-                                {{ consulta.motivoConsulta|truncatewords:8 }}
-                            </div>
-                        {% else %}
-                            -
-                        {% endif %}
+                        <!-- Mostrar el tipo de consulta (procedimiento) -->
+                        {{ consulta.procedimiento|default:"-" }}
                     </td>
                     <td>{{ consulta.fechaConsulta }}</td>
                     <td>{{ consulta.veterinario.get_full_name|default:consulta.veterinario.username }}</td>

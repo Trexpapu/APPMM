@@ -1,4 +1,6 @@
 from django.shortcuts import render
+
+from Procedimientos.models import ListaVacunas
 from .models import *
 from ClientesMascotas.models import *
 from .forms import *
@@ -78,7 +80,7 @@ def servicio_guarderia_crear(request):
             mascota.save()
             guarderia.save()
             messages.success(request, "Servicio de guardería registrado correctamente.")
-            return redirect('index-procedimientos')
+            return redirect('index-guarderia-hospitalizacion')
     else:
         form = GuarderiaForm(initial=initial_data)
     
@@ -515,3 +517,12 @@ def generar_pdf_guarderia(request, guarderia_id):
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     
     return response
+
+
+# Vista para eliminar vacuna
+@login_required
+def servicio_guarderia_eliminar(request, pk):
+    """View to delete an existing pet."""
+    guarderia = get_object_or_404(Guarderia, pk=pk)
+    guarderia.delete()
+    return redirect('historial-guarderia')
