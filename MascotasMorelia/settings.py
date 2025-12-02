@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'Procedimientos',
     'Agenda',
     'GuarderiaHospitalizacion',
+    'Estetica',
 ]
 
 MIDDLEWARE = [

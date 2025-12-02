@@ -171,7 +171,7 @@
         <h3>🖼️ Fotos</h3>
         <div class="photos-grid">
             <div class="photo-container">
-                <h4>Foto Antes</h4>
+                <h4>Foto de Ingreso</h4>
                 {% if guarderia.fotoAntes %}
                     <img src="data:image/jpeg;base64,{{ guarderia.fotoAntes }}" alt="Foto antes de la guardería" class="operation-photo">
                 {% else %}
@@ -181,7 +181,7 @@
                 {% endif %}
             </div>
             <div class="photo-container">
-                <h4>Foto Después</h4>
+                <h4>Foto de Egreso</h4>
                 {% if guarderia.fotoDespues %}
                     <img src="data:image/jpeg;base64,{{ guarderia.fotoDespues }}" alt="Foto después de la guardería" class="operation-photo">
                 {% else %}

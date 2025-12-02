@@ -1,0 +1,390 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Servicio de Hospitalización{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2>🏥 Editar Servicio de Hospitalización</h2>
+        <div class="action-buttons">
+            <a href="{% url 'servicio_hospitalizacion_detalle' hospitalizacion_actual.pk %}" class="btn-home" style="background: #17a2b8;">
+                👁️ Ver Detalles
+            </a>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- 🔍 Búsqueda y selección de mascota -->
+        <div class="form-section">
+            <h3>🐾 Selección de Mascota</h3>
+            
+            <div class="form-group">
+                <label for="mascota-search">🔍 Buscar mascota:</label>
+                <input 
+                    type="text" 
+                    id="mascota-search" 
+                    placeholder="Buscar mascota por nombre, raza, especie, nombre del cliente, email o teléfono" 
+                    class="search-input"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="mascota">🐕 Mascota (actual):</label>
+                <div class="current-selection">
+                    <strong>{{ hospitalizacion_actual.mascota.nombre }}</strong> - 
+                    {{ hospitalizacion_actual.mascota.raza }} - 
+                    {{ hospitalizacion_actual.mascota.especie }} - 
+                    Dueño: {{ hospitalizacion_actual.mascota.cliente.nombre }}
+                </div>
+                <input type="hidden" name="mascota" value="{{ hospitalizacion_actual.mascota.id }}">
+                <small class="help-text">La mascota no se puede cambiar en la edición. Si es necesario, cree un nuevo registro.</small>
+            </div>
+        </div>
+
+        <!-- 📋 INFORMACIÓN COMPLETA DE LA MASCOTA -->
+        {% if datos_mascota %}
+        <div class="form-section" style="background: #f0f8ff; border-left: 4px solid #3498db;">
+            <h3>📋 Información Completa de la Mascota</h3>
+            
+            <!-- Información Básica -->
+            <div class="info-section">
+                <h4>👤 Información Básica</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>🐕 Nombre:</strong>
+                        <span>{{ datos_mascota.nombre }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>🔬 Especie:</strong>
+                        <span>{{ datos_mascota.especie }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>🎯 Raza:</strong>
+                        <span>{{ datos_mascota.raza }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>⚖️ Peso:</strong>
+                        <span>{{ datos_mascota.peso }} kg</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>📅 Fecha Nacimiento:</strong>
+                        <span>{{ datos_mascota.fechaNacimiento }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>⚧️ Sexo:</strong>
+                        <span>{{ datos_mascota.sexo }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>❤️ Estado:</strong>
+                        <span>{% if datos_mascota.vive %}Sí{% else %}No{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información del Dueño -->
+            <div class="info-section">
+                <h4>👤 Información del Dueño</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>👤 Dueño:</strong>
+                        <span>{{ datos_mascota.cliente_nombre }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>📞 Teléfono:</strong>
+                        <span>{{ datos_mascota.cliente_telefono }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>📧 Email:</strong>
+                        <span>{{ datos_mascota.cliente_email }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historial Médico -->
+            <div class="info-section">
+                <h4>🩺 Historial Médico</h4>
+                
+                <!-- Vacunas -->
+                <div class="info-item full-width">
+                    <strong>💉 Vacunas:</strong>
+                    <div class="info-content">
+                        {{ datos_mascota.vacunas|default:"No especificado" }}
+                    </div>
+                </div>
+
+                <!-- Desparasitación -->
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>📅 Última Desparasitación:</strong>
+                        <span>{{ datos_mascota.ultimaDesparasitacion|default:"No registrada" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>💊 Último Desparasitante:</strong>
+                        <span>{{ datos_mascota.ultimoDesparasitante|default:"No especificado" }}</span>
+                    </div>
+                </div>
+
+                <!-- Alergias -->
+                <div class="info-item full-width">
+                    <strong>⚠️ Alergias:</strong>
+                    <div class="info-content">
+                        {{ datos_mascota.alergias|default:"No especificado" }}
+                    </div>
+                </div>
+
+                <!-- Alimento -->
+                <div class="info-item full-width">
+                    <strong>🍖 Alimento:</strong>
+                    <div class="info-content">
+                        {{ datos_mascota.alimento|default:"No especificado" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 📝 FORMULARIO DE HOSPITALIZACIÓN - USANDO EL FORM DE DJANGO -->
+        <div class="form-section">
+            <h3>🏥 Datos del Servicio de Hospitalización</h3>
+            
+            {% if form.errors %}
+            <div class="alert alert-error">
+                <strong>❌ Por favor corrige los siguientes errores:</strong>
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <div class="form-grid">
+                <!-- Mostrar campos del formulario -->
+                {% for field in form %}
+                    <div class="form-group {% if field.name in 'motivo,diagnostico,observaciones,tratamientos,evolucion,otrosDatos' %}full-width{% endif %}">
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="help-text">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="field-errors">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                
+                <!-- Campos de imagen MANUALES - NO son parte del formulario Django UpdateForm -->
+                <div class="form-group">
+                    <label for="fotoAntes">🖼️ Foto de Ingreso:</label>
+                    <input type="file" id="fotoAntes" name="fotoAntes" class="form-control" accept="image/*">
+                    {% if hospitalizacion_actual.fotoAntes %}
+                    <div class="current-image">
+                        <small>Imagen actual:</small>
+                        <div class="image-preview">
+                            <img src="data:image/jpeg;base64,{{ hospitalizacion_actual.fotoAntes }}" alt="Foto al ingreso" style="max-width: 200px; max-height: 200px;">
+                        </div>
+                        <small class="help-text">Dejar vacío para mantener la imagen actual</small>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="fotoDespues">🖼️ Foto de Egreso:</label>
+                    <input type="file" id="fotoDespues" name="fotoDespues" class="form-control" accept="image/*">
+                    {% if hospitalizacion_actual.fotoDespues %}
+                    <div class="current-image">
+                        <small>Imagen actual:</small>
+                        <div class="image-preview">
+                            <img src="data:image/jpeg;base64,{{ hospitalizacion_actual.fotoDespues }}" alt="Foto al egreso" style="max-width: 200px; max-height: 200px;">
+                        </div>
+                        <small class="help-text">Dejar vacío para mantener la imagen actual</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn-home" style="background: #28a745; padding: 12px 24px;">
+                💾 Guardar Cambios
+            </button>
+            <a href="{% url 'servicio_hospitalizacion_detalle' hospitalizacion_actual.pk %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
+                ❌ Cancelar
+            </a>
+        </div>
+    </form>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('mascota-search');
+    
+    // Si quieres permitir cambiar de mascota, puedes agregar un dropdown
+    // En este caso, como no se permite cambiar la mascota, el search es solo informativo
+    
+    // 🎯 CARGAR INFORMACIÓN DE MASCOTA (solo para ver información, no para cambiar)
+    if (window.location.search.includes('mascota=')) {
+        // Ya se cargó la información de la mascota
+    }
+});
+</script>
+
+<style>
+.form-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.field-errors {
+    color: #dc3545;
+    font-size: 0.875em;
+    margin-top: 5px;
+}
+
+.help-text {
+    color: #6c757d;
+    font-size: 0.875em;
+    margin-top: 5px;
+    display: block;
+}
+
+.info-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.info-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.info-section h4 {
+    color: #495057;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #3498db;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.info-item strong {
+    color: #495057;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+.info-content {
+    background: #f8f9fa;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border-left: 3px solid #17a2b8;
+    min-height: 20px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+
+select.form-control {
+    height: auto;
+}
+
+.alert.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid #f5c6cb;
+    margin-bottom: 15px;
+}
+
+.alert.alert-error ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.current-selection {
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid #17a2b8;
+    margin-bottom: 10px;
+}
+
+.current-image {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid #17a2b8;
+}
+
+.image-preview {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.image-preview img {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+}
+</style>
+{% endblock %}

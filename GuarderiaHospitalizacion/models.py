@@ -9,7 +9,7 @@ class Guarderia(models.Model):
         ('Mascotas Morelia Mano Huevona', 'Mascotas Morelia Mano Huevona'),
     ]
     ESTADOS = [
-        ('En guardería', 'En guardería'),
+        ('Guardería', 'Guardería'),
         ('Alta', 'Alta'),
     ]
     mascota = models.ForeignKey(Mascotas, on_delete=models.CASCADE)
@@ -26,7 +26,7 @@ class Guarderia(models.Model):
     estado = models.CharField(
         max_length=255,
         choices=ESTADOS,
-        default='En guardería'
+        default='Guardería'
     )
     fechaEntrada = models.DateField()
     fechaSalidaProgramada = models.DateField(blank= True, null = True)
@@ -74,6 +74,9 @@ class Hospitalizacion(models.Model):
         choices=CLINICAS,
         default='Mascotas Morelia Centro'
     )
+
+    pagado = models.FloatField(default=0)#esto es por si deja anticipo
+    pagoTotal = models.FloatField(default=0)
 
     # Fechas
     fechaEntrada = models.DateField()

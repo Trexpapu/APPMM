@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+
+{% block title %}Detalle de Hospitalización - {{ hospitalizacion.mascota.nombre }}{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2>🏥 Detalle de Servicio de Hospitalización</h2>
+        <div class="action-buttons">
+            <a href="{% url 'servicio_hospitalizacion_editar' hospitalizacion.pk %}" class="btn-home" style="background: #ffc107; color: black;">
+                ✏️ Editar
+            </a>
+            <a href="{% url 'generar_pdf_hospitalizacion' hospitalizacion.pk %}" class="btn-home" style="background: #dc3545;">
+                📄 Descargar PDF
+            </a>
+        </div>
+    </div>
+
+    <!-- Información General -->
+    <div class="form-section" style="background: #f0f8ff; border-left: 4px solid #3498db;">
+        <h3>📋 Información General</h3>
+        <div class="info-grid">
+            <div class="info-item">
+                <strong>👤 Cliente:</strong>
+                <span>{{ hospitalizacion.mascota.cliente.nombre }}</span>
+            </div>
+            <div class="info-item">
+                <strong>📞 Teléfono:</strong>
+                <span>{{ hospitalizacion.mascota.cliente.telefono|default:"No especificado" }}</span>
+            </div>
+            <div class="info-item">
+                <strong>📧 Email:</strong>
+                <span>{{ hospitalizacion.mascota.cliente.email|default:"No especificado" }}</span>
+            </div>
+            <div class="info-item">
+                <strong>🐕 Mascota:</strong>
+                <span>{{ hospitalizacion.mascota.nombre }}</span>
+            </div>
+            <div class="info-item">
+                <strong>🔬 Especie:</strong>
+                <span>{{ hospitalizacion.mascota.especie|default:"No especificado" }}</span>
+            </div>
+            <div class="info-item">
+                <strong>🎯 Raza:</strong>
+                <span>{{ hospitalizacion.mascota.raza|default:"No especificado" }}</span>
+            </div>
+            <div class="info-item">
+                <strong>🏥 Clínica:</strong>
+                <span>{{ hospitalizacion.clinicaVeterinaria }}</span>
+            </div>
+            <div class="info-item">
+                <strong>📊 Estado:</strong>
+                <span class="status-badge status-{{ hospitalizacion.estado|lower }}">
+                    {{ hospitalizacion.estado }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fechas -->
+    <div class="form-section">
+        <h3>📅 Fechas</h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <strong>Fecha de Ingreso:</strong>
+                <p>{{ hospitalizacion.fechaEntrada|date:"d/m/Y" }}</p>
+            </div>
+            <div class="form-group">
+                <strong>Fecha de Salida:</strong>
+                <p>
+                    {% if hospitalizacion.fechaSalida %}
+                        {{ hospitalizacion.fechaSalida|date:"d/m/Y" }}
+                    {% else %}
+                        <span class="badge badge-info">En hospitalización</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del Servicio -->
+    <div class="form-grid" style="gap: 20px;">
+        <div class="form-section">
+            <h3>🏥 Motivo de Hospitalización</h3>
+            <div class="description-content">
+                {% if hospitalizacion.motivo %}
+                    {{ hospitalizacion.motivo|linebreaks }}
+                {% else %}
+                    <p class="no-data">No hay información sobre el motivo.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>🩺 Diagnóstico</h3>
+            <div class="description-content">
+                {% if hospitalizacion.diagnostico %}
+                    {{ hospitalizacion.diagnostico|linebreaks }}
+                {% else %}
+                    <p class="no-data">No hay diagnóstico registrado.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>📝 Observaciones</h3>
+            <div class="description-content">
+                {% if hospitalizacion.observaciones %}
+                    {{ hospitalizacion.observaciones|linebreaks }}
+                {% else %}
+                    <p class="no-data">No hay observaciones registradas.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>💊 Tratamientos</h3>
+            <div class="description-content">
+                {% if hospitalizacion.tratamientos %}
+                    {{ hospitalizacion.tratamientos|linebreaks }}
+                {% else %}
+                    <p class="no-data">No hay tratamientos registrados.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3>📈 Evolución</h3>
+            <div class="description-content">
+                {% if hospitalizacion.evolucion %}
+                    {{ hospitalizacion.evolucion|linebreaks }}
+                {% else %}
+                    <p class="no-data">No hay evolución registrada.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="form-section full-width">
+            <h3>📋 Otros Datos</h3>
+            <div class="description-content">
+                {% if hospitalizacion.otrosDatos %}
+                    {{ hospitalizacion.otrosDatos|linebreaks }}
+                {% else %}
+                    <p class="no-data">No hay otros datos registrados.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Información Financiera -->
+    <div class="form-section">
+        <h3>💰 Información Financiera</h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <strong>Pagado:</strong>
+                <p>${{ hospitalizacion.pagado }}</p>
+            </div>
+            <div class="form-group">
+                <strong>Pago Total:</strong>
+                <p>${{ hospitalizacion.pagoTotal }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fotos -->
+    <div class="form-section">
+        <h3>🖼️ Fotos</h3>
+        <div class="photos-grid">
+            <div class="photo-container">
+                <h4>Foto de Ingreso</h4>
+                {% if hospitalizacion.fotoAntes %}
+                    <img src="data:image/jpeg;base64,{{ hospitalizacion.fotoAntes }}" alt="Foto al ingreso" class="operation-photo">
+                {% else %}
+                    <div class="no-photo">
+                        <p>No hay foto disponible</p>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="photo-container">
+                <h4>Foto de Egreso</h4>
+                {% if hospitalizacion.fotoDespues %}
+                    <img src="data:image/jpeg;base64,{{ hospitalizacion.fotoDespues }}" alt="Foto al egreso" class="operation-photo">
+                {% else %}
+                    <div class="no-photo">
+                        <p>No hay foto disponible</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="action-buttons" style="margin-top: 30px;">
+        <a href="{% url 'servicio_hospitalizacion_editar' hospitalizacion.pk %}" class="btn-home" style="background: #ffc107; color: black; padding: 12px 24px;">
+            ✏️ Editar Hospitalización
+        </a>
+        <a href="{% url 'historial-hospitalizacion' %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
+            📋 Volver al Listado
+        </a>
+    </div>
+</section>
+
+<style>
+.form-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.info-item strong {
+    color: #495057;
+    margin-bottom: 5px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.description-content {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    min-height: 100px;
+}
+
+.photos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.photo-container {
+    text-align: center;
+}
+
+.operation-photo {
+    max-width: 100%;
+    max-height: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.no-photo {
+    background: #f8f9fa;
+    padding: 40px 20px;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+    color: #6c757d;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+.no-data {
+    color: #6c757d;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status-hospitalizado {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-alta {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+</style>
+{% endblock %}

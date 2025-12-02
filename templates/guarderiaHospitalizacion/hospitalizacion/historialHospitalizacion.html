@@ -1,0 +1,465 @@
+{% extends 'base.html' %}
+
+{% block title %}🏥 Historial de Hospitalizaciones{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2>🏥 Historial de Hospitalizaciones</h2>
+        <a href="{% url 'servicio_hospitalizacion_crear' %}" class="btn-home btn-agregar">
+            ➕ Nueva Hospitalización
+        </a>
+    </div>
+
+    <!-- Filtros Combinados -->
+    <div class="filtros-combinados">
+        <form method="get" action="" class="filtros-form">
+            <div class="filtros-grid">
+                <!-- Filtro por Cliente -->
+                <div class="filtro-group">
+                    <label for="q_cliente" class="filtro-label">
+                        👤 Buscar por Cliente
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q_cliente" 
+                            name="q_cliente" 
+                            placeholder="Nombre, email o teléfono del cliente..." 
+                            class="filtro-input"
+                            value="{{ query_cliente }}"
+                        >
+                        {% if query_cliente %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_cliente').value = ''; this.form.submit();"
+                            title="Limpiar filtro de cliente"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Mascota -->
+                <div class="filtro-group">
+                    <label for="q_mascota" class="filtro-label">
+                        🐕 Buscar por Mascota
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q_mascota" 
+                            name="q_mascota" 
+                            placeholder="Nombre, raza o especie" 
+                            class="filtro-input"
+                            value="{{ query_mascota }}"
+                        >
+                        {% if query_mascota %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_mascota').value = ''; this.form.submit();"
+                            title="Limpiar filtro de mascota"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Clínica -->
+                <div class="filtro-group">
+                    <label for="q_veterinaria" class="filtro-label">
+                        🏥 Clínica Veterinaria
+                    </label>
+                    <div class="filtro-input-container">
+                        <select id="q_veterinaria" name="q_veterinaria" class="filtro-input">
+                            <option value="">Todas las clínicas</option>
+                            {% for clinica in clinicas %}
+                            <option value="{{ clinica.0 }}" {% if query_veterinaria == clinica.0 %}selected{% endif %}>
+                                {{ clinica.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if query_veterinaria %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_veterinaria').value = ''; this.form.submit();"
+                            title="Limpiar filtro de clínica"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Estado -->
+                <div class="filtro-group">
+                    <label for="q_estado" class="filtro-label">
+                        📊 Estado
+                    </label>
+                    <div class="filtro-input-container">
+                        <select id="q_estado" name="q_estado" class="filtro-input">
+                            <option value="">Todos los estados</option>
+                            {% for estado in estados %}
+                            <option value="{{ estado.0 }}" {% if query_estado == estado.0 %}selected{% endif %}>
+                                {{ estado.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if query_estado %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_estado').value = ''; this.form.submit();"
+                            title="Limpiar filtro de estado"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Fecha de Entrada -->
+                <div class="filtro-group">
+                    <label for="q_fecha_entrada" class="filtro-label">
+                        📅 Fecha de Ingreso
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="date" 
+                            id="q_fecha_entrada" 
+                            name="q_fecha_entrada" 
+                            class="filtro-input"
+                            value="{{ query_fecha_entrada }}"
+                        >
+                        {% if query_fecha_entrada %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_fecha_entrada').value = ''; this.form.submit();"
+                            title="Limpiar filtro de fecha"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="filtro-actions">
+                    <button type="submit" class="btn-home filtro-submit">
+                        🔍 Buscar
+                    </button>
+                    {% if filtros_activos %}
+                    <a href="{% url 'historial-hospitalizacion' %}" class="btn-home filtro-reset">
+                        🗑️ Limpiar Filtros
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Información de resultados -->
+    {% if filtros_activos %}
+    <div class="results-info">
+        <p>
+            📊 Mostrando <strong>{{ hospitalizaciones|length }}</strong> hospitalización(es)
+            {% if query_cliente %}para cliente: "<strong>{{ query_cliente }}</strong>"{% endif %}
+            {% if query_mascota %}{% if query_cliente %}y {% endif %}mascota: "<strong>{{ query_mascota }}</strong>"{% endif %}
+            {% if query_veterinaria %}{% if query_cliente or query_mascota %}en {% else %}en {% endif %}clínica: "<strong>{{ clinica_seleccionada }}</strong>"{% endif %}
+            {% if query_estado %}{% if query_cliente or query_mascota or query_veterinaria %}con estado: "<strong>{{ estado_seleccionado }}</strong>"{% else %}con estado: "<strong>{{ estado_seleccionado }}</strong>"{% endif %}{% endif %}
+            {% if query_fecha_entrada %}{% if query_cliente or query_mascota or query_veterinaria or query_estado %}el {% else %}el {% endif %}<strong>{{ query_fecha_entrada }}</strong>{% endif %}
+        </p>
+    </div>
+    {% else %}
+    <div class="results-info">
+        <p>📊 Total de hospitalizaciones: <strong>{{ hospitalizaciones|length }}</strong></p>
+    </div>
+    {% endif %}
+
+    <div class="custom-table-container">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>👤 Cliente</th>
+                    <th>📧 Email</th>
+                    <th>📞 Teléfono</th>
+                    <th>🐕 Mascota</th>
+                    <th>🔬 Especie</th>
+                    <th>🎯 Raza</th>
+                    <th>🏥 Motivo</th>
+                    <th>🩺 Diagnóstico</th>
+                    <th>📅 Fecha Ingreso</th>
+                    <th>📅 Fecha Salida</th>
+                    <th>📊 Estado</th>
+                    <th>🏥 Clínica</th>
+                    <th>💰 Pagado</th>
+                    <th>💰 Pago Total</th>
+                    <th>⚡ Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hospitalizacion in hospitalizaciones %}
+                <tr>
+                    <td>
+                        <div class="client-info">
+                            <strong>{{ hospitalizacion.mascota.cliente.nombre }}</strong>
+                        </div>
+                    </td>
+                    <td>{{ hospitalizacion.mascota.cliente.email|default:"-" }}</td>
+                    <td>{{ hospitalizacion.mascota.cliente.telefono|default:"-" }}</td>
+                    <td>
+                        <div class="pet-info">
+                            <strong>{{ hospitalizacion.mascota.nombre }}</strong>
+                            <div class="pet-details">
+                                <small>🎯 {{ hospitalizacion.mascota.raza|default:"Sin raza" }}</small>
+                                <small>🔬 {{ hospitalizacion.mascota.especie|default:"Sin especie" }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ hospitalizacion.mascota.especie|default:"-" }}</td>
+                    <td>{{ hospitalizacion.mascota.raza|default:"-" }}</td>
+                    <td>
+                        {% if hospitalizacion.motivo %}
+                            <div class="truncate-text" title="{{ hospitalizacion.motivo }}">
+                                {{ hospitalizacion.motivo|truncatewords:8 }}
+                            </div>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if hospitalizacion.diagnostico %}
+                            <div class="truncate-text" title="{{ hospitalizacion.diagnostico }}">
+                                {{ hospitalizacion.diagnostico|truncatewords:8 }}
+                            </div>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ hospitalizacion.fechaEntrada }}</td>
+                    <td>
+                        {% if hospitalizacion.fechaSalida %}
+                            {{ hospitalizacion.fechaSalida }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="estado-badge estado-{{ hospitalizacion.estado|lower }}">
+                            {{ hospitalizacion.estado }}
+                        </span>
+                    </td>
+                    <td>{{ hospitalizacion.clinicaVeterinaria|default:"-" }}</td>
+                    <td>
+                        <strong>${{ hospitalizacion.pagado }}</strong>
+                    </td>
+                    <td>
+                        <strong>${{ hospitalizacion.pagoTotal }}</strong>
+                    </td>
+                    <td>
+                        <div class="action-buttons compact">
+                            <a href="{% url 'servicio_hospitalizacion_detalle' hospitalizacion.pk %}" 
+                               class="btn-home" style="background: #17a2b8; padding: 5px 10px;"
+                               title="Ver detalles">
+                                👁️
+                            </a>
+                            <a href="{% url 'servicio_hospitalizacion_editar' hospitalizacion.pk %}" 
+                               class="btn-home" 
+                               style="background: #ffc107; color: black; padding: 5px 10px;"
+                               title="Editar hospitalización">
+                                ✏️
+                            </a>
+                            <a href="{% url 'servicio_hospitalizacion_eliminar' hospitalizacion.pk %}" 
+                               class="btn-home" 
+                               style="background: #dc3545; padding: 5px 10px;" 
+                               onclick="return confirm('¿Estás seguro de que quieres eliminar esta hospitalización de {{ hospitalizacion.mascota.nombre }}?');"
+                               title="Eliminar hospitalización">
+                                🗑️
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="15" class="no-data">
+                        {% if filtros_activos %}
+                            🔍 No se encontraron hospitalizaciones que coincidan con los filtros aplicados.
+                            <a href="{% url 'historial-hospitalizacion' %}" style="color: #3498db; text-decoration: none; margin-left: 10px;">
+                                📋 Ver todas las hospitalizaciones
+                            </a>
+                        {% else %}
+                            📝 No hay hospitalizaciones registradas. 
+                            <a href="{% url 'servicio_hospitalizacion_crear' %}" style="color: #3498db; text-decoration: none; margin-left: 10px;">
+                                ➕ Registrar primera hospitalización
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<style>
+.filtros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.filtro-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filtro-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.filtro-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.filtro-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filtro-clear {
+    position: absolute;
+    right: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px 5px;
+}
+
+.filtro-actions {
+    display: flex;
+    gap: 10px;
+    align-items: end;
+}
+
+.filtro-submit, .filtro-reset {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.results-info {
+    background: #e9ecef;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border-left: 4px solid #007bff;
+}
+
+.client-info, .pet-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.client-details, .pet-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.client-details small, .pet-details small {
+    font-size: 0.75em;
+    color: #6c757d;
+}
+
+.truncate-text {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.action-buttons.compact {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+
+.no-data {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Estilos para los badges de estado */
+.estado-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.estado-hospitalizado {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.estado-alta {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* Ajustes para la tabla */
+.custom-table-container {
+    overflow-x: auto;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.custom-table thead {
+    background-color: #f8f9fa;
+}
+
+.custom-table th {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: bold;
+    color: #495057;
+}
+
+.custom-table td {
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: top;
+}
+
+.custom-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+</style>
+{% endblock %}
