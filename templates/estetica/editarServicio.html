@@ -1,0 +1,487 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Servicio de Estética{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2>✂️ Editar Servicio de Estética</h2>
+        <div class="action-buttons">
+            <a href="{% url 'servicio_estetica_detalle' estetica_actual.pk %}" class="btn-home" style="background: #17a2b8;">
+                👁️ Ver Detalles
+            </a>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- 🔍 Búsqueda y selección de mascota -->
+        <div class="form-section">
+            <h3>🐾 Selección de Mascota</h3>
+            
+            <div class="form-group">
+                <label for="mascota-search">🔍 Buscar mascota:</label>
+                <input 
+                    type="text" 
+                    id="mascota-search" 
+                    placeholder="Buscar mascota por nombre, raza, especie, nombre del cliente, email o teléfono" 
+                    class="search-input"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="mascota">🐕 Mascota:</label>
+                <select name="mascota" id="mascota-select" class="form-control" required>
+                    <option value="">-- Selecciona una mascota --</option>
+                    {% for mascota in mascotas %}
+                        <option value="{{ mascota.id }}" 
+                            {% if mascota.id|stringformat:"s" == mascota_id %}selected{% endif %}
+                            {% if estetica_actual.mascota.id == mascota.id %}selected{% endif %}>
+                            {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - Dueño: {{ mascota.cliente.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <small class="help-text">Selecciona la mascota para este servicio. Puedes buscar arriba para filtrar.</small>
+            </div>
+        </div>
+
+        <!-- 📋 INFORMACIÓN COMPLETA DE LA MASCOTA -->
+        {% if datos_mascota %}
+        <div class="form-section" style="background: #f0f8ff; border-left: 4px solid #3498db;">
+            <h3>📋 Información Completa de la Mascota</h3>
+            
+            <!-- Información Básica -->
+            <div class="info-section">
+                <h4>👤 Información Básica</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>🐕 Nombre:</strong>
+                        <span>{{ datos_mascota.nombre }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>🔬 Especie:</strong>
+                        <span>{{ datos_mascota.especie }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>🎯 Raza:</strong>
+                        <span>{{ datos_mascota.raza }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>⚖️ Peso:</strong>
+                        <span>{{ datos_mascota.peso }} kg</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>📅 Fecha Nacimiento:</strong>
+                        <span>{{ datos_mascota.fechaNacimiento }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>⚧️ Sexo:</strong>
+                        <span>{{ datos_mascota.sexo }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>❤️ Estado:</strong>
+                        <span>{% if datos_mascota.vive %}Sí{% else %}No{% endif %}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información del Dueño -->
+            <div class="info-section">
+                <h4>👤 Información del Dueño</h4>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>👤 Dueño:</strong>
+                        <span>{{ datos_mascota.cliente_nombre }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>📞 Teléfono:</strong>
+                        <span>{{ datos_mascota.cliente_telefono }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>📧 Email:</strong>
+                        <span>{{ datos_mascota.cliente_email }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historial Médico -->
+            <div class="info-section">
+                <h4>🩺 Historial Médico</h4>
+                
+                <!-- Vacunas -->
+                <div class="info-item full-width">
+                    <strong>💉 Vacunas:</strong>
+                    <div class="info-content">
+                        {{ datos_mascota.vacunas|default:"No especificado" }}
+                    </div>
+                </div>
+
+                <!-- Desparasitación -->
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>📅 Última Desparasitación:</strong>
+                        <span>{{ datos_mascota.ultimaDesparasitacion|default:"No registrada" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>💊 Último Desparasitante:</strong>
+                        <span>{{ datos_mascota.ultimoDesparasitante|default:"No especificado" }}</span>
+                    </div>
+                </div>
+
+                <!-- Alergias -->
+                <div class="info-item full-width">
+                    <strong>⚠️ Alergias:</strong>
+                    <div class="info-content">
+                        {{ datos_mascota.alergias|default:"No especificado" }}
+                    </div>
+                </div>
+
+                <!-- Alimento -->
+                <div class="info-item full-width">
+                    <strong>🍖 Alimento:</strong>
+                    <div class="info-content">
+                        {{ datos_mascota.alimento|default:"No especificado" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 📝 FORMULARIO DE ESTÉTICA - USANDO EL FORM DE DJANGO -->
+        <div class="form-section">
+            <h3>✂️ Datos del Servicio de Estética</h3>
+            
+            {% if form.errors %}
+            <div class="alert alert-error">
+                <strong>❌ Por favor corrige los siguientes errores:</strong>
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            
+            <div class="form-grid">
+                <!-- Mostrar campos del formulario -->
+                {% for field in form %}
+                    <div class="form-group {% if field.name in 'condicionesDeMascota,servicio,detallesServicio' %}full-width{% endif %} 
+                                 {% if field.name == 'espeficiacionCorte' %}especificacion-corte{% endif %}"
+                         {% if field.name == 'espeficiacionCorte' and estetica_actual.cortesDePeloEspeciales != 'Otro Especifique' %}style="display: none;"{% endif %}>
+                        <label for="{{ field.id_for_label }}">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="help-text">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="field-errors">
+                                {{ field.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                
+                <!-- Campos de imagen MANUALES - NO son parte del formulario Django UpdateForm -->
+                <div class="form-group">
+                    <label for="fotoAntes">🖼️ Foto Antes del Servicio:</label>
+                    <input type="file" id="fotoAntes" name="fotoAntes" class="form-control" accept="image/*">
+                    {% if estetica_actual.fotoAntes %}
+                    <div class="current-image">
+                        <small>Imagen actual:</small>
+                        <div class="image-preview">
+                            <img src="data:image/jpeg;base64,{{ estetica_actual.fotoAntes }}" alt="Foto antes del servicio" style="max-width: 200px; max-height: 200px;">
+                        </div>
+                        <small class="help-text">Dejar vacío para mantener la imagen actual</small>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="fotoDespues">🖼️ Foto Después del Servicio:</label>
+                    <input type="file" id="fotoDespues" name="fotoDespues" class="form-control" accept="image/*">
+                    {% if estetica_actual.fotoDespues %}
+                    <div class="current-image">
+                        <small>Imagen actual:</small>
+                        <div class="image-preview">
+                            <img src="data:image/jpeg;base64,{{ estetica_actual.fotoDespues }}" alt="Foto después del servicio" style="max-width: 200px; max-height: 200px;">
+                        </div>
+                        <small class="help-text">Dejar vacío para mantener la imagen actual</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button type="submit" class="btn-home" style="background: #28a745; padding: 12px 24px;">
+                💾 Guardar Cambios
+            </button>
+            <a href="{% url 'servicio_estetica_detalle' estetica_actual.pk %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
+                ❌ Cancelar
+            </a>
+        </div>
+    </form>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 🔍 Búsqueda en tiempo real de mascotas
+    const searchInput = document.getElementById('mascota-search');
+    const selectElement = document.getElementById('mascota-select');
+    
+    if (searchInput && selectElement) {
+        const allOptions = Array.from(selectElement.options);
+        
+        // Ocultar el primer option (placeholder)
+        if (allOptions[0]) {
+            allOptions[0].style.display = 'none';
+        }
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            // Mostrar todas las opciones primero
+            allOptions.forEach(option => {
+                option.style.display = '';
+            });
+            
+            if (searchTerm) {
+                // Filtrar opciones
+                allOptions.forEach(option => {
+                    if (option.value && option.textContent.toLowerCase().includes(searchTerm)) {
+                        option.style.display = '';
+                    } else {
+                        option.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Mostrar el placeholder si no hay búsqueda
+            if (allOptions[0]) {
+                allOptions[0].style.display = searchTerm ? 'none' : '';
+            }
+        });
+    }
+    
+    // Actualizar la página cuando se selecciona una mascota diferente
+    if (selectElement) {
+        selectElement.addEventListener('change', function() {
+            const selectedMascotaId = this.value;
+            if (selectedMascotaId) {
+                // Recargar la página con el parámetro de mascota seleccionada
+                const currentUrl = window.location.pathname;
+                window.location.href = currentUrl + '?mascota=' + selectedMascotaId;
+            }
+        });
+    }
+    
+    // JavaScript para manejar la especificación de corte en modo edición
+    const cortesSelect = document.getElementById('id_cortesDePeloEspeciales_update');
+    const especificacionCorteDiv = document.querySelector('.especificacion-corte');
+    const especificacionCorteInput = document.getElementById('id_espeficiacionCorte_update');
+
+    // Función para mostrar/ocultar el campo de especificación
+    function toggleEspecificacionCorte() {
+        if (cortesSelect && especificacionCorteDiv && especificacionCorteInput) {
+            const valorSeleccionado = cortesSelect.value;
+            
+            if (valorSeleccionado === 'Otro Especifique') {
+                especificacionCorteDiv.style.display = 'block';
+                especificacionCorteInput.disabled = false;
+                especificacionCorteInput.required = true;
+            } else {
+                especificacionCorteDiv.style.display = 'none';
+                especificacionCorteInput.disabled = true;
+                especificacionCorteInput.required = false;
+                especificacionCorteInput.value = '';
+            }
+        }
+    }
+
+    // Ejecutar al cargar y cuando cambie el select
+    if (cortesSelect) {
+        cortesSelect.addEventListener('change', toggleEspecificacionCorte);
+        // Ejecutar al cargar la página
+        toggleEspecificacionCorte();
+    }
+});
+</script>
+
+<style>
+.form-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.field-errors {
+    color: #dc3545;
+    font-size: 0.875em;
+    margin-top: 5px;
+}
+
+.help-text {
+    color: #6c757d;
+    font-size: 0.875em;
+    margin-top: 5px;
+    display: block;
+}
+
+.info-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.info-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.info-section h4 {
+    color: #495057;
+    margin-bottom: 15px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #3498db;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.info-item strong {
+    color: #495057;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+.info-content {
+    background: #f8f9fa;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border-left: 3px solid #17a2b8;
+    min-height: 20px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+
+select.form-control {
+    height: auto;
+}
+
+.alert.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 12px;
+    border-radius: 4px;
+    border: 1px solid #f5c6cb;
+    margin-bottom: 15px;
+}
+
+.alert.alert-error ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.current-selection {
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid #17a2b8;
+    margin-bottom: 10px;
+}
+
+.current-image {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid #17a2b8;
+}
+
+.image-preview {
+    margin: 10px 0;
+    text-align: center;
+}
+
+.image-preview img {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+}
+
+/* Estilo para el campo de especificación de corte en edición */
+.especificacion-corte {
+    transition: all 0.3s ease;
+    margin-top: 5px;
+    padding-top: 10px;
+    border-top: 1px dashed #ddd;
+}
+
+.especificacion-corte[style*="display: block"] {
+    display: block !important;
+}
+
+.especificacion-corte[style*="display: none"] {
+    display: none !important;
+}
+
+/* Estilo específico para el campo de especificación cuando está deshabilitado */
+#id_espeficiacionCorte_update:disabled {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+}
+</style>
+{% endblock %}

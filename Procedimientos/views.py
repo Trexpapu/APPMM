@@ -19,6 +19,8 @@ from reportlab.lib import colors
 from reportlab.lib.units import inch
 from django.conf import settings
 import os
+from django.utils.timezone import localtime
+
 # Create your views here.
 @login_required
 def indexProcedimientos(request):
@@ -601,6 +603,9 @@ def eliminar_desparasitacion(request, pk):
 def generar_pdf_operacion(request, operacion_id):
     """Generar PDF con los datos de la operación"""
     operacion = get_object_or_404(Operaciones, id=operacion_id)
+
+    fecha_entrada = localtime(operacion.fechaEntrada)
+    fecha_salida = localtime(operacion.fechaSalida) if operacion.fechaSalida else None
     
     # Crear el PDF en memoria
     buffer = BytesIO()
@@ -716,8 +721,8 @@ def generar_pdf_operacion(request, operacion_id):
     story.append(Spacer(1, 5))
     
     fechas_data = [
-        ['Fecha de Entrada:', operacion.fechaEntrada.strftime('%d/%m/%Y %H:%M')],
-        ['Fecha de Salida:', operacion.fechaSalida.strftime('%d/%m/%Y %H:%M') if operacion.fechaSalida else 'Pendiente'],
+        ['Fecha y Hora de Inicio de la Operación:', fecha_entrada.strftime('%d/%m/%Y %H:%M')],
+        ['Fecha y Hora de FIn de la Operación:', fecha_salida.strftime('%d/%m/%Y %H:%M') if operacion.fechaSalida else 'Pendiente'],
         ['Clínica Veterinaria:', operacion.clinicaVeterinaria],
         ['Veterinario Responsable:', operacion.veterinario.get_full_name() or operacion.veterinario.username],
     ]
@@ -817,25 +822,13 @@ def generar_pdf_operacion(request, operacion_id):
     # Fecha y lugar
     fecha_lugar = f"""
     <para>
-    <b>Fecha:</b> {operacion.fechaEntrada.strftime('%d de %B de %Y')}<br/>
+    <b>Fecha y hora:</b> {fecha_entrada.strftime('%d/%m/%Y %H:%M')}<br/>
     <b>Lugar:</b> {operacion.clinicaVeterinaria}<br/>
-    <b>Hora:</b> {operacion.fechaEntrada.strftime('%H:%M')}
     </para>
     """
     story.append(Paragraph(fecha_lugar, normal_style))
     
-    # Información del veterinario
-    story.append(Spacer(1, 20))
-    story.append(Paragraph("INFORMACIÓN DEL VETERINARIO RESPONSABLE", heading_style))
-    
-    vet_info = f"""
-    <para>
-    <b>Nombre:</b> {operacion.veterinario.get_full_name() or operacion.veterinario.username}<br/>
-    <b>Clínica:</b> {operacion.clinicaVeterinaria}<br/>
-    <b>Fecha de operación:</b> {operacion.fechaEntrada.strftime('%d/%m/%Y')}
-    </para>
-    """
-    story.append(Paragraph(vet_info, normal_style))
+   
     
     # Generar el PDF
     pdf_doc.build(story)

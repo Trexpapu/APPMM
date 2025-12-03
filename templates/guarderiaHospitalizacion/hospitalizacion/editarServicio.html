@@ -31,15 +31,18 @@
             </div>
 
             <div class="form-group">
-                <label for="mascota">🐕 Mascota (actual):</label>
-                <div class="current-selection">
-                    <strong>{{ hospitalizacion_actual.mascota.nombre }}</strong> - 
-                    {{ hospitalizacion_actual.mascota.raza }} - 
-                    {{ hospitalizacion_actual.mascota.especie }} - 
-                    Dueño: {{ hospitalizacion_actual.mascota.cliente.nombre }}
-                </div>
-                <input type="hidden" name="mascota" value="{{ hospitalizacion_actual.mascota.id }}">
-                <small class="help-text">La mascota no se puede cambiar en la edición. Si es necesario, cree un nuevo registro.</small>
+                <label for="mascota">🐕 Mascota:</label>
+                <select name="mascota" id="mascota-select" class="form-control" required>
+                    <option value="">-- Selecciona una mascota --</option>
+                    {% for mascota in mascotas %}
+                        <option value="{{ mascota.id }}" 
+                            {% if mascota.id|stringformat:"s" == mascota_id %}selected{% endif %}
+                            {% if hospitalizacion_actual.mascota.id == mascota.id %}selected{% endif %}>
+                            {{ mascota.nombre }} - {{ mascota.raza }} - {{ mascota.especie }} - Dueño: {{ mascota.cliente.nombre }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <small class="help-text">Selecciona la mascota para este servicio. Puedes buscar arriba para filtrar.</small>
             </div>
         </div>
 
@@ -228,14 +231,54 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // 🔍 Búsqueda en tiempo real de mascotas
     const searchInput = document.getElementById('mascota-search');
+    const selectElement = document.getElementById('mascota-select');
     
-    // Si quieres permitir cambiar de mascota, puedes agregar un dropdown
-    // En este caso, como no se permite cambiar la mascota, el search es solo informativo
+    if (searchInput && selectElement) {
+        const allOptions = Array.from(selectElement.options);
+        
+        // Ocultar el primer option (placeholder)
+        if (allOptions[0]) {
+            allOptions[0].style.display = 'none';
+        }
+        
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            
+            // Mostrar todas las opciones primero
+            allOptions.forEach(option => {
+                option.style.display = '';
+            });
+            
+            if (searchTerm) {
+                // Filtrar opciones
+                allOptions.forEach(option => {
+                    if (option.value && option.textContent.toLowerCase().includes(searchTerm)) {
+                        option.style.display = '';
+                    } else {
+                        option.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Mostrar el placeholder si no hay búsqueda
+            if (allOptions[0]) {
+                allOptions[0].style.display = searchTerm ? 'none' : '';
+            }
+        });
+    }
     
-    // 🎯 CARGAR INFORMACIÓN DE MASCOTA (solo para ver información, no para cambiar)
-    if (window.location.search.includes('mascota=')) {
-        // Ya se cargó la información de la mascota
+    // Actualizar la página cuando se selecciona una mascota diferente
+    if (selectElement) {
+        selectElement.addEventListener('change', function() {
+            const selectedMascotaId = this.value;
+            if (selectedMascotaId) {
+                // Recargar la página con el parámetro de mascota seleccionada
+                const currentUrl = window.location.pathname;
+                window.location.href = currentUrl + '?mascota=' + selectedMascotaId;
+            }
+        });
     }
 });
 </script>

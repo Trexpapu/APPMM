@@ -63,13 +63,13 @@
         <div class="form-grid">
             <div class="form-group">
                 <strong>Fecha de Ingreso:</strong>
-                <p>{{ hospitalizacion.fechaEntrada|date:"d/m/Y" }}</p>
+                <p>{{ hospitalizacion.fechaEntrada }}</p>
             </div>
             <div class="form-group">
                 <strong>Fecha de Salida:</strong>
                 <p>
                     {% if hospitalizacion.fechaSalida %}
-                        {{ hospitalizacion.fechaSalida|date:"d/m/Y" }}
+                        {{ hospitalizacion.fechaSalida }}
                     {% else %}
                         <span class="badge badge-info">En hospitalización</span>
                     {% endif %}

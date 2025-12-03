@@ -101,7 +101,7 @@
                         <span>{{ datos_mascota.sexo }}</span>
                     </div>
                     <div class="info-item">
-                        <strong>❤️ Estado:</strong>
+                        <strong>❤️ Vivo:</strong>
                         <span>{% if datos_mascota.vive %}Sí{% else %}No{% endif %}</span>
                     </div>
                 </div>
@@ -194,7 +194,10 @@
                     {% if field.name != 'mascota' %}
                     <div class="form-group {% if field.name in 'motivo,diagnostico,observaciones,tratamientos,evolucion,otrosDatos' %}full-width{% endif %}">
                         <label for="{{ field.id_for_label }}">
+                            <label for="{{ field.id_for_label }}">
                             {{ field.label }}
+                            {% if field.field.required %}<span style="color: red;">*</span>{% endif %}
+                            </label>
                         </label>
                         {{ field }}
                         {% if field.help_text %}

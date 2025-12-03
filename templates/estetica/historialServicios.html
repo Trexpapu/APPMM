@@ -1,0 +1,431 @@
+{% extends 'base.html' %}
+
+{% block title %}✂️ Historial de Estética{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2>✂️ Historial de Servicios de Estética</h2>
+        <a href="{% url 'nuevo-servicio-estetica' %}" class="btn-home btn-agregar">
+            ➕ Nuevo Servicio
+        </a>
+    </div>
+
+    <!-- Filtros Combinados -->
+    <div class="filtros-combinados">
+        <form method="get" action="" class="filtros-form">
+            <div class="filtros-grid">
+                <!-- Filtro por Cliente -->
+                <div class="filtro-group">
+                    <label for="q_cliente" class="filtro-label">
+                        👤 Buscar por Cliente
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q_cliente" 
+                            name="q_cliente" 
+                            placeholder="Nombre, email o teléfono del cliente..." 
+                            class="filtro-input"
+                            value="{{ query_cliente }}"
+                        >
+                        {% if query_cliente %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_cliente').value = ''; this.form.submit();"
+                            title="Limpiar filtro de cliente"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Mascota -->
+                <div class="filtro-group">
+                    <label for="q_mascota" class="filtro-label">
+                        🐕 Buscar por Mascota
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q_mascota" 
+                            name="q_mascota" 
+                            placeholder="Nombre, raza o especie" 
+                            class="filtro-input"
+                            value="{{ query_mascota }}"
+                        >
+                        {% if query_mascota %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_mascota').value = ''; this.form.submit();"
+                            title="Limpiar filtro de mascota"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Clínica -->
+                <div class="filtro-group">
+                    <label for="q_clinica" class="filtro-label">
+                        🏥 Clínica
+                    </label>
+                    <div class="filtro-input-container">
+                        <select id="q_clinica" name="q_clinica" class="filtro-input">
+                            <option value="">Todas las clínicas</option>
+                            {% for clinica in clinicas %}
+                            <option value="{{ clinica.0 }}" {% if query_clinica == clinica.0 %}selected{% endif %}>
+                                {{ clinica.1 }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% if query_clinica %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_clinica').value = ''; this.form.submit();"
+                            title="Limpiar filtro de clínica"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Fecha de Ingreso -->
+                <div class="filtro-group">
+                    <label for="q_fecha_ingreso" class="filtro-label">
+                        📅 Fecha de Ingreso
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="date" 
+                            id="q_fecha_ingreso" 
+                            name="q_fecha_ingreso" 
+                            class="filtro-input"
+                            value="{{ query_fecha_ingreso }}"
+                        >
+                        {% if query_fecha_ingreso %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_fecha_ingreso').value = ''; this.form.submit();"
+                            title="Limpiar filtro de fecha"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Filtro por Estilista -->
+                <div class="filtro-group">
+                    <label for="q_estilista" class="filtro-label">
+                        👨‍🔬 Estilista
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q_estilista" 
+                            name="q_estilista" 
+                            placeholder="Nombre del estilista" 
+                            class="filtro-input"
+                            value="{{ query_estilista }}"
+                        >
+                        {% if query_estilista %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q_estilista').value = ''; this.form.submit();"
+                            title="Limpiar filtro de estilista"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="filtro-actions">
+                    <button type="submit" class="btn-home filtro-submit">
+                        🔍 Buscar
+                    </button>
+                    {% if filtros_activos %}
+                    <a href="{% url 'historial-estetica' %}" class="btn-home filtro-reset">
+                        🗑️ Limpiar Filtros
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Información de resultados -->
+    {% if filtros_activos %}
+    <div class="results-info">
+        <p>
+            📊 Mostrando <strong>{{ esteticas|length }}</strong> servicio(s) de estética
+            {% if query_cliente %}para cliente: "<strong>{{ query_cliente }}</strong>"{% endif %}
+            {% if query_mascota %}{% if query_cliente %}y {% endif %}mascota: "<strong>{{ query_mascota }}</strong>"{% endif %}
+            {% if query_clinica %}{% if query_cliente or query_mascota %}en {% else %}en {% endif %}clínica: "<strong>{{ clinica_seleccionada }}</strong>"{% endif %}
+            {% if query_estilista %}{% if query_cliente or query_mascota or query_clinica %}con estilista: "<strong>{{ query_estilista }}</strong>"{% else %}con estilista: "<strong>{{ query_estilista }}</strong>"{% endif %}{% endif %}
+            {% if query_fecha_ingreso %}{% if query_cliente or query_mascota or query_clinica or query_estilista %}el {% else %}el {% endif %}<strong>{{ query_fecha_ingreso }}</strong>{% endif %}
+        </p>
+    </div>
+    {% else %}
+    <div class="results-info">
+        <p>📊 Total de servicios de estética: <strong>{{ esteticas|length }}</strong></p>
+    </div>
+    {% endif %}
+
+    <div class="custom-table-container">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>👤 Cliente</th>
+                    <th>📧 Email</th>
+                    <th>📞 Teléfono</th>
+                    <th>🐕 Mascota</th>
+                    <th>🔬 Especie</th>
+                    <th>🎯 Raza</th>
+                    <th>✂️ Servicio</th>
+                    <th>📅 Fecha Ingreso</th>
+                    <th>📅 Fecha Egreso</th>
+                    <th>👨‍🔬 Estilista</th>
+                    <th>🏥 Clínica</th>
+                    <th>💰 Pagado</th>
+                    <th>💰 Pago Total</th>
+                    <th>⚡ Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for estetica in esteticas %}
+                <tr>
+                    <td>
+                        <div class="client-info">
+                            <strong>{{ estetica.mascota.cliente.nombre }}</strong>
+                        </div>
+                    </td>
+                    <td>{{ estetica.mascota.cliente.email|default:"-" }}</td>
+                    <td>{{ estetica.mascota.cliente.telefono|default:"-" }}</td>
+                    <td>
+                        <div class="pet-info">
+                            <strong>{{ estetica.mascota.nombre }}</strong>
+                            <div class="pet-details">
+                                <small>🎯 {{ estetica.mascota.raza|default:"Sin raza" }}</small>
+                                <small>🔬 {{ estetica.mascota.especie|default:"Sin especie" }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ estetica.mascota.especie|default:"-" }}</td>
+                    <td>{{ estetica.mascota.raza|default:"-" }}</td>
+                    <td>
+                        {% if estetica.servicio %}
+                            <div class="truncate-text" title="{{ estetica.servicio }}">
+                                {{ estetica.servicio|truncatewords:8 }}
+                            </div>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ estetica.fechaHoraIngreso }}</td>
+                    <td>
+                        {% if estetica.fechaHoraEgreso %}
+                            {{ estetica.fechaHoraEgreso }}
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                    <td>{{ estetica.estilista.get_full_name|default:estetica.estilista.username }}</td>
+                    <td>{{ estetica.clinicaVeterinaria|default:"-" }}</td>
+                    <td>
+                        <strong>${{ estetica.pagado }}</strong>
+                    </td>
+                    <td>
+                        <strong>${{ estetica.pagoTotal }}</strong>
+                    </td>
+                    <td>
+                        <div class="action-buttons compact">
+                            <a href="{% url 'servicio_estetica_detalle' estetica.pk %}" 
+                               class="btn-home" style="background: #17a2b8; padding: 5px 10px;"
+                               title="Ver detalles">
+                                👁️
+                            </a>
+                            <a href="{% url 'servicio_estetica_editar' estetica.pk %}" 
+                               class="btn-home" 
+                               style="background: #ffc107; color: black; padding: 5px 10px;"
+                               title="Editar servicio">
+                                ✏️
+                            </a>
+                           
+                            <a href="{% url 'servicio_estetica_eliminar' estetica.pk %}" 
+                               class="btn-home" 
+                               style="background: #dc3545; padding: 5px 10px;" 
+                               onclick="return confirm('¿Estás seguro de que quieres eliminar este servicio de estética de {{ estetica.mascota.nombre }}?');"
+                               title="Eliminar servicio">
+                                🗑️
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="14" class="no-data">
+                        {% if filtros_activos %}
+                            🔍 No se encontraron servicios de estética que coincidan con los filtros aplicados.
+                            <a href="{% url 'historial-estetica' %}" style="color: #3498db; text-decoration: none; margin-left: 10px;">
+                                📋 Ver todos los servicios
+                            </a>
+                        {% else %}
+                            📝 No hay servicios de estética registrados. 
+                            <a href="{% url 'nuevo-servicio-estetica' %}" style="color: #3498db; text-decoration: none; margin-left: 10px;">
+                                ➕ Registrar primer servicio
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<style>
+.filtros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.filtro-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filtro-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.filtro-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.filtro-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filtro-clear {
+    position: absolute;
+    right: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px 5px;
+}
+
+.filtro-actions {
+    display: flex;
+    gap: 10px;
+    align-items: end;
+}
+
+.filtro-submit, .filtro-reset {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.results-info {
+    background: #e9ecef;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border-left: 4px solid #007bff;
+}
+
+.client-info, .pet-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.client-details, .pet-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.client-details small, .pet-details small {
+    font-size: 0.75em;
+    color: #6c757d;
+}
+
+.truncate-text {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.action-buttons.compact {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+}
+
+.no-data {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Ajustes para la tabla */
+.custom-table-container {
+    overflow-x: auto;
+}
+
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.custom-table thead {
+    background-color: #f8f9fa;
+}
+
+.custom-table th {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: bold;
+    color: #495057;
+}
+
+.custom-table td {
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: top;
+}
+
+.custom-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+</style>
+{% endblock %}

@@ -237,9 +237,7 @@ class GuarderiaUpdateForm(forms.ModelForm):
 
 
 
-from django import forms
-from .models import Hospitalizacion
-from ClientesMascotas.models import Mascotas
+
 
 class HospitalizacionForm(forms.ModelForm):
     class Meta:

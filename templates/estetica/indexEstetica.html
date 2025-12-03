@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Estética - Inicio{% endblock %}
+
+{% block content %}
+<section class="container index-cliente">
+    <h2>✂️ Gestión de Servicios de Estética</h2>
+    <div class="options">
+        <a href="{% url 'historial-estetica' %}" class="btn-home">📋 Historial de Servicios de Estética</a>
+        <a href="{% url 'nuevo-servicio-estetica' %}" class="btn-home">✂️ Nuevo Servicio de Estética</a>
+
+    </div>
+</section>
+{% endblock %}

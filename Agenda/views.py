@@ -254,7 +254,18 @@ def atender_cita(request, pk):
     mascota = cita.mascota
     
     if cita.tipoCita == 'Consulta':
-        # Redirigir a la nueva vista para consultas desde citas
-        return redirect('nueva-consulta-desde-cita', mascota_id=mascota.id)
+        return redirect('nueva-consulta')
+    
+    elif cita.tipoCita == 'Operación médica':
+        return redirect('crear_operacion')
+    
+    elif cita.tipoCita == 'Desparasitación':
+        return redirect('nueva_desparasitacion')
+    
+    elif cita.tipoCita == 'Vacunación':
+        return redirect('nueva_vacunacion')
+    
+    elif cita.tipoCita == 'Servicio de estética':
+        return redirect('nuevo-servicio-estetica')
     else:
         return redirect('ver-proximas-citas')

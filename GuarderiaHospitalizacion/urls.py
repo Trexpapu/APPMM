@@ -13,7 +13,7 @@ urlpatterns = [
 
     path('detalleServicioGuarderia/<int:pk>/', views.servicio_guarderia_detalle, name='servicio_guarderia_detalle'),
 
-    path('guarderia/<int:guarderia_id>/pdf/', views.generar_pdf_guarderia, name='generar_pdf_guarderia'),
+    path('guarderia/<int:pk>/pdf/', views.generar_pdf_guarderia, name='generar_pdf_guarderia'),
 
 
     path('nuevoServicioHospitalizacion/', views.servicio_hospitalizacion_crear, name='servicio_hospitalizacion_crear'),
@@ -25,6 +25,6 @@ urlpatterns = [
 
     path('detalleServicioHospitalizacion/<int:pk>/', views.servicio_hospitalizacion_detalle, name='servicio_hospitalizacion_detalle'),
 
-    path('hospitalizacion/<int:guarderia_id>/pdf/', views.generar_pdf_hospitalizacion, name='generar_pdf_hospitalizacion'),
+    path('hospitalizacion/<int:pk>/pdf/', views.generar_pdf_hospitalizacion, name='generar_pdf_hospitalizacion'),
 
 ]

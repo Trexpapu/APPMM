@@ -49,6 +49,7 @@ def servicio_guarderia_crear(request):
                 'fechaNacimiento': mascota.fechaNacimiento,
                 'peso': mascota.peso,
                 'sexo': mascota.get_sexo_display(),
+                'vive': mascota.vive,
                 'vacunas': mascota.vacunas,
                 'alergias': mascota.alergias,
                 'ultimaDesparasitacion': mascota.ultimaDesparasitacion,
@@ -175,6 +176,7 @@ def servicio_guarderia_editar(request, pk):
                 'peso': mascota.peso,
                 'sexo': mascota.get_sexo_display(),
                 'vacunas': mascota.vacunas,
+                'vive': mascota.vive,
                 'alergias': mascota.alergias,
                 'ultimaDesparasitacion': mascota.ultimaDesparasitacion,
                 'ultimoDesparasitante': mascota.ultimoDesparasitante,
@@ -259,9 +261,9 @@ def servicio_guarderia_detalle(request, pk):
 
 
 @login_required
-def generar_pdf_guarderia(request, guarderia_id):
+def generar_pdf_guarderia(request, pk):
     """Generar PDF con los datos del servicio de guardería"""
-    guarderia = get_object_or_404(Guarderia, id=guarderia_id)
+    guarderia = get_object_or_404(Guarderia, id=pk)
     
     # Crear el PDF en memoria
     buffer = BytesIO()
@@ -377,8 +379,8 @@ def generar_pdf_guarderia(request, guarderia_id):
     story.append(Spacer(1, 5))
     
     fechas_data = [
-        ['Fecha de Entrada:', guarderia.fechaEntrada.strftime('%d/%m/%Y')],
-        ['Fecha de Salida Programada:', guarderia.fechaSalidaProgramada.strftime('%d/%m/%Y') if guarderia.fechaSalidaProgramada else 'No especificada'],
+        ['Fecha de Ingreso:', guarderia.fechaEntrada.strftime('%d/%m/%Y')],
+        ['Fecha de Egreso Programada:', guarderia.fechaSalidaProgramada.strftime('%d/%m/%Y') if guarderia.fechaSalidaProgramada else 'No especificada'],
         ['Clínica Veterinaria:', guarderia.clinicaVeterinaria],
         ['Estado del Servicio:', guarderia.estado],
     ]
@@ -396,7 +398,7 @@ def generar_pdf_guarderia(request, guarderia_id):
     
     # Información de alimentación y salud
     if guarderia.alimento:
-        story.append(Paragraph("<b>ALIMENTACIÓN PROPORCIONADA:</b>", normal_style))
+        story.append(Paragraph("<b>ALIMENTACIÓN DE LA MASCOTA:</b>", normal_style))
         story.append(Paragraph(guarderia.alimento, normal_style))
         story.append(Spacer(1, 8))
     
@@ -406,7 +408,7 @@ def generar_pdf_guarderia(request, guarderia_id):
         story.append(Spacer(1, 8))
     
     if guarderia.tratamientos:
-        story.append(Paragraph("<b>TRATAMIENTOS REQUERIDOS:</b>", normal_style))
+        story.append(Paragraph("<b>TRATAMIENTOS DURANTE ESTADÍA:</b>", normal_style))
         story.append(Paragraph(guarderia.tratamientos, normal_style))
         story.append(Spacer(1, 8))
     
@@ -501,7 +503,7 @@ def generar_pdf_guarderia(request, guarderia_id):
     # Fecha y lugar
     fecha_lugar = f"""
     <para>
-    <b>Fecha:</b> {guarderia.fechaEntrada.strftime('%d de %B de %Y')}<br/>
+    <b>Fecha:</b> {guarderia.fechaEntrada.strftime('%d/%m/%Y')}<br/>
     <b>Lugar:</b> {guarderia.clinicaVeterinaria}
     </para>
     """
@@ -551,6 +553,7 @@ def servicio_hospitalizacion_crear(request):
                 'peso': mascota.peso,
                 'sexo': mascota.get_sexo_display(),
                 'vacunas': mascota.vacunas,
+                'vive': mascota.vive,
                 'alergias': mascota.alergias,
                 'ultimaDesparasitacion': mascota.ultimaDesparasitacion,
                 'ultimoDesparasitante': mascota.ultimoDesparasitante,
@@ -590,16 +593,15 @@ def servicio_hospitalizacion_crear(request):
     })
 
 
-
-
 @login_required
 def servicio_hospitalizacion_editar(request, pk):
     """Editar servicio de hospitalización existente."""
     hospitalizacion = get_object_or_404(Hospitalizacion, pk=pk)
     mascotas = Mascotas.objects.all().select_related('cliente')
-    mascota_id = request.GET.get('mascota') or str(hospitalizacion.mascota.id) if hospitalizacion.mascota else None
+    mascota_id = request.GET.get('mascota') or request.POST.get('mascota') or str(hospitalizacion.mascota.id) if hospitalizacion.mascota else None
     
     datos_mascota = None
+    mascota = None
 
     # 🔹 Cargar datos de la mascota cuando se selecciona una o la actual
     if mascota_id:
@@ -615,6 +617,7 @@ def servicio_hospitalizacion_editar(request, pk):
                 'sexo': mascota.get_sexo_display(),
                 'vacunas': mascota.vacunas,
                 'alergias': mascota.alergias,
+                'vive': mascota.vive,
                 'ultimaDesparasitacion': mascota.ultimaDesparasitacion,
                 'ultimoDesparasitante': mascota.ultimoDesparasitante,
                 'alimento': mascota.alimento,
@@ -631,6 +634,10 @@ def servicio_hospitalizacion_editar(request, pk):
         form = HospitalizacionUpdateForm(request.POST, instance=hospitalizacion)
         if form.is_valid():
             hospitalizacion_editada = form.save(commit=False)
+            
+            # 🔹 ACTUALIZAR MASCOTA SI SE HA SELECCIONADO UNA NUEVA
+            if mascota_id and mascota:
+                hospitalizacion_editada.mascota = mascota
             
             # 🔹 MANEJAR FOTO ANTES - SIGUIENDO LA MISMA LÓGICA QUE GUARDERÍA
             if 'fotoAntes' in request.FILES and request.FILES['fotoAntes']:
@@ -784,7 +791,7 @@ def generar_pdf_hospitalizacion(request, pk):
     
     fechas_data = [
         ['Fecha de Ingreso:', hospitalizacion.fechaEntrada.strftime('%d/%m/%Y')],
-        ['Fecha de Salida:', hospitalizacion.fechaSalida.strftime('%d/%m/%Y') if hospitalizacion.fechaSalida else 'No especificada'],
+        ['Fecha de Egreso:', hospitalizacion.fechaSalida.strftime('%d/%m/%Y') if hospitalizacion.fechaSalida else 'No especificada'],
         ['Clínica Veterinaria:', hospitalizacion.clinicaVeterinaria],
         ['Estado del Paciente:', hospitalizacion.estado],
     ]
@@ -817,7 +824,7 @@ def generar_pdf_hospitalizacion(request, pk):
         story.append(Spacer(1, 8))
     
     if hospitalizacion.tratamientos:
-        story.append(Paragraph("<b>TRATAMIENTOS APLICADOS:</b>", normal_style))
+        story.append(Paragraph("<b>TRATAMIENTOS REQUERIDOS:</b>", normal_style))
         story.append(Paragraph(hospitalizacion.tratamientos, normal_style))
         story.append(Spacer(1, 8))
     
@@ -915,7 +922,7 @@ def generar_pdf_hospitalizacion(request, pk):
     # Fecha y lugar
     fecha_lugar = f"""
     <para>
-    <b>Fecha:</b> {hospitalizacion.fechaEntrada.strftime('%d de %B de %Y')}<br/>
+    <b>Fecha:</b> {hospitalizacion.fechaEntrada.strftime('%d/%m/%Y')}<br/>
     <b>Lugar:</b> {hospitalizacion.clinicaVeterinaria}
     </para>
     """
