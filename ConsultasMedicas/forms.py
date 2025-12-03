@@ -1,5 +1,7 @@
 from django import forms
 from .models import *
+from ClientesMascotas.models import *
+from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
 class DocumentosConsultaForm(forms.ModelForm):
@@ -537,3 +539,36 @@ class DocumentoConsultaUpdateForm(forms.ModelForm):
         labels = {
             'descripcion': '📝 Descripción'
         }
+
+class RecetaMedicaForm(forms.Form):
+    CLINICAS = [
+        ('Mascotas Morelia Centro (Samuel Castañon Pte. 73 Centro 60600 Apatzingán, Mich.) número 453-227-1694', 'Mascotas Morelia Centro (Samuel Castañon Pte. 73 Centro 60600 Apatzingán, Mich.) número 453-227-1694'),
+    ] 
+
+    mascota = forms.ModelChoiceField(
+        queryset=Mascotas.objects.all(),
+        label="Mascota",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    veterinario = forms.ModelChoiceField(
+        queryset=User.objects.all(),
+        label="Veterinario",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    veterinaria = forms.ChoiceField(
+        choices=CLINICAS,
+        label="Veterinaria",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    fecha = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date'}),
+        label="Fecha de la receta"
+    )
+
+    descripcion = forms.CharField(
+        widget=forms.Textarea,
+        label="Descripción de la receta"
+    )

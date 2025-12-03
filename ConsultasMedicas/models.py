@@ -6,9 +6,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 class ConsultasMedicas(models.Model):
     CLINICAS = [
-        ('Mascotas Morelia Centro', 'Mascotas Morelia Centro'),
-        ('Mascotas Morelia Salida Apatzingán', 'Mascotas Morelia Salida Apatzingán'),
-        ('Mascotas Morelia Mano Huevona', 'Mascotas Morelia Mano Huevona'),
+        ('Mascotas Morelia Centro (Samuel Castañon Pte. 73 Centro 60600 Apatzingán, Mich. Número 453-227-1694)', 'Mascotas Morelia Centro (Samuel Castañon Pte. 73 Centro 60600 Apatzingán, Mich. Número 453-227-1694)'),
     ] 
     PROCEDIMIENTOS = [
         ('Consulta', 'Consulta'),
@@ -197,7 +195,7 @@ class ConsultasMedicas(models.Model):
     clinicaVeterinaria = models.CharField(
         max_length=255,
         choices=CLINICAS,
-        default='Mascotas Morelia Centro'  # puedes poner un valor por defecto si quieres
+        default='Mascotas Morelia Centro (Samuel Castañon Pte. 73 Centro 60600 Apatzingán, Mich. Número 453-227-1694)'  # puedes poner un valor por defecto si quieres
     )
 
 class DocumentosConsulta(models.Model):

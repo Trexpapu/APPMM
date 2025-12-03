@@ -19,4 +19,6 @@ urlpatterns = [
     path('documento/<int:documento_id>/eliminar/', views.eliminar_documento, name='eliminar_documento'),
  
     path('borrarConsultas/<int:pk>/', views.borrar_consulta, name='borrar-consultas'),
+
+    path('recetaMedica/', views.receta_medica, name='receta-medica'),
 ]
