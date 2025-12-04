@@ -8,14 +8,65 @@
 <section class="container">
     <div class="header-actions">
         <h2>📋 Listado de Clientes</h2>
-
     </div>
 
+    <!-- Filtros -->
+    <div class="filtros-combinados">
+        <form method="get" action="" class="filtros-form">
+            <div class="filtros-grid">
+                <!-- Filtro por Cliente -->
+                <div class="filtro-group">
+                    <label for="q" class="filtro-label">
+                        🔍 Buscar Cliente
+                    </label>
+                    <div class="filtro-input-container">
+                        <input 
+                            type="text" 
+                            id="q" 
+                            name="q" 
+                            placeholder="Nombre, email o teléfono..." 
+                            class="filtro-input"
+                            value="{{ query }}"
+                        >
+                        {% if query %}
+                        <button 
+                            type="button" 
+                            class="filtro-clear" 
+                            onclick="document.getElementById('q').value = ''; this.form.submit();"
+                            title="Limpiar filtro"
+                        >
+                            ❌
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
 
-    
-    <a href="{% url 'ver_clientes' %}" class="btn-home filtro-reset">
+                <!-- Botones de acción -->
+                <div class="filtro-actions">
+                    <button type="submit" class="btn-home filtro-submit">
+                        🔍 Buscar
+                    </button>
+                    {% if query %}
+                    <a href="{% url 'ver_clientes' %}" class="btn-home filtro-reset">
                         🗑️ Limpiar Filtros
-    </a>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Información de resultados -->
+    <div class="results-info">
+        <p>
+            📊 
+            {% if query %}
+                Mostrando <strong>{{ clientes|length }}</strong> cliente(s) para: "<strong>{{ query }}</strong>"
+            {% else %}
+                Total de clientes: <strong>{{ clientes|length }}</strong>
+            {% endif %}
+        </p>
+    </div>
 
     <div class="custom-table-container">
         <table class="custom-table">
@@ -62,7 +113,11 @@
                 {% empty %}
                 <tr>
                     <td colspan="5" class="no-data">
-                        No hay clientes registrados.
+                        {% if query %}
+                            🔍 No se encontraron clientes que coincidan con: "<strong>{{ query }}</strong>"
+                        {% else %}
+                            📝 No hay clientes registrados.
+                        {% endif %}
                     </td>
                 </tr>
                 {% endfor %}

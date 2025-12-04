@@ -16,11 +16,10 @@ def indexClientes(request):
 @login_required
 def indexMascotas(request):
     return render(request, 'clientesMascotas/Mascotas/indexMascota.html')
-
 @login_required
 def ver_clientes(request):
     """View that renders a table with all clients or filters them based on a query."""
-    query = request.GET.get('q', '').strip().lower()  # Remove replace to keep spaces intact
+    query = request.GET.get('q', '').strip()
     if query:
         clientes = Clientes.objects.filter(
             Q(nombre__icontains=query) |
@@ -29,8 +28,11 @@ def ver_clientes(request):
         )
     else:
         clientes = Clientes.objects.all()
-    return render(request, 'clientesMascotas/Clientes/VerClientes.html', {'clientes': clientes})
-
+    
+    return render(request, 'clientesMascotas/Clientes/VerClientes.html', {
+        'clientes': clientes,
+        'query': query
+    })
 
 
 
