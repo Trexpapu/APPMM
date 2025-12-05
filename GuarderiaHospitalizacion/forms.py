@@ -222,7 +222,6 @@ class GuarderiaUpdateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['mascota'].queryset = Mascotas.objects.all().select_related('cliente')
         # Hacer campos opcionales
-        self.fields['fechaSalidaProgramada'].required = False
         self.fields['fechaSalidaReal'].required = False
         
         # Si estamos editando, mostrar las fechas actuales formateadas correctamente

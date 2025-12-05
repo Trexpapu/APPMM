@@ -18,7 +18,50 @@ from reportlab.lib import colors
 from reportlab.lib.units import inch
 from django.conf import settings
 import os
+import requests
+import json
+from datetime import date, datetime
+from django.utils.timezone import localtime
 # Create your views here.
+
+
+
+
+
+def json_serializer(obj):
+    """Usar formato ISO que n8n entienda sin ambigüedad"""
+    if isinstance(obj, datetime):
+        local_dt = localtime(obj)
+        # Formato ISO 8601: 2025-12-05T18:30:00-05:00
+        return local_dt.isoformat()
+    
+    elif isinstance(obj, date):
+        return obj.strftime("%Y-%m-%d")
+    
+    return str(obj) if obj is not None else ""
+
+def enviar_datos(datos_mascota, datos_formulario, url):
+    datos = {
+        **datos_mascota,
+        **datos_formulario
+    }
+    if datos.get('cliente_email') == "" or datos.get('cliente_email') == None:
+        return
+    # Convertir el diccionario a una cadena JSON manualmente, usando nuestro serializador personalizado
+    try:
+        datos_json = json.dumps(datos, default=json_serializer)
+    except TypeError as e:
+        print(f"Error al serializar los datos: {e}")
+        return
+
+    # Enviar la solicitud con el JSON ya serializado
+    try:
+        response = requests.post(url, data=datos_json, headers={'Content-Type': 'application/json'})
+        print("Respuesta:", response.text)
+    except Exception as e:
+        print("Error:", e)
+
+
 @login_required
 def index_guarderia_hospitalizacion(request):
     return render(request, 'guarderiaHospitalizacion/indexGuarderiaHospitalizacion.html')
@@ -59,6 +102,16 @@ def servicio_guarderia_crear(request):
                 'cliente_telefono': mascota.cliente.telefono,
                 'cliente_email': mascota.cliente.email,
             }
+
+            datos_mascota_n8n = {
+                'nombre': mascota.nombre,
+                'especie': mascota.especie,
+                'raza': mascota.raza,
+                'peso': mascota.peso,
+                'sexo': mascota.get_sexo_display(),
+                'cliente_nombre': mascota.cliente.nombre,
+                'cliente_email': mascota.cliente.email,
+            }
             
         except Mascotas.DoesNotExist:
             mascota_id = None
@@ -81,6 +134,15 @@ def servicio_guarderia_crear(request):
             mascota.save()
             guarderia.save()
             messages.success(request, "Servicio de guardería registrado correctamente.")
+            datos_formulario = {
+                    'ID': str(guarderia.pk),
+                    'fecha_salida': form.cleaned_data["fechaSalidaProgramada"],
+                    'anticipo' : form.cleaned_data["pagado"],
+                    'pago_total' : form.cleaned_data["pagoTotal"],
+                    'veterinaria' : form.cleaned_data["clinicaVeterinaria"],
+                    'sheet': 'guarderia'
+                }
+            enviar_datos(datos_mascota_n8n, datos_formulario, "http://localhost:5678/webhook/agregar")
             return redirect('index-guarderia-hospitalizacion')
     else:
         form = GuarderiaForm(initial=initial_data)

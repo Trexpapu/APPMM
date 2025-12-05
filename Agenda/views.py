@@ -15,17 +15,23 @@ from django.contrib.auth.decorators import login_required
 from datetime import date, datetime
 from django.utils.timezone import localtime
 # Create your views here.
+from django.db.models import Case, When, Value
+from django.utils import timezone
+from datetime import datetime
+
 
 @login_required
 def indexAgenda(request):
     return render(request, 'agenda/proximasCitas/indexAgenda.html')
 
 
+
+@login_required
 def ver_proximas_citas(request):
-    # Obtener todos los registros inicialmente
+    # Obtener todos los registros inicialmente, ordenados por fecha más cercana primero
     consultas = SiguientesCitas.objects.all().select_related(
         'mascota', 'mascota__cliente', 'veterinario'
-    ).order_by('fechaSiguienteCita')
+    ).order_by('fechaSiguienteCita')  # ASCENDENTE: más cercanas primero
     
     # Inicializar variables de filtro
     query_cliente = request.GET.get('q_cliente', '')
@@ -97,7 +103,15 @@ def ver_proximas_citas(request):
     asistencia_seleccionada = query_asistencia
     tipo_cita_seleccionado = query_tipo_cita
     
-    consultas = consultas.order_by('-fechaSiguienteCita')
+    
+    # Si quieres separar las citas pasadas y ponerlas al final:
+    consultas = consultas.order_by(
+         Case(
+             When(fechaSiguienteCita__lt=timezone.now(), then=Value(1)),
+             default=Value(0)
+         ),
+         'fechaSiguienteCita'
+     )
     
     context = {
         'siguientesConsultas': consultas,
@@ -124,7 +138,6 @@ def ver_proximas_citas(request):
 
 
 
-
 def json_serializer(obj):
     """Usar formato ISO que n8n entienda sin ambigüedad"""
     if isinstance(obj, datetime):
@@ -137,13 +150,13 @@ def json_serializer(obj):
     
     return str(obj) if obj is not None else ""
 
-def enviar_datos(datos_mascota, datos_formulario):
-    url = "http://localhost:5678/webhook/agregar"
+def enviar_datos(datos_mascota, datos_formulario, url= "http://localhost:5678/webhook/agregar"):
     datos = {
         **datos_mascota,
         **datos_formulario
     }
-
+    if datos.get('cliente_email') == "" or datos.get('cliente_email') == None:
+        return
     # Convertir el diccionario a una cadena JSON manualmente, usando nuestro serializador personalizado
     try:
         datos_json = json.dumps(datos, default=json_serializer)
@@ -157,6 +170,28 @@ def enviar_datos(datos_mascota, datos_formulario):
         print("Respuesta:", response.text)
     except Exception as e:
         print("Error:", e)
+
+
+def borrar_datos(datos_, url= "http://localhost:5678/webhook/agregar"):
+    datos = {
+        **datos_,
+        
+    }
+    # Convertir el diccionario a una cadena JSON manualmente, usando nuestro serializador personalizado
+    try:
+        datos_json = json.dumps(datos, default=json_serializer)
+    except TypeError as e:
+        print(f"Error al serializar los datos: {e}")
+        return
+
+    # Enviar la solicitud con el JSON ya serializado
+    try:
+        response = requests.post(url, data=datos_json, headers={'Content-Type': 'application/json'})
+        print("Respuesta:", response.text)
+    except Exception as e:
+        print("Error:", e)
+
+
 @login_required
 def agendar_proxima_cita(request):
     """View to add a next consultation."""
@@ -215,13 +250,15 @@ def agendar_proxima_cita(request):
                 proximaCita.save()
                 messages.success(request, "Cita agendada correctamente.")
                 datos_formulario = {
+                    'ID': str(proximaCita.pk),
                     'fecha_cita': form.cleaned_data["fechaSiguienteCita"],
                     'motivo' : form.cleaned_data["descripcionCita"],
                     'tipo_cita' : form.cleaned_data["tipoCita"],
                     'veterinaria' : form.cleaned_data["clinicaVeterinaria"],
                     'veterinario': str(request.user), 
                     'correo_veterinario': str(request.user.email), 
-                    'mensaje_Enviado' : "no"
+                    'mensaje_Enviado' : "no", 
+                    'sheet': 'agenda'
                 }
                 enviar_datos(datos_mascota_n8n, datos_formulario)
                 return redirect('index-agenda')
@@ -242,6 +279,11 @@ def borrar_proxima_cita(request, pk):
     """View to delete an existing pet."""
     proxConsulta = get_object_or_404(SiguientesCitas, pk=pk)
     proxConsulta.delete()
+    datos_ = {
+        'ID': str(pk),
+        'sheet': 'agenda'
+    }
+    borrar_datos(datos_, url= "http://localhost:5678/webhook/eliminar-datos")
     return redirect('ver-proximas-citas')
 
 @login_required
@@ -276,6 +318,15 @@ def editar_proxima_cita(request, pk):
                 'cliente_email': mascota.cliente.email,
                 'cliente_direccion': mascota.cliente.direccion,
             }
+            datos_mascota_n8n = {
+                'nombre': mascota.nombre,
+                'especie': mascota.especie,
+                'raza': mascota.raza,
+                'peso': mascota.peso,
+                'sexo': mascota.get_sexo_display(),
+                'cliente_nombre': mascota.cliente.nombre,
+                'cliente_email': mascota.cliente.email,
+            }
             
         except Mascotas.DoesNotExist:
             mascota_id = None
@@ -289,6 +340,19 @@ def editar_proxima_cita(request, pk):
             if mascota_id:
                 proxConsultaEditada.mascota_id = mascota_id
             proxConsultaEditada.save()
+            if proxConsultaEditada.asistencia == 'Pendiente':
+                datos_formulario = {
+                    'ID': str(proxConsultaEditada.pk),
+                    'fecha_cita': form.cleaned_data["fechaSiguienteCita"],
+                    'motivo' : form.cleaned_data["descripcionCita"],
+                    'tipo_cita' : form.cleaned_data["tipoCita"],
+                    'veterinaria' : form.cleaned_data["clinicaVeterinaria"],
+                    'veterinario': str(request.user), 
+                    'correo_veterinario': str(request.user.email), 
+                    'mensaje_Enviado' : "no", 
+                    'sheet': 'agenda'
+                }
+                enviar_datos(datos_mascota_n8n, datos_formulario, "http://localhost:5678/webhook/editar-datos")
             messages.success(request, "Cita actualizada correctamente.")
             return redirect('ver-proximas-citas')
     else:

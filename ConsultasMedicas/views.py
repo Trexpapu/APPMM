@@ -20,6 +20,13 @@ from reportlab.lib.units import inch
 from reportlab.lib import colors
 from io import BytesIO
 from django.utils import timezone
+import requests
+import json
+from django.contrib.auth.decorators import login_required
+from datetime import date, datetime
+from django.utils.timezone import localtime
+
+
 
 # Create your views here.
 @login_required
@@ -638,6 +645,43 @@ def generar_pdf_consulta(request, consulta_id):
 
 
 
+
+
+def json_serializer(obj):
+    """Usar formato ISO que n8n entienda sin ambigüedad"""
+    if isinstance(obj, datetime):
+        local_dt = localtime(obj)
+        # Formato ISO 8601: 2025-12-05T18:30:00-05:00
+        return local_dt.isoformat()
+    
+    elif isinstance(obj, date):
+        return obj.strftime("%Y-%m-%d")
+    
+    return str(obj) if obj is not None else ""
+
+def enviar_datos(datos_mascota, datos_formulario, url= "http://localhost:5678/webhook/receta"):
+    datos = {
+        **datos_mascota,
+        **datos_formulario
+    }
+    if datos.get('cliente_email') == "" or datos.get('cliente_email') == None:
+        return
+    # Convertir el diccionario a una cadena JSON manualmente, usando nuestro serializador personalizado
+    try:
+        datos_json = json.dumps(datos, default=json_serializer)
+    except TypeError as e:
+        print(f"Error al serializar los datos: {e}")
+        return
+
+    # Enviar la solicitud con el JSON ya serializado
+    try:
+        response = requests.post(url, data=datos_json, headers={'Content-Type': 'application/json'})
+        print("Respuesta:", response.text)
+    except Exception as e:
+        print("Error:", e)
+
+
+
 @login_required
 def receta_medica(request):
     """Vista para generar recetas médicas (solo visualización/generación, no guarda en DB)"""
@@ -689,10 +733,9 @@ def receta_medica(request):
                     'veterinario': form.cleaned_data['veterinario'],
                     'veterinaria': form.cleaned_data['veterinaria'],
                     'fecha': form.cleaned_data['fecha'],
-                    'descripcion': form.cleaned_data['descripcion'],
-                    'datos_mascota': datos_mascota,
+                    'descripcion': form.cleaned_data['descripcion']
                 }
-                pass
+                enviar_datos(datos_mascota, datos_receta)
             else:
                 # Generar PDF de la receta
                 return generar_pdf_receta(form.cleaned_data, datos_mascota)

@@ -28,7 +28,7 @@ class Guarderia(models.Model):
         default='Guardería'
     )
     fechaEntrada = models.DateField()
-    fechaSalidaProgramada = models.DateField(blank= True, null = True)
+    fechaSalidaProgramada = models.DateField()
     fechaSalidaReal = models.DateField(blank= True, null = True)
     pagado = models.FloatField(default=0)#esto es por si deja anticipo
     pagoTotal = models.FloatField(default=0)
