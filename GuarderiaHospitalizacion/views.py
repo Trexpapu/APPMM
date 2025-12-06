@@ -218,6 +218,8 @@ def historial_guarderia(request):
     
     # Determinar si hay filtros activos
     filtros_activos = any([query_cliente, query_mascota, query_veterinaria, query_fecha_entrada, query_estado])
+    if not filtros_activos:
+        guarderias = guarderias[:10]
     
     return render(request, 'guarderiaHospitalizacion/guarderia/historialGuarderia.html', {
         'guarderias': guarderias,
@@ -1164,6 +1166,7 @@ def historial_hospitalizacion(request):
     # Determinar si hay filtros activos
     filtros_activos = any([query_cliente, query_mascota, query_veterinaria, query_fecha_entrada, query_estado])
     
+    
     # Obtener el nombre de la clínica seleccionada para mostrar en el mensaje
     clinica_seleccionada = ''
     if query_veterinaria:
@@ -1179,6 +1182,9 @@ def historial_hospitalizacion(request):
             if estado[0] == query_estado:
                 estado_seleccionado = estado[1]
                 break
+
+    if not filtros_activos:
+        hospitalizaciones = hospitalizaciones[:10]
     
     context = {
         'hospitalizaciones': hospitalizaciones,

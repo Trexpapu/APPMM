@@ -55,9 +55,9 @@
             </div>
 
             <!-- 🔄 Botón para cargar datos de la mascota seleccionada -->
-            <button type="button" id="cargar-mascota-btn" class="btn-home">
+          <!--  <button type="button" id="cargar-mascota-btn" class="btn-home">
                 🔄 Cargar Datos de Mascota
-            </button>
+            </button> -->
         </div>
 
         <!-- 💡 PREGUNTA PARA CARGAR CONSULTA PREVIA -->
@@ -100,6 +100,22 @@
                 <div class="info-item">
                     <strong>⚧️ Sexo:</strong>
                     <span>{{ datos_mascota.sexo }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>💉 Vacunas:</strong>
+                    <span>{{ datos_mascota.vacunas }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>📅 Última Desparasitación Aplicada:</strong>
+                    <span>{{ datos_mascota.ultimaDesparasitacion }}</span>
+                </div>
+                <div class="info-item">
+                    <strong>💊 Último Desparasitante Aplicado:</strong>
+                    <span>{{ datos_mascota.ultimoDesparasitante }}</span>
+                </div>
+                <div class="info-item">
+                        <strong>❤️ Vivo:</strong>
+                        <span>{% if datos_mascota.vive %}Sí{% else %}No{% endif %}</span>
                 </div>
                 <div class="info-item">
                     <strong>👤 Dueño:</strong>
@@ -154,47 +170,7 @@
                 </div>
             </div>
 
-            <!-- SECCIÓN DE DATOS DE PROCEDIMIENTOS (solo lectura) -->
-            <div class="form-section" style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                <h4 style="color: #495057; margin-bottom: 15px;">📋 Datos de Procedimientos (solo lectura)</h4>
-                
-                <!-- Campo de solo lectura: Vacunas -->
-                <div class="form-group full-width">
-                    <label for="id_vacunas">💉 Vacunas:</label>
-                    {{ form.vacunas }}
-                    <small class="help-text">Las vacunas se gestionan en el apartado de procedimientos</small>
-                    {% if form.vacunas.errors %}
-                    <div class="field-errors">
-                        {{ form.vacunas.errors }}
-                    </div>
-                    {% endif %}
-                </div>
-
-                <!-- Campos de solo lectura: Desparasitación -->
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="id_ultimaDesparasitacion">📅 Última desparasitación:</label>
-                        {{ form.ultimaDesparasitacion }}
-                        <small class="help-text">Fecha de la última desparasitación</small>
-                        {% if form.ultimaDesparasitacion.errors %}
-                        <div class="field-errors">
-                            {{ form.ultimaDesparasitacion.errors }}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_ultimoDesparasitante">💊 Último desparasitante:</label>
-                        {{ form.ultimoDesparasitante }}
-                        <small class="help-text">Desparasitante aplicado</small>
-                        {% if form.ultimoDesparasitante.errors %}
-                        <div class="field-errors">
-                            {{ form.ultimoDesparasitante.errors }}
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+          
 
             <!-- Resto de campos de la consulta -->
             <div class="form-grid">
@@ -264,6 +240,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const ultimoDesparasitanteField = document.getElementById('id_ultimoDesparasitante');
     const addDocBtn = document.getElementById('add-doc-btn');
     const container = document.getElementById('documentos-container');
+
+    
+    
+    if (dropdown) {
+        dropdown.addEventListener('change', function() {
+            const mascotaId = this.value;
+            if (mascotaId) {
+                window.location.href = `?mascota=${mascotaId}`;
+            }
+        });
+    }
 
     // 🔍 FILTRO DE BÚSQUEDA
     searchInput.addEventListener('input', function() {

@@ -92,7 +92,7 @@
                         <span>{{ datos_mascota.sexo }}</span>
                     </div>
                     <div class="info-item">
-                        <strong>❤️ Estado:</strong>
+                        <strong>❤️ Vivo:</strong>
                         <span>{% if datos_mascota.vive %}Sí{% else %}No{% endif %}</span>
                     </div>
                 </div>
@@ -263,51 +263,34 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('mascota-search');
-    const dropdown = document.getElementById('id_mascota');
-    const cargarBtn = document.getElementById('cargar-mascota-btn');
+    // Selección del dropdown
+    const mascotaSelect = document.getElementById('id_mascota');
     
-    // 🔍 FILTRO DE BÚSQUEDA
-    if (searchInput && dropdown) {
+    if (mascotaSelect) {
+        mascotaSelect.addEventListener('change', function() {
+            const mascotaId = this.value;
+            if (mascotaId) {
+                window.location.href = `?mascota=${mascotaId}`;
+            }
+        });
+    }
+    
+    // Filtro de búsqueda
+    const searchInput = document.getElementById('mascota-search');
+    if (searchInput && mascotaSelect) {
         searchInput.addEventListener('input', function() {
-            const filter = searchInput.value.toLowerCase().replace(/\s+/g, '');
-            dropdown.querySelectorAll('option').forEach(option => {
+            const filter = this.value.toLowerCase().replace(/\s+/g, '');
+            mascotaSelect.querySelectorAll('option').forEach(option => {
                 const text = option.textContent.toLowerCase().replace(/\s+/g, '');
                 option.style.display = text.includes(filter) ? '' : 'none';
             });
         });
     }
     
-    // 🐾 CARGAR DATOS DE MASCOTA (recargar página con parámetro)
-    if (cargarBtn && dropdown) {
-        cargarBtn.addEventListener('click', function() {
-            const selectedOption = dropdown.options[dropdown.selectedIndex];
-            if (!selectedOption.value) {
-                alert('Por favor, selecciona una mascota primero.');
-                return;
-            }
-            
-            // Recargar página con la mascota seleccionada
-            window.location.href = `?mascota=${selectedOption.value}`;
-        });
-    }
-    
-    // 🔄 Recargar automáticamente al cambiar la selección
-    if (dropdown) {
-        dropdown.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            if (selectedOption.value) {
-                // Recargar automáticamente al cambiar la selección
-                window.location.href = `?mascota=${selectedOption.value}`;
-            }
-        });
-    }
-    
-    // 📅 Establecer fecha actual por defecto
+    // Fecha por defecto
     const fechaField = document.getElementById('id_fecha');
     if (fechaField && !fechaField.value) {
-        const today = new Date().toISOString().split('T')[0];
-        fechaField.value = today;
+        fechaField.value = new Date().toISOString().split('T')[0];
     }
 });
 </script>

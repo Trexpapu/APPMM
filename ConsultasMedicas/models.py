@@ -144,6 +144,7 @@ class ConsultasMedicas(models.Model):
         ('ESTABLES_LONGITUDINALES', 'ESTABLES LONGITUDINALES'),
 
         ('INESTABLES_FLUCTUANTES', 'INESTABLES FLUCTUANTES'),
+        ('NINGUNO', 'NINGUNO'),
     ]
 
     

@@ -4,7 +4,7 @@ from django.db import models
 # Create your models here.
 class Clientes(models.Model):
     nombre = models.CharField(max_length=255)
-    email = models.EmailField(unique=True, blank = True)
+    email = models.EmailField(unique=True, blank = True, null = True)
     telefono = models.CharField(max_length=20, unique = True)
     direccion = models.TextField(blank=True)
 

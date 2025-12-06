@@ -292,10 +292,7 @@ class ConsultaMedicaForm(forms.ModelForm):
             self.fields[field].widget.attrs['readonly'] = True
             self.fields[field].widget.attrs['style'] = 'background-color: #f8f9fa;'
         
-        # Establecer el veterinario actual como opción por defecto
-        from django.contrib.auth import get_user_model
-        User = get_user_model()
-        self.fields['veterinario'].queryset = User.objects.filter(is_active=True)
+      
 
 
 class ConsultaMedicaUpdateForm(forms.ModelForm):

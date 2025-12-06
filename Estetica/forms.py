@@ -121,9 +121,6 @@ class EsteticaForm(forms.ModelForm):
         self.fields['detallesServicio'].required = False
         self.fields['espeficiacionCorte'].required = False
         
-        # Configurar estilistas como usuarios con permiso de estética o staff
-        from django.contrib.auth.models import User
-        self.fields['estilista'].queryset = User.objects.filter(is_staff=True)
         
         # Ya no necesitamos manejar el estilo aquí, lo hará el JavaScript
 
@@ -241,7 +238,5 @@ class EsteticaUpdateForm(forms.ModelForm):
         self.fields['detallesServicio'].required = False
         self.fields['espeficiacionCorte'].required = False
         
-        from django.contrib.auth.models import User
-        self.fields['estilista'].queryset = User.objects.filter(is_staff=True)
         
        

@@ -25,7 +25,7 @@ import json
 from django.contrib.auth.decorators import login_required
 from datetime import date, datetime
 from django.utils.timezone import localtime
-
+from Agenda.views import permisos
 
 
 # Create your views here.
@@ -60,7 +60,7 @@ def nueva_consulta(request):
                 'alergias': mascota.alergias,
                 'ultimaDesparasitacion': mascota.ultimaDesparasitacion, 
                 'ultimoDesparasitante': mascota.ultimoDesparasitante,
-                'alimento': mascota.alimento,
+                'alimento': mascota.alimento
             })
             
             # 🔹 Preparar datos de la mascota para mostrar en el template
@@ -68,12 +68,18 @@ def nueva_consulta(request):
                 'nombre': mascota.nombre,
                 'especie': mascota.especie,
                 'raza': mascota.raza,
+                'vacunas': mascota.vacunas,
+                'vive': mascota.vive,
+                'ultimaDesparasitacion': mascota.ultimaDesparasitacion, 
+                'ultimoDesparasitante': mascota.ultimoDesparasitante,
                 'fechaNacimiento': mascota.fechaNacimiento,
                 'sexo': mascota.get_sexo_display(),
                 'cliente_nombre': mascota.cliente.nombre,
                 'cliente_telefono': mascota.cliente.telefono,
                 'cliente_email': mascota.cliente.email,
+                
             }
+            print(initial_data)
             
             # 🔹 Cargar consulta anterior SOLO si el usuario lo solicita
             if cargar_prev == "1":
@@ -98,13 +104,13 @@ def nueva_consulta(request):
         form = ConsultaMedicaForm(request.POST, initial=initial_data)
         
         if form.is_valid():
-            nConsulta = form.save(commit=False)
+            consulta = form.save(commit=False)
             mascota_id = request.POST.get('mascota')
 
             if mascota_id:
-                nConsulta.mascota_id = mascota_id
-                nConsulta.veterinario = request.user
-                nConsulta.save()
+                consulta.mascota_id = mascota_id
+                consulta, veterinario, veterinarioEmail=  permisos(request, consulta)
+                consulta.save()
 
                 # 🐾 Actualizar datos de la mascota (solo peso y alergias)
                 mascota = Mascotas.objects.get(pk=mascota_id)
@@ -122,7 +128,7 @@ def nueva_consulta(request):
                     if archivo:
                         descripcion = descripciones[i] if i < len(descripciones) else ''
                         documento = DocumentosConsulta(
-                            consulta=nConsulta,
+                            consulta=consulta,
                             archivo=archivo,
                             descripcion=descripcion
                         )
@@ -133,6 +139,7 @@ def nueva_consulta(request):
             else:
                 form.add_error(None, "Debe seleccionar una mascota antes de guardar.")
     else:
+        
         form = ConsultaMedicaForm(initial=initial_data)
 
     # 🔹 Determinar si mostrar la pregunta de cargar consulta previa
@@ -225,7 +232,8 @@ def ver_consultas(request):
     
     # Ordenar de la más nueva a la más vieja
     consultas = consultas.order_by('-fechaConsulta')
-    
+    if not filtros_activos:
+        consultas = consultas[:10]
     context = {
         'consultas': consultas,
         'query_cliente': query_cliente,
@@ -297,6 +305,8 @@ def editar_consulta(request, consulta_id):
         'raza': mascota_seleccionada.raza,
         'fechaNacimiento': mascota_seleccionada.fechaNacimiento,
         'sexo': mascota_seleccionada.get_sexo_display(),
+        'alimento': mascota_seleccionada.alimento,
+        'alimento': mascota_seleccionada.alimento,
         'cliente_nombre': mascota_seleccionada.cliente.nombre,
         'cliente_telefono': mascota_seleccionada.cliente.telefono,
         'cliente_email': mascota_seleccionada.cliente.email,
@@ -306,11 +316,12 @@ def editar_consulta(request, consulta_id):
         form = ConsultaMedicaUpdateForm(request.POST, instance=consulta)
         
         if form.is_valid():
-            consulta_editada = form.save(commit=False)
+            consulta = form.save(commit=False)
             mascota_id = request.POST.get('mascota')
             if mascota_id:
-                consulta_editada.mascota_id = mascota_id
-            consulta_editada.save()
+                consulta.mascota_id = mascota_id
+            consulta, veterinario, veterinarioEmail=  permisos(request, consulta)
+            consulta.save()
 
             # 🚫 NO actualizamos los datos de la mascota en la edición de consulta
             # Los datos se mantienen solo en la consulta, no en la mascota
@@ -330,7 +341,7 @@ def editar_consulta(request, consulta_id):
                 if archivo:
                     descripcion = descripciones[i] if i < len(descripciones) else ''
                     DocumentosConsulta.objects.create(
-                        consulta=consulta_editada,
+                        consulta=consulta,
                         archivo=archivo,
                         descripcion=descripcion
                     )

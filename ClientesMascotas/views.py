@@ -27,7 +27,7 @@ def ver_clientes(request):
             Q(telefono__icontains=query)
         )
     else:
-        clientes = Clientes.objects.all()
+        clientes = Clientes.objects.all()[:10]
     
     return render(request, 'clientesMascotas/Clientes/VerClientes.html', {
         'clientes': clientes,
@@ -64,6 +64,8 @@ def ver_mascotas(request):
     
     # Determinar si hay filtros activos
     filtros_activos = query_cliente or query_mascota
+    if not filtros_activos:
+        mascotas = mascotas[:10]
     
     return render(request, 'clientesMascotas/Mascotas/verMascotas.html', {
         'mascotas': mascotas,

@@ -121,7 +121,8 @@ def ver_proximas_citas(request):
          ),
          'fechaSiguienteCita'
      )
-    
+    if not filtros_activos:
+        consultas = consultas[:10]
     context = {
         'siguientesConsultas': consultas,
         'query_cliente': query_cliente,
@@ -305,7 +306,7 @@ def editar_proxima_cita(request, pk):
     mascotas = Mascotas.objects.all().select_related('cliente')
     mascota_id = request.GET.get('mascota') or str(proxConsulta.mascota.id) if proxConsulta.mascota else None
     
-    initial_data = {}
+    
     datos_mascota = None
 
     # 🔹 Cargar datos de la mascota cuando se selecciona una o la actual
@@ -347,20 +348,21 @@ def editar_proxima_cita(request, pk):
     if request.method == 'POST':
         form = UpdateSiguienteCitaForm(request.POST, instance=proxConsulta)
         if form.is_valid():
-            proxConsultaEditada = form.save(commit=False)
+            proximaCita = form.save(commit=False)
             mascota_id = request.POST.get('mascota')
             if mascota_id:
-                proxConsultaEditada.mascota_id = mascota_id
-            proxConsultaEditada.save()
-            if proxConsultaEditada.asistencia == 'Pendiente':
+                proximaCita.mascota_id = mascota_id
+            proximaCita, veterinario, veterinarioEmail=  permisos(request, proximaCita)
+            proximaCita.save()
+            if proximaCita.asistencia == 'Pendiente':
                 datos_formulario = {
-                    'ID': str(proxConsultaEditada.pk),
+                    'ID': str(proximaCita.pk),
                     'fecha_cita': form.cleaned_data["fechaSiguienteCita"],
                     'motivo' : form.cleaned_data["descripcionCita"],
                     'tipo_cita' : form.cleaned_data["tipoCita"],
                     'veterinaria' : form.cleaned_data["clinicaVeterinaria"],
-                    'veterinario': str(request.user), 
-                    'correo_veterinario': str(request.user.email), 
+                    'veterinario': str(veterinario), 
+                    'correo_veterinario': str(veterinarioEmail), 
                     'mensaje_Enviado' : "no", 
                     'sheet': 'agenda'
                 }

@@ -21,7 +21,7 @@
             <h3>🐾 Selección de Mascota</h3>
             
             <div class="alert alert-warning" style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
-                <strong>⚠️ Atención:</strong> Si cambias la mascota, los datos de peso y alergias se mantendrán como estaban en esta consulta.
+                <strong>⚠️ Atención:</strong> No puedes cambiar la mascota en la edición de consulta.
             </div>
             
             <div class="form-group">
@@ -62,14 +62,15 @@
                     {% endfor %}
                 </select>
             </div>
-
+            
             <!-- 🔄 Botón para cargar datos de la mascota seleccionada -->
+             
             <button type="button" id="cargar-mascota-btn" class="btn-home">
                 🔄 Cargar Datos Actuales de Mascota
             </button>
             <small class="help-text" style="display: block; margin-top: 5px;">
                 Este botón carga los datos <strong>actuales</strong> de la mascota seleccionada. Los datos de la consulta original se mantendrán si no los cambias.
-            </small>
+            </small> -->
         </div>
 
         <!-- 📋 INFORMACIÓN DE LA MASCOTA ACTUAL -->
@@ -122,93 +123,23 @@
                 {{ form.errors }}
             </div>
             {% endif %}
-            
-            <!-- Campos editables: Peso y Alergias -->
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="id_peso">⚖️ Peso (kg):</label>
-                    {{ form.peso }}
-                    <small class="help-text">Peso registrado en esta consulta</small>
-                    {% if form.peso.errors %}
-                    <div class="field-errors">
-                        {{ form.peso.errors }}
-                    </div>
-                    {% endif %}
+
+
+           <div class="form-grid">
+            {% for field in form %}
+            <div class="form-group {% if field.field.widget.input_type == 'textarea' %}full-width{% endif %}">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                <small class="help-text">{{ field.help_text }}</small>
+                {% endif %}
+                {% if field.errors %}
+                <div class="field-errors">
+                    {{ field.errors }}
                 </div>
-                
-                <div class="form-group full-width">
-                    <label for="id_alergias">⚠️ Alergias:</label>
-                    {{ form.alergias }}
-                    <small class="help-text">Alergias registradas en esta consulta</small>
-                    {% if form.alergias.errors %}
-                    <div class="field-errors">
-                        {{ form.alergias.errors }}
-                    </div>
-                    {% endif %}
-                </div>
+                {% endif %}
             </div>
-
-            <!-- SECCIÓN DE DATOS DE PROCEDIMIENTOS (solo lectura) -->
-            <div class="form-section" style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                <h4 style="color: #495057; margin-bottom: 15px;">📋 Datos de Procedimientos (solo lectura)</h4>
-                
-                <!-- Campo de solo lectura: Vacunas -->
-                <div class="form-group full-width">
-                    <label for="id_vacunas">💉 Vacunas:</label>
-                    {{ form.vacunas }}
-                    <small class="help-text">Vacunas registradas en esta consulta</small>
-                    {% if form.vacunas.errors %}
-                    <div class="field-errors">
-                        {{ form.vacunas.errors }}
-                    </div>
-                    {% endif %}
-                </div>
-
-                <!-- Campos de solo lectura: Desparasitación -->
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="id_ultimaDesparasitacion">📅 Última desparasitación:</label>
-                        {{ form.ultimaDesparasitacion }}
-                        <small class="help-text">Fecha de la última desparasitación registrada</small>
-                        {% if form.ultimaDesparasitacion.errors %}
-                        <div class="field-errors">
-                            {{ form.ultimaDesparasitacion.errors }}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        <label for="id_ultimoDesparasitante">💊 Último desparasitante:</label>
-                        {{ form.ultimoDesparasitante }}
-                        <small class="help-text">Desparasitante aplicado registrado</small>
-                        {% if form.ultimoDesparasitante.errors %}
-                        <div class="field-errors">
-                            {{ form.ultimoDesparasitante.errors }}
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Resto de campos de la consulta -->
-            <div class="form-grid">
-                {% for field in form %}
-                    {% if field.name not in 'peso alergias vacunas ultimaDesparasitacion ultimoDesparasitante' %}
-                    <div class="form-group {% if field.field.widget.input_type == 'textarea' %}full-width{% endif %}">
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.help_text %}
-                        <small class="help-text">{{ field.help_text }}</small>
-                        {% endif %}
-                        {% if field.errors %}
-                        <div class="field-errors">
-                            {{ field.errors }}
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
+            {% endfor %}
         </div>
 
         <!-- 📎 SECCIÓN DE DOCUMENTOS EXISTENTES -->
@@ -329,6 +260,15 @@ document.addEventListener('DOMContentLoaded', function() {
     const modalMessage = document.getElementById('modalMessage');
     const deleteForm = document.getElementById('deleteForm');
     const cancelDelete = document.getElementById('cancelDelete');
+
+    if (dropdown) {
+        dropdown.addEventListener('change', function() {
+            const mascotaId = this.value;
+            if (mascotaId) {
+                window.location.href = `?mascota=${mascotaId}`;
+            }
+        });
+    }
 
     // 🔍 FILTRO DE BÚSQUEDA
     searchInput.addEventListener('input', function() {

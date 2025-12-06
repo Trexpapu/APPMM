@@ -20,7 +20,7 @@ from reportlab.lib.units import inch
 from django.conf import settings
 import os
 from django.utils.timezone import localtime
-
+from Agenda.views import permisos
 # Create your views here.
 @login_required
 def indexProcedimientos(request):
@@ -56,7 +56,7 @@ def crear_operacion(request):
                 operacion.fotoAntes = encode_image_to_base64(request.FILES['fotoAntes'])
             if 'fotoDespues' in request.FILES:
                 operacion.fotoDespues = encode_image_to_base64(request.FILES['fotoDespues'])
-            
+            operacion, veterinario, veterinarioEmail=  permisos(request, operacion)
             operacion.save()
             messages.success(request, "Operación registrada correctamente.")
             return redirect('index-procedimientos')
@@ -97,7 +97,7 @@ def editar_operacion(request, pk):
             else:
                 # Mantener la imagen existente - NO hacer nada, ya está en la instancia
                 pass
-            
+            operacion_editada, veterinario, veterinarioEmail=  permisos(request, operacion_editada)
             operacion_editada.save()
             messages.success(request, "Operación actualizada correctamente.")
             return redirect('detalle_operacion', pk=operacion.pk)
@@ -123,7 +123,7 @@ def historial_operaciones(request):
     query_veterinario = request.GET.get('q_veterinario', '')
     query_veterinaria = request.GET.get('q_veterinaria', '')
     query_fecha_entrada = request.GET.get('q_fecha_entrada', '')
-    
+    filtros_activos = any([query_cliente, query_mascota, query_veterinaria, query_fecha_entrada, query_operacion])
     # Aplicar filtros
     if query_cliente:
         operaciones = operaciones.filter(
@@ -159,6 +159,8 @@ def historial_operaciones(request):
     # Datos para filtros
     veterinarios = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
     clinicas = Operaciones.CLINICAS
+    if not filtros_activos:
+        operaciones = operaciones[:10]
     
     context = {
         'operaciones': operaciones,
@@ -280,13 +282,16 @@ def nueva_vacunacion(request):
     if request.method == 'POST':
         form = VacunacionesForm(request.POST)
         if form.is_valid():
-            vacunacion = form.save()
-            
+            vacunacion = form.save(commit=False)
+            vacunacion, veterinario, veterinarioEmail=  permisos(request, vacunacion)
+            vacunacion.save()
+
+
             # Actualizar las vacunas de la mascota
             mascota = vacunacion.mascota
             vacunas_data = Vacunaciones.objects.filter(mascota=mascota)
             vacunas_cleaned_data = ", ".join([str(v.vacunas) for v in vacunas_data])
-            
+            print(vacunas_cleaned_data)
             mascota.vacunas = vacunas_cleaned_data
             mascota.save()
             
@@ -357,6 +362,8 @@ def historial_vacunaciones(request):
     # Determinar si hay filtros activos
     filtros_activos = any([query_cliente, query_mascota, query_veterinario, 
                           query_veterinaria, query_vacuna, query_fecha])
+    if not filtros_activos:
+        vacunaciones = vacunaciones[:10]
     
     return render(request, 'procedimientos/vacunaciones/verVacunaciones.html', {
         'vacunaciones': vacunaciones,
@@ -380,15 +387,17 @@ def editar_vacunacion(request, pk):
     if request.method == 'POST':
         form = VacunacionesUpdateForm(request.POST, instance=vacunacion)
         if form.is_valid():
-            vacunacion_actualizada = form.save()
+            vacunacion = form.save(commit=False)
             
             # Actualizar las vacunas de la mascota
-            mascota = vacunacion_actualizada.mascota
+            mascota = vacunacion.mascota
             vacunas_data = Vacunaciones.objects.filter(mascota=mascota)
             vacunas_cleaned_data = ", ".join([str(v.vacunas) for v in vacunas_data])
             
             mascota.vacunas = vacunas_cleaned_data
             mascota.save()
+            vacunacion, veterinario, veterinarioEmail=  permisos(request, vacunacion)
+            vacunacion.save()
             
             messages.success(request, "✅ Vacunación actualizada exitosamente.")
             return redirect('historial_vacunaciones')
@@ -497,7 +506,7 @@ def nueva_desparasitacion(request):
         form = DesparasitacionesForm(request.POST)
         if form.is_valid():
             # Guardar la desparasitación
-            desparasitacion = form.save()
+            desparasitacion = form.save(commit=False)
             
             # Actualizar datos de mascota
             mascota = desparasitacion.mascota
@@ -505,7 +514,9 @@ def nueva_desparasitacion(request):
             mascota.ultimoDesparasitante = str(desparasitacion.desparasitante)
             mascota.peso = desparasitacion.peso  # Actualizar el peso con el nuevo valor
             mascota.save()
-            
+
+            desparasitacion, veterinario, veterinarioEmail=  permisos(request, desparasitacion)
+            desparasitacion.save()
             messages.success(request, "✅ Desparasitación registrada exitosamente.")
             return redirect('index-procedimientos')
     else:
@@ -572,6 +583,8 @@ def historial_desparasitaciones(request):
     # Determinar si hay filtros activos
     filtros_activos = any([query_cliente, query_mascota, query_veterinario, 
                           query_veterinaria, query_desparasitante, query_fecha])
+    if not filtros_activos:
+        desparasitaciones = desparasitaciones[:10]
     
     return render(request, 'procedimientos/desparasitaciones/verDesparasitaciones.html', {
         'desparasitaciones': desparasitaciones,

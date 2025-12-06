@@ -19,8 +19,17 @@ from reportlab.lib.units import inch
 from django.conf import settings
 import os
 from django.utils.timezone import localtime
-# Create your views here.
 
+# Create your views here.
+def permisos(request, obj):
+    if request.user.is_superuser:
+        veterinario = obj.estilista.username
+        veterinarioEmail = obj.estilista.email
+    else: 
+        veterinario = request.user.username
+        veterinarioEmail = request.user.email
+        obj.estilista = request.user
+    return obj, veterinario, veterinarioEmail
 
 @login_required
 def indexInicioEstetica(request):
@@ -70,7 +79,8 @@ def servicio_estetica_crear(request):
                 estetica.fotoAntes = encode_image_to_base64(request.FILES['fotoAntes'])
             if 'fotoDespues' in request.FILES:
                 estetica.fotoDespues = encode_image_to_base64(request.FILES['fotoDespues'])
-            
+
+            estetica, veterinario, veterinarioEmail=  permisos(request, estetica)
             estetica.save()
             messages.success(request, "Servicio de estética registrado correctamente.")
             return redirect('index-estetica')  # Cambiar por tu URL de listado
@@ -142,7 +152,8 @@ def historial_estetica(request):
             if clinica[0] == query_clinica:
                 clinica_seleccionada = clinica[1]
                 break
-    
+    if not filtros_activos:
+        esteticas = esteticas[:10]
     context = {
         'esteticas': esteticas,
         'clinicas': clinicas,
@@ -218,7 +229,7 @@ def servicio_estetica_editar(request, pk):
             else:
                 # Mantener la imagen existente - NO hacer nada, ya está en la instancia
                 pass
-            
+            estetica_editada, veterinario, veterinarioEmail=  permisos(request, estetica_editada)
             estetica_editada.save()
             messages.success(request, "Servicio de estética actualizado correctamente.")
             return redirect('servicio_estetica_detalle', pk=estetica.pk)
