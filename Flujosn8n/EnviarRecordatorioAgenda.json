@@ -1,0 +1,953 @@
+{
+  "name": "EnviarRecordatorioAgenda",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "53810789-8205-4a78-95fd-b69db6ed2c54",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q",
+          "mode": "list",
+          "cachedResultName": "Base de datos Mascotas Morelia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Agenda",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        288,
+        0
+      ],
+      "id": "8fdbed2a-02ae-41f5-b6f2-d48b80425639",
+      "name": "Obtener datos",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3nRF5ZsAkYzNabuO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $json.Fecha.split('T')[0] }}",
+        "outputFieldName": "FechaCitaFormateada",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        512,
+        0
+      ],
+      "id": "016ad79c-51ab-4bb6-935c-8044cce3c7d6",
+      "name": "Fecha de cita"
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $today.plus({ days: 3 }) }}",
+        "outputFieldName": "Fecha3dias",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        784,
+        16
+      ],
+      "id": "c5659157-5ab9-475d-97b8-45d26ad906f7",
+      "name": "Hoy + 3 dias"
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $today.plus({ days: 1 }) }}",
+        "outputFieldName": "Fecha1dias",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        736,
+        -240
+      ],
+      "id": "a4926e3d-a0b9-4c22-aadb-076534254dd2",
+      "name": "Hoy + 1 dia"
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $today }}",
+        "outputFieldName": "FechaHoy",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        784,
+        208
+      ],
+      "id": "4f817f26-ce53-4a08-8e49-d6892bd6bf9e",
+      "name": "FechaHoy"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6f5ccc66-a308-4432-afc5-48432062b718",
+              "leftValue": "={{ $('Fecha de cita').item.json.FechaCitaFormateada }}",
+              "rightValue": "={{ $('Hoy + 1 dia').item.json.Fecha1dias }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "d5301def-33ee-422b-9776-a5f6e466d24d",
+              "leftValue": "={{ $('Obtener datos').item.json['Mensaje enviado 1 dia'] }}",
+              "rightValue": "no",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        976,
+        -240
+      ],
+      "id": "7b6208a0-8d04-4ed8-99e5-9d2c688c8043",
+      "name": "Citas dia siguiente",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a6b98f29-b3e2-49b4-accc-a9d22e84e360",
+              "leftValue": "={{ $('Fecha de cita').item.json.FechaCitaFormateada }}",
+              "rightValue": "={{ $json.Fecha3dias }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "b9efb256-3853-4c43-b8da-c332e54cc800",
+              "leftValue": "={{ $('Obtener datos').item.json['Mensaje Enviado 3 dias'] }}",
+              "rightValue": "no",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1072,
+        16
+      ],
+      "id": "f33b9111-fa1e-4c3f-9d31-6c6f9301a4ca",
+      "name": "Citas en 3 dias",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6f5ccc66-a308-4432-afc5-48432062b718",
+              "leftValue": "={{ $('Fecha de cita').item.json.FechaCitaFormateada }}",
+              "rightValue": "={{ $json.FechaHoy }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1024,
+        224
+      ],
+      "id": "8bbab605-b6ca-41a3-99c7-784187c6a173",
+      "name": "Citas de hoy",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q",
+          "mode": "list",
+          "cachedResultName": "Base de datos Mascotas Morelia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Agenda",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('Obtener datos').item.json.ID }}",
+            "Mensaje enviado 1 dia": "si"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mascota",
+              "displayName": "Mascota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Especie",
+              "displayName": "Especie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Raza",
+              "displayName": "Raza",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Sexo",
+              "displayName": "Sexo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Peso",
+              "displayName": "Peso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Cliente",
+              "displayName": "Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Correo",
+              "displayName": "Correo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Veterinario",
+              "displayName": "Veterinario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Veterinaria",
+              "displayName": "Veterinaria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Motivo",
+              "displayName": "Motivo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Tipo Cita",
+              "displayName": "Tipo Cita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Correo Veterinario",
+              "displayName": "Correo Veterinario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Mensaje Enviado 3 dias",
+              "displayName": "Mensaje Enviado 3 dias",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Mensaje enviado 1 dia",
+              "displayName": "Mensaje enviado 1 dia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1424,
+        -240
+      ],
+      "id": "64eaa72b-58e5-4b1e-a063-4fed0ca24262",
+      "name": "actualizar mensaje 1 dia",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3nRF5ZsAkYzNabuO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q",
+          "mode": "list",
+          "cachedResultName": "Base de datos Mascotas Morelia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Agenda",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('Obtener datos').item.json.ID }}",
+            "Mensaje Enviado 3 dias": "si"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mascota",
+              "displayName": "Mascota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Especie",
+              "displayName": "Especie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Raza",
+              "displayName": "Raza",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Sexo",
+              "displayName": "Sexo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Peso",
+              "displayName": "Peso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Cliente",
+              "displayName": "Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Correo",
+              "displayName": "Correo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Veterinario",
+              "displayName": "Veterinario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Veterinaria",
+              "displayName": "Veterinaria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Motivo",
+              "displayName": "Motivo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Tipo Cita",
+              "displayName": "Tipo Cita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Correo Veterinario",
+              "displayName": "Correo Veterinario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Mensaje Enviado 3 dias",
+              "displayName": "Mensaje Enviado 3 dias",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mensaje enviado 1 dia",
+              "displayName": "Mensaje enviado 1 dia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1520,
+        16
+      ],
+      "id": "817213e3-5fa0-43c3-93be-ef790f64cadc",
+      "name": "actualizar mensaje 3 dias",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3nRF5ZsAkYzNabuO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Obtener datos').item.json.Correo }}",
+        "subject": "=Cita en Mascotas Morelia para {{ $('Obtener datos').item.json.Mascota }} {{ new Date($('Obtener datos').item.json.Fecha).toLocaleString('es-ES', { timeZone: 'America/Mexico_City', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}",
+        "emailType": "text",
+        "message": "=Estimad@ {{ $('Obtener datos').item.json.Cliente }},\n\nMascotas Morelia te recuerda que la cita de tu mascota {{ $('Obtener datos').item.json.Mascota }} es mañana {{ new Date($('Obtener datos').item.json.Fecha).toLocaleString('es-ES', { timeZone: 'America/Mexico_City', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}.\n\nLa cita es para {{ $('Obtener datos').item.json['Tipo Cita'] }} y el motivo es {{ $('Obtener datos').item.json.Motivo }}.\n\nLa cita será atendida por {{ $('Obtener datos').item.json.Veterinario }} en la clínica {{ $('Obtener datos').item.json.Veterinaria }}.\n\nDatos de tu mascota:\n• Especie: {{ $('Obtener datos').item.json.Especie }}\n• Raza: {{ $('Obtener datos').item.json.Raza }}\n• Sexo: {{ $('Obtener datos').item.json.Sexo }}\n• Peso: {{ $('Obtener datos').item.json.Peso }} kg\n\n\n¡Esperamos verte pronto!",
+        "options": {
+          "bccList": "={{ $('Obtener datos').item.json['Correo Veterinario'] }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1184,
+        -240
+      ],
+      "id": "937619a0-d207-42fe-865b-cf208e44dfda",
+      "name": "correo recordatorio dia siguiente",
+      "webhookId": "b1e13dbc-762c-472a-8b9b-850121cf1eee",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "oMzw6dcsBT2FIzoM",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q",
+          "mode": "list",
+          "cachedResultName": "Base de datos Mascotas Morelia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Agenda",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit#gid=0"
+        },
+        "clear": "specificRows",
+        "startIndex": "={{ $('Obtener datos').item.json.row_number }}"
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1488,
+        240
+      ],
+      "id": "136c9a06-b412-4d6d-ab26-4d56f47c037c",
+      "name": "Clear sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3nRF5ZsAkYzNabuO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Obtener datos').item.json.Correo }}",
+        "subject": "=Cita en Mascotas Morelia para {{ $('Obtener datos').item.json.Mascota }} {{ new Date($('Obtener datos').item.json.Fecha).toLocaleString('es-ES', { timeZone: 'America/Mexico_City', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}",
+        "emailType": "text",
+        "message": "=Estimad@ {{ $('Obtener datos').item.json.Cliente }},\n\nMascotas Morelia te recuerda que la cita de tu mascota {{ $('Obtener datos').item.json.Mascota }} está próxima.\n\nLa cita es para {{ $('Obtener datos').item.json['Tipo Cita'] }} y el motivo es {{ $('Obtener datos').item.json.Motivo }}, programada para el día {{ new Date($('Obtener datos').item.json.Fecha).toLocaleString('es-ES', { timeZone: 'America/Mexico_City', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}.\n\nLa cita será atendida por {{ $('Obtener datos').item.json.Veterinario }} en la clínica {{ $('Obtener datos').item.json.Veterinaria }}.\n\nDatos de tu mascota:\n• Especie: {{ $('Obtener datos').item.json.Especie }}\n• Raza: {{ $('Obtener datos').item.json.Raza }}\n• Sexo: {{ $('Obtener datos').item.json.Sexo }}\n• Peso: {{ $('Obtener datos').item.json.Peso }} kg\n\n\n¡Esperamos verte pronto!",
+        "options": {
+          "bccList": "={{ $('Obtener datos').item.json['Correo Veterinario'] }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1296,
+        32
+      ],
+      "id": "dd64ebf3-480f-4437-add2-a8a70ec99751",
+      "name": "Correo recordatorio en 3 dias",
+      "webhookId": "b1e13dbc-762c-472a-8b9b-850121cf1eee",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "oMzw6dcsBT2FIzoM",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Obtener datos').item.json.Correo }}",
+        "subject": "=Cita en Mascotas Morelia para {{ $('Obtener datos').item.json.Mascota }} {{ new Date($('Obtener datos').item.json.Fecha).toLocaleString('es-ES', { timeZone: 'America/Mexico_City', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}",
+        "emailType": "text",
+        "message": "=Estimad@ {{ $('Obtener datos').item.json.Cliente }},\n\nMascotas Morelia te recuerda que la cita de tu mascota {{ $('Obtener datos').item.json.Mascota }} es hoy {{ new Date($('Obtener datos').item.json.Fecha).toLocaleString('es-ES', { timeZone: 'America/Mexico_City', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}.\n\nLa cita es para {{ $('Obtener datos').item.json['Tipo Cita'] }} y el motivo es {{ $('Obtener datos').item.json.Motivo }}.\n\nLa cita será atendida por {{ $('Obtener datos').item.json.Veterinario }} en la clínica {{ $('Obtener datos').item.json.Veterinaria }}.\n\nDatos de tu mascota:\n• Especie: {{ $('Obtener datos').item.json.Especie }}\n• Raza: {{ $('Obtener datos').item.json.Raza }}\n• Sexo: {{ $('Obtener datos').item.json.Sexo }}\n• Peso: {{ $('Obtener datos').item.json.Peso }} kg\n\n\n¡Esperamos verte pronto!",
+        "options": {
+          "bccList": "={{ $('Obtener datos').item.json['Correo Veterinario'] }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1280,
+        240
+      ],
+      "id": "0e8bf2b8-05c6-469f-9311-7e89ab332af1",
+      "name": "correo recordatorio hoy",
+      "webhookId": "b1e13dbc-762c-472a-8b9b-850121cf1eee",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "oMzw6dcsBT2FIzoM",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Obtener datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener datos": {
+      "main": [
+        [
+          {
+            "node": "Fecha de cita",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fecha de cita": {
+      "main": [
+        [
+          {
+            "node": "FechaHoy",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Hoy + 3 dias",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Hoy + 1 dia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hoy + 3 dias": {
+      "main": [
+        [
+          {
+            "node": "Citas en 3 dias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hoy + 1 dia": {
+      "main": [
+        [
+          {
+            "node": "Citas dia siguiente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FechaHoy": {
+      "main": [
+        [
+          {
+            "node": "Citas de hoy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Citas en 3 dias": {
+      "main": [
+        [
+          {
+            "node": "Correo recordatorio en 3 dias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Citas dia siguiente": {
+      "main": [
+        [
+          {
+            "node": "correo recordatorio dia siguiente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "correo recordatorio dia siguiente": {
+      "main": [
+        [
+          {
+            "node": "actualizar mensaje 1 dia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Citas de hoy": {
+      "main": [
+        [
+          {
+            "node": "correo recordatorio hoy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Correo recordatorio en 3 dias": {
+      "main": [
+        [
+          {
+            "node": "actualizar mensaje 3 dias",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "correo recordatorio hoy": {
+      "main": [
+        [
+          {
+            "node": "Clear sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ecae567e-2910-409f-8f30-30311f749d6a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bb5b4802a342c7ba50e55216edd01b9f6f5f5420b80da26ca81d9dac80937c07"
+  },
+  "id": "sjzxZr2UGtCDd6I8",
+  "tags": []
+}

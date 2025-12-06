@@ -19,7 +19,16 @@ from django.db.models import Case, When, Value
 from django.utils import timezone
 from datetime import datetime
 
-
+def permisos(request, obj):
+    if request.user.is_superuser:
+        veterinario = obj.veterinario.username
+        veterinarioEmail = obj.veterinario.email
+    else: 
+        veterinario = request.user.username
+        veterinarioEmail = request.user.email
+        obj.veterinario = request.user
+    return obj, veterinario, veterinarioEmail
+    
 @login_required
 def indexAgenda(request):
     return render(request, 'agenda/proximasCitas/indexAgenda.html')
@@ -172,7 +181,7 @@ def enviar_datos(datos_mascota, datos_formulario, url= "http://localhost:5678/we
         print("Error:", e)
 
 
-def borrar_datos(datos_, url= "http://localhost:5678/webhook/agregar"):
+def borrar_datos(datos_, url= "http://localhost:5678/webhook/eliminar-datos"):
     datos = {
         **datos_,
         
@@ -198,7 +207,6 @@ def agendar_proxima_cita(request):
     mascotas = Mascotas.objects.all().select_related('cliente')
     mascota_id = request.GET.get('mascota') or request.POST.get('mascota')
     
-    initial_data = {}
     datos_mascota = None
 
     # 🔹 Cargar datos de la mascota cuando se selecciona una
@@ -239,14 +247,17 @@ def agendar_proxima_cita(request):
 
     # 🔹 POST: Guardar nueva cita
     if request.method == 'POST':
+
         form = SiguientesCitasForm(request.POST)
         if form.is_valid():
             proximaCita = form.save(commit=False)
             mascota_id = request.POST.get('mascota')
+                
 
             if mascota_id:
                 proximaCita.mascota_id = mascota_id
-                proximaCita.veterinario = request.user
+                #validacion 
+                proximaCita, veterinario, veterinarioEmail=  permisos(request, proximaCita)
                 proximaCita.save()
                 messages.success(request, "Cita agendada correctamente.")
                 datos_formulario = {
@@ -255,11 +266,12 @@ def agendar_proxima_cita(request):
                     'motivo' : form.cleaned_data["descripcionCita"],
                     'tipo_cita' : form.cleaned_data["tipoCita"],
                     'veterinaria' : form.cleaned_data["clinicaVeterinaria"],
-                    'veterinario': str(request.user), 
-                    'correo_veterinario': str(request.user.email), 
+                    'veterinario': str(veterinario), 
+                    'correo_veterinario': str(veterinarioEmail), 
                     'mensaje_Enviado' : "no", 
                     'sheet': 'agenda'
                 }
+                
                 enviar_datos(datos_mascota_n8n, datos_formulario)
                 return redirect('index-agenda')
             else:
@@ -283,7 +295,7 @@ def borrar_proxima_cita(request, pk):
         'ID': str(pk),
         'sheet': 'agenda'
     }
-    borrar_datos(datos_, url= "http://localhost:5678/webhook/eliminar-datos")
+    borrar_datos(datos_)
     return redirect('ver-proximas-citas')
 
 @login_required

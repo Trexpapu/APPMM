@@ -62,6 +62,25 @@ def enviar_datos(datos_mascota, datos_formulario, url):
         print("Error:", e)
 
 
+def borrar_datos(datos_, url= "http://localhost:5678/webhook/eliminar-datos"):
+    datos = {
+        **datos_,
+        
+    }
+    # Convertir el diccionario a una cadena JSON manualmente, usando nuestro serializador personalizado
+    try:
+        datos_json = json.dumps(datos, default=json_serializer)
+    except TypeError as e:
+        print(f"Error al serializar los datos: {e}")
+        return
+
+    # Enviar la solicitud con el JSON ya serializado
+    try:
+        response = requests.post(url, data=datos_json, headers={'Content-Type': 'application/json'})
+        print("Respuesta:", response.text)
+    except Exception as e:
+        print("Error:", e)
+
 @login_required
 def index_guarderia_hospitalizacion(request):
     return render(request, 'guarderiaHospitalizacion/indexGuarderiaHospitalizacion.html')
@@ -247,6 +266,15 @@ def servicio_guarderia_editar(request, pk):
                 'cliente_telefono': mascota.cliente.telefono,
                 'cliente_email': mascota.cliente.email,
             }
+            datos_mascota_n8n = {
+                'nombre': mascota.nombre,
+                'especie': mascota.especie,
+                'raza': mascota.raza,
+                'peso': mascota.peso,
+                'sexo': mascota.get_sexo_display(),
+                'cliente_nombre': mascota.cliente.nombre,
+                'cliente_email': mascota.cliente.email,
+            }
             
         except Mascotas.DoesNotExist:
             mascota_id = None
@@ -278,6 +306,15 @@ def servicio_guarderia_editar(request, pk):
             
             guarderia_editada.save()
             messages.success(request, "Servicio de guardería actualizado correctamente.")
+            datos_formulario = {
+                    'ID': str(guarderia_editada.pk),
+                    'fecha_salida': form.cleaned_data["fechaSalidaProgramada"],
+                    'anticipo' : form.cleaned_data["pagado"],
+                    'pago_total' : form.cleaned_data["pagoTotal"],
+                    'veterinaria' : form.cleaned_data["clinicaVeterinaria"],
+                    'sheet': 'guarderia'
+                }
+            enviar_datos(datos_mascota_n8n, datos_formulario, "http://localhost:5678/webhook/editar-datos")
             return redirect('servicio_guarderia_detalle', pk=guarderia.pk)
     else:
         form = GuarderiaUpdateForm(instance=guarderia)
@@ -589,6 +626,11 @@ def servicio_guarderia_eliminar(request, pk):
     """View to delete an existing pet."""
     guarderia = get_object_or_404(Guarderia, pk=pk)
     guarderia.delete()
+    datos_ = {
+        'ID': str(pk),
+        'sheet': 'guarderia'
+    }
+    borrar_datos(datos_)
     return redirect('historial-guarderia')
 
 
@@ -624,6 +666,15 @@ def servicio_hospitalizacion_crear(request):
                 'cliente_telefono': mascota.cliente.telefono,
                 'cliente_email': mascota.cliente.email,
             }
+            datos_mascota_n8n = {
+                'nombre': mascota.nombre,
+                'especie': mascota.especie,
+                'raza': mascota.raza,
+                'peso': mascota.peso,
+                'sexo': mascota.get_sexo_display(),
+                'cliente_nombre': mascota.cliente.nombre,
+                'cliente_email': mascota.cliente.email,
+            }
             
         except Mascotas.DoesNotExist:
             mascota_id = None
@@ -642,6 +693,15 @@ def servicio_hospitalizacion_crear(request):
             
             hospitalizacion.save()
             messages.success(request, "Servicio de hospitalización registrado correctamente.")
+            datos_formulario = {
+                    'ID': str(hospitalizacion.pk),
+                    'fecha_salida': form.cleaned_data["fechaSalida"],
+                    'anticipo' : form.cleaned_data["pagado"],
+                    'pago_total' : form.cleaned_data["pagoTotal"],
+                    'veterinaria' : form.cleaned_data["clinicaVeterinaria"],
+                    'sheet': 'hospitalizacion'
+                }
+            enviar_datos(datos_mascota_n8n, datos_formulario, "http://localhost:5678/webhook/agregar")
             return redirect('index-guarderia-hospitalizacion')  # Ajusta según tu URL
     else:
         form = HospitalizacionForm(initial=initial_data)
@@ -687,6 +747,15 @@ def servicio_hospitalizacion_editar(request, pk):
                 'cliente_telefono': mascota.cliente.telefono,
                 'cliente_email': mascota.cliente.email,
             }
+            datos_mascota_n8n = {
+                'nombre': mascota.nombre,
+                'especie': mascota.especie,
+                'raza': mascota.raza,
+                'peso': mascota.peso,
+                'sexo': mascota.get_sexo_display(),
+                'cliente_nombre': mascota.cliente.nombre,
+                'cliente_email': mascota.cliente.email,
+            }
             
         except Mascotas.DoesNotExist:
             mascota_id = None
@@ -719,6 +788,15 @@ def servicio_hospitalizacion_editar(request, pk):
             
             hospitalizacion_editada.save()
             messages.success(request, "Servicio de hospitalización actualizado correctamente.")
+            datos_formulario = {
+                    'ID': str(hospitalizacion_editada.pk),
+                    'fecha_salida': form.cleaned_data["fechaSalida"],
+                    'anticipo' : form.cleaned_data["pagado"],
+                    'pago_total' : form.cleaned_data["pagoTotal"],
+                    'veterinaria' : form.cleaned_data["clinicaVeterinaria"],
+                    'sheet': 'hospitalizacion'
+                }
+            enviar_datos(datos_mascota_n8n, datos_formulario, "http://localhost:5678/webhook/editar-datos")
             return redirect('servicio_hospitalizacion_detalle', pk=hospitalizacion.pk)
     else:
         form = HospitalizacionUpdateForm(instance=hospitalizacion)
@@ -1124,4 +1202,9 @@ def servicio_hospitalizacion_eliminar(request, pk):
     """View to delete an existing pet."""
     hospitalizacion = get_object_or_404(Hospitalizacion, pk=pk)
     hospitalizacion.delete()
+    datos_ = {
+        'ID': str(pk),
+        'sheet': 'hospitalizacion'
+    }
+    borrar_datos(datos_)
     return redirect('historial-hospitalizacion')

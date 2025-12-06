@@ -1,0 +1,157 @@
+{
+  "name": "Enviar Receta",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "receta",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "83d43ce5-33e3-4070-8f88-45b8746c7c38",
+      "name": "Webhook",
+      "webhookId": "1d9bc565-c1f2-4227-9e6f-43258650a44d"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Webhook').item.json.body.cliente_email }}",
+        "subject": "=Mascotas Morelia receta para {{ $('Webhook').item.json.body.nombre }}",
+        "emailType": "text",
+        "message": "=📋 Datos de la Mascota\n• Especie: {{ $('Webhook').item.json.body.especie }}\n• Raza: {{ $('Webhook').item.json.body.raza }}\n• Fecha de nacimiento: {{ $('Fecha Nacimiento').item.json['Fecha Nacimiento'] }}\n• Peso: {{ $('Webhook').item.json.body.peso }} kg\n• Sexo: {{ $('Webhook').item.json.body.sexo }}\n• Vacunas: {{ $('Webhook').item.json.body.vacunas }}\n• Alergias: {{ $('Webhook').item.json.body.alergias }}\n• Alimento: {{ $('Webhook').item.json.body.alimento }}\n• Última desparasitación: {{ $('Fecha Desp').item.json['Fecha Desparasitacion'] }}\n• Desparasitante aplicado: {{ $('Webhook').item.json.body.ultimoDesparasitante }}\n\n👤 Datos del Cliente\n• Nombre: {{ $('Webhook').item.json.body.cliente_nombre }}\n• Teléfono: {{ $('Webhook').item.json.body.cliente_telefono }}\n\n📝 Receta – Mascotas Morelia\n{{ $('Webhook').item.json.body.descripcion }}\n\n📅 Fecha de emisión: {{ $('Fecha Receta').item.json['Fecha Receta'] }}\n\n🏥 Clínica: {{ $('Webhook').item.json.body.veterinaria }}\n\n👨‍⚕️ Veterinario responsable: {{ $('Webhook').item.json.body.veterinario }}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "4b6b3bbb-839e-4d54-ba27-a9c160ba5ecd",
+      "name": "Send a message",
+      "webhookId": "143b1c11-70bb-4861-9dc4-c124fd871812",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "oMzw6dcsBT2FIzoM",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $('Webhook').item.json.body.fechaNacimiento }}",
+        "format": "custom",
+        "customFormat": "dd-MM-yyyy",
+        "outputFieldName": "Fecha Nacimiento",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        160,
+        0
+      ],
+      "id": "cacf3018-35b4-46d2-997d-4ed5c97baf33",
+      "name": "Fecha Nacimiento"
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $('Webhook').item.json.body.fecha }}",
+        "format": "custom",
+        "customFormat": "dd-MM-yyyy",
+        "outputFieldName": "Fecha Receta",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        320,
+        0
+      ],
+      "id": "a4c80290-e3d3-4fc3-963a-f077986558e9",
+      "name": "Fecha Receta"
+    },
+    {
+      "parameters": {
+        "operation": "formatDate",
+        "date": "={{ $('Webhook').item.json.body.ultimaDesparasitacion }}",
+        "format": "custom",
+        "customFormat": "dd-MM-yyyy",
+        "outputFieldName": "Fecha Desparasitacion",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        464,
+        0
+      ],
+      "id": "ad403843-c1c4-41e6-b136-56978b4f304f",
+      "name": "Fecha Desp"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Fecha Nacimiento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fecha Nacimiento": {
+      "main": [
+        [
+          {
+            "node": "Fecha Receta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fecha Receta": {
+      "main": [
+        [
+          {
+            "node": "Fecha Desp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fecha Desp": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "be15590f-d8a6-4b7a-a07d-7bd3099ae543",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bb5b4802a342c7ba50e55216edd01b9f6f5f5420b80da26ca81d9dac80937c07"
+  },
+  "id": "K0H8bTcgZs3kXoEg",
+  "tags": []
+}

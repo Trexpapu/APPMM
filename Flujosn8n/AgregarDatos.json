@@ -1,0 +1,505 @@
+{
+  "name": "AgregarDatos",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "agregar",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        16
+      ],
+      "id": "800e48ca-5ed3-45c9-b1f9-544f31ce14d5",
+      "name": "Webhook",
+      "webhookId": "d60dbd67-c46f-4a67-88f3-76378e9bddb6"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q",
+          "mode": "list",
+          "cachedResultName": "Base de datos Mascotas Morelia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Agenda",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Mascota": "={{ $json.body.nombre }}",
+            "Especie": "={{ $json.body.especie }}",
+            "Raza": "={{ $json.body.raza }}",
+            "Sexo": "={{ $json.body.sexo }}",
+            "Peso": "={{ $json.body.peso }}",
+            "Cliente": "={{ $json.body.cliente_nombre }}",
+            "Correo": "={{ $json.body.cliente_email }}",
+            "Veterinario": "={{ $json.body.veterinario }}",
+            "Veterinaria": "={{ $json.body.veterinaria }}",
+            "Motivo": "={{ $json.body.motivo }}",
+            "Tipo Cita": "={{ $json.body.tipo_cita }}",
+            "Fecha": "={{ $json.body.fecha_cita }}",
+            "Correo Veterinario": "={{ $json.body.correo_veterinario }}",
+            "ID": "={{ $json.body.ID }}",
+            "Mensaje Enviado 3 dias": "={{ $json.body.mensaje_Enviado }}",
+            "Mensaje enviado 1 dia": "={{ $json.body.mensaje_Enviado }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mascota",
+              "displayName": "Mascota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Especie",
+              "displayName": "Especie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Raza",
+              "displayName": "Raza",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sexo",
+              "displayName": "Sexo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Peso",
+              "displayName": "Peso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cliente",
+              "displayName": "Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correo",
+              "displayName": "Correo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Veterinario",
+              "displayName": "Veterinario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Veterinaria",
+              "displayName": "Veterinaria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Motivo",
+              "displayName": "Motivo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Tipo Cita",
+              "displayName": "Tipo Cita",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correo Veterinario",
+              "displayName": "Correo Veterinario",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mensaje Enviado 3 dias",
+              "displayName": "Mensaje Enviado 3 dias",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mensaje enviado 1 dia",
+              "displayName": "Mensaje enviado 1 dia",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        112,
+        -224
+      ],
+      "id": "ccad8ca9-5a36-4a81-a32e-fe47cfc98bd2",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3nRF5ZsAkYzNabuO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.body.sheet }}",
+                    "rightValue": "agenda",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "d0856a71-e214-4c7a-ba74-1ee9ec3de069"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "agenda"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a328c2c7-2de6-492e-b9dc-ec29abe45ce3",
+                    "leftValue": "={{ $('Webhook').item.json.body.sheet }}",
+                    "rightValue": "guarderia",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "guarderia"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -192,
+        16
+      ],
+      "id": "f1b575b2-e687-4e90-b90e-87f1bdc51ab2",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q",
+          "mode": "list",
+          "cachedResultName": "Base de datos Mascotas Morelia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1352081072,
+          "mode": "list",
+          "cachedResultName": "Guarderia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit#gid=1352081072"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Mascota": "={{ $json.body.nombre }}",
+            "Especie": "={{ $json.body.especie }}",
+            "Raza": "={{ $json.body.raza }}",
+            "Sexo": "={{ $json.body.sexo }}",
+            "Peso": "={{ $json.body.peso }}",
+            "Cliente": "={{ $json.body.cliente_nombre }}",
+            "Correo": "={{ $json.body.cliente_email }}",
+            "Veterinaria": "={{ $json.body.veterinaria }}",
+            "ID": "={{ $json.body.ID }}",
+            "Fecha Salida": "={{ $json.body.fecha_salida }}",
+            "Anticipo": "={{ $json.body.anticipo }}",
+            "Pago Total": "={{ $json.body.pago_total }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mascota",
+              "displayName": "Mascota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Especie",
+              "displayName": "Especie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Raza",
+              "displayName": "Raza",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sexo",
+              "displayName": "Sexo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Peso",
+              "displayName": "Peso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cliente",
+              "displayName": "Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correo",
+              "displayName": "Correo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Veterinaria",
+              "displayName": "Veterinaria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha Salida",
+              "displayName": "Fecha Salida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Anticipo",
+              "displayName": "Anticipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Pago Total",
+              "displayName": "Pago Total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        96,
+        96
+      ],
+      "id": "2cfc7110-5182-455e-9820-f95a276930b9",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3nRF5ZsAkYzNabuO",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f2ff51e9-5df2-4447-af2c-69f8411ee17f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bb5b4802a342c7ba50e55216edd01b9f6f5f5420b80da26ca81d9dac80937c07"
+  },
+  "id": "0HBwGr8tttoysIuT",
+  "tags": []
+}

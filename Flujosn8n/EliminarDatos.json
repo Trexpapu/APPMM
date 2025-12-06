@@ -1,0 +1,185 @@
+{
+  "name": "EliminarDatos",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "eliminar-datos",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        16
+      ],
+      "id": "c9a9a6a3-56ab-497a-8dee-24d9502f63bd",
+      "name": "Webhook",
+      "webhookId": "a3d80018-d4b3-4496-ba49-94cd117532a5"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').item.json.body.sheet }}",
+                    "rightValue": "agenda",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "eca9f479-968d-48ed-b3e0-3ede93d5ef01"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "agenda"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -192,
+        16
+      ],
+      "id": "a6cf7c00-4ce2-4464-8d00-38f52c3ff90f",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q",
+          "mode": "list",
+          "cachedResultName": "Base de datos Mascotas Morelia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Agenda",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "ID",
+              "lookupValue": "={{ $json.body.ID }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        32,
+        -144
+      ],
+      "id": "f074e37f-b9cd-4014-96b5-324f6d4fc481",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3nRF5ZsAkYzNabuO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q",
+          "mode": "list",
+          "cachedResultName": "Base de datos Mascotas Morelia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Agenda",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit#gid=0"
+        },
+        "clear": "specificRows",
+        "startIndex": "={{ $json.row_number }}"
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        -144
+      ],
+      "id": "a3d9d17e-df05-44ce-af53-2acdc01c28b3",
+      "name": "Clear sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "3nRF5ZsAkYzNabuO",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Clear sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "38962d22-26f2-46a9-9753-5d1866941ebe",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bb5b4802a342c7ba50e55216edd01b9f6f5f5420b80da26ca81d9dac80937c07"
+  },
+  "id": "hr4e1bX2rqMqk66K",
+  "tags": []
+}
