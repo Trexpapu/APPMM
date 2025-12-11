@@ -81,8 +81,12 @@ WSGI_APPLICATION = 'MascotasMorelia.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'mascotasmorelia',
+        'USER': 'postgres',
+        'PASSWORD': 'aPERRITOMAN12',
+        'HOST': 'localhost',     # o el host real en producción
+        'PORT': '5432',          # puerto por defecto de postgres
     }
 }
 
