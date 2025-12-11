@@ -174,7 +174,10 @@ class ConsultasMedicas(models.Model):
         default='1/5'
     )
     examanesFisicosRealizados = models.TextField(blank=True)
-    peso = models.FloatField()
+    peso = models.DecimalField(
+        max_digits=5,   # número total de dígitos
+        decimal_places=3  # número de decimales fijos
+    )
     vacunas = models.TextField(blank=True)  
     alergias = models.TextField(blank=True)
     ultimaDesparasitacion = models.DateField(blank= True, null=True)

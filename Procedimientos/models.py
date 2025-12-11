@@ -40,7 +40,10 @@ class Desparasitaciones(models.Model):
        
     ]
     mascota = models.ForeignKey(Mascotas, on_delete=models.CASCADE)
-    peso = models.FloatField(default=0)
+    peso = models.DecimalField(
+        max_digits=5,   # número total de dígitos
+        decimal_places=3  # número de decimales fijos
+    )
     desparasitante = models.ForeignKey(ListaDesparasitantes, on_delete= models.CASCADE)
     fecha = models.DateField()
     veterinario =  models.ForeignKey(User, on_delete=models.CASCADE)
@@ -56,7 +59,10 @@ class Operaciones(models.Model):
        
     ]
     mascota = models.ForeignKey(Mascotas, on_delete= models.CASCADE)
-    peso = models.FloatField(default=0)
+    peso = models.DecimalField(
+        max_digits=5,   # número total de dígitos
+        decimal_places=3  # número de decimales fijos
+    )
     estadoSaludPrevio = models.TextField(blank= True)
     fechaEntrada = models.DateTimeField()
     fechaSalida = models.DateTimeField(blank= True, null = True)

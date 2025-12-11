@@ -112,7 +112,7 @@ class ConsultaMedicaForm(forms.ModelForm):
                 'class': 'form-control'
             }),
             'peso': forms.NumberInput(attrs={
-                'step': '0.01', 
+                
                 'placeholder': 'Peso en kg',
                 'class': 'form-control'
             }),
@@ -364,8 +364,7 @@ class ConsultaMedicaUpdateForm(forms.ModelForm):
                 'placeholder': 'Ej. 30 rpm',
                 'class': 'form-control'
             }),
-            'peso': forms.NumberInput(attrs={
-                'step': '0.01', 
+            'peso': forms.NumberInput(attrs={ 
                 'placeholder': 'Peso en kg',
                 'class': 'form-control'
             }),

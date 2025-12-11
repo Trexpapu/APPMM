@@ -18,7 +18,10 @@ class Mascotas(models.Model):
     especie = models.CharField(max_length=255)
     raza = models.CharField(max_length=255)
     fechaNacimiento = models.DateField()
-    peso = models.FloatField()
+    peso = models.DecimalField(
+        max_digits=5,   # número total de dígitos
+        decimal_places=3  # número de decimales fijos
+    )
     vacunas = models.TextField(blank=True)  
     ultimaDesparasitacion = models.DateField(blank= True, null=True)
     ultimoDesparasitante = models.TextField(blank=True)

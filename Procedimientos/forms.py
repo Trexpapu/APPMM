@@ -34,7 +34,6 @@ class DesparasitacionesUpdateForm(forms.ModelForm):
             }),
             'peso': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'step': '0.01',
                 'placeholder': 'Peso de la mascota en kg'
             }),
         }
@@ -83,7 +82,6 @@ class DesparasitacionesForm(forms.ModelForm):
             }),
             'peso': forms.NumberInput(attrs={
                 'class': 'form-control',
-                'step': '0.01',
                 'placeholder': 'Peso de la mascota en kg'
             }),
         }
