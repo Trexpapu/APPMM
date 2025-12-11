@@ -53,11 +53,6 @@
                     {% endfor %}
                 </select>
             </div>
-
-            <!-- 🔄 Botón para cargar datos de la mascota seleccionada -->
-          <!--  <button type="button" id="cargar-mascota-btn" class="btn-home">
-                🔄 Cargar Datos de Mascota
-            </button> -->
         </div>
 
         <!-- 💡 PREGUNTA PARA CARGAR CONSULTA PREVIA -->
@@ -170,8 +165,6 @@
                 </div>
             </div>
 
-          
-
             <!-- Resto de campos de la consulta -->
             <div class="form-grid">
                 {% for field in form %}
@@ -232,17 +225,71 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('mascota-search');
     const dropdown = document.getElementById('mascota');
-    const cargarBtn = document.getElementById('cargar-mascota-btn');
-    const vacunasField = document.getElementById('id_vacunas');
-    const alergiasField = document.getElementById('id_alergias');
-    const pesoField = document.getElementById('id_peso');
-    const ultimaDesparasitacionField = document.getElementById('id_ultimaDesparasitacion');
-    const ultimoDesparasitanteField = document.getElementById('id_ultimoDesparasitante');
     const addDocBtn = document.getElementById('add-doc-btn');
     const container = document.getElementById('documentos-container');
+    
+    // 🔍 FILTRO DE BÚSQUEDA
+    if (searchInput && dropdown) {
+        searchInput.addEventListener('input', function() {
+            const filter = searchInput.value.toLowerCase().replace(/\s+/g, '');
+            dropdown.querySelectorAll('option').forEach(option => {
+                const text = option.textContent.toLowerCase().replace(/\s+/g, '');
+                option.style.display = text.includes(filter) ? '' : 'none';
+            });
+        });
+    }
 
-    
-    
+    // ➕ AÑADIR MÁS CAMPOS DE DOCUMENTOS - FUNCIÓN CORREGIDA
+    if (addDocBtn && container) {
+        addDocBtn.addEventListener('click', function() {
+            const newDoc = document.createElement('div');
+            newDoc.classList.add('documento-group');
+            
+            // Contador para nombres únicos
+            const docCount = container.querySelectorAll('.documento-group').length;
+            
+            newDoc.innerHTML = `
+                <div class="form-group">
+                    <label>📄 Archivo adicional:</label>
+                    <input type="file" name="archivo_${docCount}" accept="image/*, .pdf, .doc, .docx, .txt" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>📝 Descripción:</label>
+                    <textarea name="descripcion_${docCount}" rows="2" placeholder="Describe brevemente el documento" class="form-control"></textarea>
+                </div>
+                <button type="button" class="btn-home remove-doc-btn" style="background: #dc3545;">
+                    🗑️ Eliminar este archivo
+                </button>
+            `;
+            container.appendChild(newDoc);
+            
+            // Agregar evento al botón de eliminar recién creado
+            const removeBtn = newDoc.querySelector('.remove-doc-btn');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', function() {
+                    newDoc.remove();
+                });
+            }
+        });
+    }
+
+    // Cargar datos de la mascota si ya hay una seleccionada
+    if (dropdown && dropdown.value) {
+        const selectedOption = dropdown.options[dropdown.selectedIndex];
+        
+        // Solo actualizar si los campos existen
+        const pesoField = document.getElementById('id_peso');
+        const alergiasField = document.getElementById('id_alergias');
+        
+        if (pesoField) {
+            pesoField.value = selectedOption.getAttribute('data-peso') || '';
+        }
+        if (alergiasField) {
+            alergiasField.value = selectedOption.getAttribute('data-alergias') || '';
+        }
+    }
+
+    // Cambiar de mascota recargando la página
     if (dropdown) {
         dropdown.addEventListener('change', function() {
             const mascotaId = this.value;
@@ -251,80 +298,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
-    // 🔍 FILTRO DE BÚSQUEDA
-    searchInput.addEventListener('input', function() {
-        const filter = searchInput.value.toLowerCase().replace(/\s+/g, '');
-        dropdown.querySelectorAll('option').forEach(option => {
-            const text = option.textContent.toLowerCase().replace(/\s+/g, '');
-            option.style.display = text.includes(filter) ? '' : 'none';
-        });
-    });
-
-    // 🐾 CARGAR DATOS DE MASCOTA
-    cargarBtn.addEventListener('click', function() {
-        const selectedOption = dropdown.options[dropdown.selectedIndex];
-        if (!selectedOption.value) {
-            alert('Por favor, selecciona una mascota primero.');
-            return;
-        }
-        
-        // Actualizar campos con datos de la mascota
-        if (vacunasField) vacunasField.value = selectedOption.getAttribute('data-vacunas') || '';
-        if (alergiasField) alergiasField.value = selectedOption.getAttribute('data-alergias') || '';
-        if (pesoField) pesoField.value = selectedOption.getAttribute('data-peso') || '';
-        
-        // Cargar campos de desparasitación
-        if (ultimaDesparasitacionField) {
-            ultimaDesparasitacionField.value = selectedOption.getAttribute('data-ultimadesparasitacion') || '';
-        }
-        if (ultimoDesparasitanteField) {
-            ultimoDesparasitanteField.value = selectedOption.getAttribute('data-ultimodesparasitante') || '';
-        }
-        
-        // Recargar página con la mascota seleccionada
-        window.location.href = `?mascota=${selectedOption.value}`;
-    });
-
-    // ➕ AÑADIR MÁS CAMPOS DE DOCUMENTOS
-    addDocBtn.addEventListener('click', function() {
-        const newDoc = document.createElement('div');
-        newDoc.classList.add('documento-group');
-        newDoc.innerHTML = `
-            <div class="form-group">
-                <label>📄 Archivo adicional:</label>
-                <input type="file" name="archivo" accept="image/*, .pdf, .doc, .docx, .txt" class="form-control">
-            </div>
-            <div class="form-group">
-                <label>📝 Descripción:</label>
-                <textarea name="descripcion" rows="2" placeholder="Describe brevemente el documento" class="form-control"></textarea>
-            </div>
-            <button type="button" class="btn-home" onclick="this.parentElement.remove()" style="background: #dc3545;">
-                🗑️ Eliminar este archivo
-            </button>
-        `;
-        container.appendChild(newDoc);
-    });
-
-    // 🎯 CARGAR DATOS AUTOMÁTICAMENTE SI YA HAY MASCOTA SELECCIONADA
-    if (dropdown.value) {
-        const selectedOption = dropdown.options[dropdown.selectedIndex];
-        if (vacunasField) vacunasField.value = selectedOption.getAttribute('data-vacunas') || '';
-        if (alergiasField) alergiasField.value = selectedOption.getAttribute('data-alergias') || '';
-        if (pesoField) pesoField.value = selectedOption.getAttribute('data-peso') || '';
-        
-        // Cargar campos de desparasitación automáticamente
-        if (ultimaDesparasitacionField) {
-            ultimaDesparasitacionField.value = selectedOption.getAttribute('data-ultimadesparasitacion') || '';
-        }
-        if (ultimoDesparasitanteField) {
-            ultimoDesparasitanteField.value = selectedOption.getAttribute('data-ultimodesparasitante') || '';
-        }
-    }
 });
 </script>
-
-<style>
-
-</style>
 {% endblock %}
