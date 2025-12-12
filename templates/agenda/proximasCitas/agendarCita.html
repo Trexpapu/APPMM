@@ -57,10 +57,7 @@
                 </select>
             </div>
 
-            <!-- 🔄 Botón para cargar datos de la mascota seleccionada -->
-            <button type="button" id="cargar-mascota-btn" class="btn-home">
-                🔄 Cargar Datos de Mascota
-            </button>
+           
         </div>
 
         <!-- 📋 INFORMACIÓN DE LA MASCOTA Y DUEÑO -->
@@ -207,7 +204,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('mascota-search');
     const dropdown = document.getElementById('mascota');
-    const cargarBtn = document.getElementById('cargar-mascota-btn');
 
     // 🔍 FILTRO DE BÚSQUEDA
     searchInput.addEventListener('input', function() {
@@ -218,21 +214,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // 🐾 CARGAR DATOS DE MASCOTA
-    cargarBtn.addEventListener('click', function() {
-        const selectedOption = dropdown.options[dropdown.selectedIndex];
-        if (!selectedOption.value) {
-            alert('Por favor, selecciona una mascota primero.');
-            return;
-        }
-        
-        // Recargar página con la mascota seleccionada
-        window.location.href = `?mascota=${selectedOption.value}`;
-    });
+    
 
-    // 🎯 CARGAR AUTOMÁTICAMENTE SI YA HAY MASCOTA EN URL
-    if (window.location.search.includes('mascota=') && dropdown.value) {
-        // La página ya se cargará con los datos de la mascota gracias a la vista
+    if (dropdown) {
+        dropdown.addEventListener('change', function() {
+            const mascotaId = this.value;
+            if (mascotaId) {
+                window.location.href = `?mascota=${mascotaId}`;
+            }
+        });
     }
 });
 </script>

@@ -10,10 +10,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -400,
-        16
+        -432,
+        160
       ],
-      "id": "c9a9a6a3-56ab-497a-8dee-24d9502f63bd",
+      "id": "9b26d779-edf5-43f4-be33-e0bb7b56015b",
       "name": "Webhook",
       "webhookId": "a3d80018-d4b3-4496-ba49-94cd117532a5"
     },
@@ -31,7 +31,7 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{ $('Webhook').item.json.body.sheet }}",
+                    "leftValue": "={{ $json.body.sheet }}",
                     "rightValue": "agenda",
                     "operator": {
                       "type": "string",
@@ -44,6 +44,55 @@
               },
               "renameOutput": true,
               "outputKey": "agenda"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a8f9bec8-ffa1-476a-9685-d5c263c55ddb",
+                    "leftValue": "={{ $json.body.sheet }}",
+                    "rightValue": "guarderia",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "guarderia"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "eb68242d-99b6-47d6-a7d1-776b13438adb",
+                    "leftValue": "={{ $json.body.sheet }}",
+                    "rightValue": "hospitalizacion",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "hospitalizacion"
             }
           ]
         },
@@ -52,10 +101,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.3,
       "position": [
-        -192,
-        16
+        -224,
+        160
       ],
-      "id": "a6cf7c00-4ce2-4464-8d00-38f52c3ff90f",
+      "id": "711943fe-3521-415d-bae3-33f49894917d",
       "name": "Switch"
     },
     {
@@ -88,13 +137,13 @@
       "typeVersion": 4.7,
       "position": [
         32,
-        -144
+        -96
       ],
-      "id": "f074e37f-b9cd-4014-96b5-324f6d4fc481",
+      "id": "c953f7f5-1f3c-43d5-b024-3d3fe5e5a8a1",
       "name": "Get row(s) in sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "3nRF5ZsAkYzNabuO",
+          "id": "9R4LGTlYGsLvxgS0",
           "name": "Google Sheets account"
         }
       }
@@ -122,14 +171,166 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        224,
-        -144
+        288,
+        -112
       ],
-      "id": "a3d9d17e-df05-44ce-af53-2acdc01c28b3",
+      "id": "eb197542-949a-4919-9b22-f984ccfe6c53",
       "name": "Clear sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "3nRF5ZsAkYzNabuO",
+          "id": "9R4LGTlYGsLvxgS0",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q",
+          "mode": "list",
+          "cachedResultName": "Base de datos Mascotas Morelia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1352081072,
+          "mode": "list",
+          "cachedResultName": "Guarderia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit#gid=1352081072"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "ID",
+              "lookupValue": "={{ $json.body.ID }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        112,
+        160
+      ],
+      "id": "1e620f50-6b7e-4f62-9bcd-617ec263b130",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9R4LGTlYGsLvxgS0",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q",
+          "mode": "list",
+          "cachedResultName": "Base de datos Mascotas Morelia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1352081072,
+          "mode": "list",
+          "cachedResultName": "Guarderia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit#gid=1352081072"
+        },
+        "clear": "specificRows",
+        "startIndex": "={{ $json.row_number }}"
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        432,
+        160
+      ],
+      "id": "b98ef813-d678-4f27-9672-4529d31c9b97",
+      "name": "Clear sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9R4LGTlYGsLvxgS0",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q",
+          "mode": "list",
+          "cachedResultName": "Base de datos Mascotas Morelia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2003363825,
+          "mode": "list",
+          "cachedResultName": "Hospitalizacion",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit#gid=2003363825"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "ID",
+              "lookupValue": "={{ $json.body.ID }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        112,
+        448
+      ],
+      "id": "34560a61-a676-47d7-a2e1-cace66f25843",
+      "name": "Get row(s) in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9R4LGTlYGsLvxgS0",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "value": "1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q",
+          "mode": "list",
+          "cachedResultName": "Base de datos Mascotas Morelia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2003363825,
+          "mode": "list",
+          "cachedResultName": "Hospitalizacion",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit#gid=2003363825"
+        },
+        "clear": "specificRows",
+        "startIndex": "={{ $json.row_number }}"
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        400,
+        448
+      ],
+      "id": "fef11673-8ee7-4220-9934-a6e5f65ca973",
+      "name": "Clear sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9R4LGTlYGsLvxgS0",
           "name": "Google Sheets account"
         }
       }
@@ -156,6 +357,20 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s) in sheet2",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     },
@@ -169,17 +384,39 @@
           }
         ]
       ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Clear sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Clear sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "38962d22-26f2-46a9-9753-5d1866941ebe",
+  "versionId": "c0a22492-cbef-4ed1-8b3e-667b26ca8e6d",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "bb5b4802a342c7ba50e55216edd01b9f6f5f5420b80da26ca81d9dac80937c07"
+    "instanceId": "a770ccb3a6ffef522de6cf935aa84c834a3757e322f15df858463c95f73967c5"
   },
-  "id": "hr4e1bX2rqMqk66K",
+  "id": "lNzPjlLRccBx61nW",
   "tags": []
 }

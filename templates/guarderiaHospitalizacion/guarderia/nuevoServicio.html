@@ -61,10 +61,7 @@
                 {% endif %}
             </div>
 
-            <!-- 🔄 Botón para cargar datos de la mascota seleccionada -->
-            <button type="button" id="cargar-mascota-btn" class="btn-home">
-                🔄 Cargar Datos de Mascota
-            </button>
+           
         </div>
 
         <!-- 📋 INFORMACIÓN COMPLETA DE LA MASCOTA SELECCIONADA -->
@@ -233,8 +230,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('mascota-search');
     const dropdown = document.getElementById('{{ form.mascota.id_for_label }}');
-    const cargarBtn = document.getElementById('cargar-mascota-btn');
-    const alimentoField = document.getElementById('id_alimento'); // Campo de alimento del formulario
+    const alimentoField = document.getElementById('id_alimento');
 
     // 🔍 FILTRO DE BÚSQUEDA
     searchInput.addEventListener('input', function() {
@@ -245,32 +241,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // 🐾 CARGAR DATOS DE MASCOTA
-    cargarBtn.addEventListener('click', function() {
-        const selectedOption = dropdown.options[dropdown.selectedIndex];
-        if (!selectedOption.value) {
-            alert('Por favor, selecciona una mascota primero.');
-            return;
-        }
-        
-        // 🆕 ACTUALIZAR CAMPO DE ALIMENTO EN EL FORMULARIO
-        const alimento = selectedOption.getAttribute('data-alimento');
-        if (alimento && alimentoField) {
-            alimentoField.value = alimento;
-        }
-        
-        // Recargar página con la mascota seleccionada
-        window.location.href = `?mascota=${selectedOption.value}`;
-    });
+    // 🐾 CAMBIAR MASCOTA AUTOMÁTICAMENTE AL CAMBIAR EL DROPDOWN
+    dropdown.addEventListener('change', function() {
+        const mascotaId = this.value;
 
-    // 🎯 CARGAR AUTOMÁTICAMENTE SI YA HAY MASCOTA EN URL
-    if (dropdown.value && window.location.search.includes('mascota=')) {
-        // El botón se mostrará automáticamente y los datos se cargarán desde la vista
-    }
+        if (mascotaId) {
+            // Obtener option seleccionado correctamente
+            const selectedOption = this.options[this.selectedIndex];
+
+            // Actualizar campo de alimento automáticamente
+            const alimento = selectedOption.getAttribute('data-alimento');
+            if (alimento && alimentoField) {
+                alimentoField.value = alimento;
+            }
+
+            // Recargar página cargando los datos de la mascota
+            window.location.href = `?mascota=${mascotaId}`;
+        }
+    });
 });
 </script>
 
-<style>
 
-</style>
+
 {% endblock %}

@@ -6,7 +6,8 @@
         "rule": {
           "interval": [
             {
-              "field": "hours"
+              "field": "hours",
+              "hoursInterval": 3
             }
           ]
         }
@@ -14,10 +15,10 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        0,
-        0
+        -736,
+        240
       ],
-      "id": "53810789-8205-4a78-95fd-b69db6ed2c54",
+      "id": "2806b1a5-4f9f-4002-b960-3820f7c474fb",
       "name": "Schedule Trigger"
     },
     {
@@ -41,14 +42,14 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.6,
       "position": [
-        288,
-        0
+        -448,
+        240
       ],
-      "id": "8fdbed2a-02ae-41f5-b6f2-d48b80425639",
+      "id": "6ac5fc13-beb7-4807-af53-db8114cb3d67",
       "name": "Obtener datos",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "3nRF5ZsAkYzNabuO",
+          "id": "9R4LGTlYGsLvxgS0",
           "name": "Google Sheets account"
         }
       }
@@ -63,10 +64,10 @@
       "type": "n8n-nodes-base.dateTime",
       "typeVersion": 2,
       "position": [
-        512,
-        0
+        -224,
+        240
       ],
-      "id": "016ad79c-51ab-4bb6-935c-8044cce3c7d6",
+      "id": "e25db64b-8a0b-4a10-a5f0-3aadb4dfd991",
       "name": "Fecha de cita"
     },
     {
@@ -79,10 +80,10 @@
       "type": "n8n-nodes-base.dateTime",
       "typeVersion": 2,
       "position": [
-        784,
-        16
+        48,
+        256
       ],
-      "id": "c5659157-5ab9-475d-97b8-45d26ad906f7",
+      "id": "b9465107-f4f5-4315-befd-98a94194c70c",
       "name": "Hoy + 3 dias"
     },
     {
@@ -95,10 +96,10 @@
       "type": "n8n-nodes-base.dateTime",
       "typeVersion": 2,
       "position": [
-        736,
-        -240
+        0,
+        0
       ],
-      "id": "a4926e3d-a0b9-4c22-aadb-076534254dd2",
+      "id": "25edaf9a-456f-4815-995e-8858cbbd9ec4",
       "name": "Hoy + 1 dia"
     },
     {
@@ -111,10 +112,10 @@
       "type": "n8n-nodes-base.dateTime",
       "typeVersion": 2,
       "position": [
-        784,
-        208
+        48,
+        448
       ],
-      "id": "4f817f26-ce53-4a08-8e49-d6892bd6bf9e",
+      "id": "aaaa3360-ddf8-4a85-ba88-1f1db338d75e",
       "name": "FechaHoy"
     },
     {
@@ -155,10 +156,10 @@
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.2,
       "position": [
-        976,
-        -240
+        240,
+        0
       ],
-      "id": "7b6208a0-8d04-4ed8-99e5-9d2c688c8043",
+      "id": "61280c34-a6a8-47bb-b7de-c50b9701ace9",
       "name": "Citas dia siguiente",
       "alwaysOutputData": false
     },
@@ -200,10 +201,10 @@
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.2,
       "position": [
-        1072,
-        16
+        336,
+        256
       ],
-      "id": "f33b9111-fa1e-4c3f-9d31-6c6f9301a4ca",
+      "id": "78d05127-0607-4396-9296-2c0bf5344c2c",
       "name": "Citas en 3 dias",
       "alwaysOutputData": false
     },
@@ -235,10 +236,10 @@
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.2,
       "position": [
-        1024,
-        224
+        288,
+        464
       ],
-      "id": "8bbab605-b6ca-41a3-99c7-784187c6a173",
+      "id": "a5febee9-edbc-4ff5-bc1f-858908d7e538",
       "name": "Citas de hoy",
       "alwaysOutputData": false
     },
@@ -449,14 +450,14 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.6,
       "position": [
-        1424,
-        -240
+        688,
+        0
       ],
-      "id": "64eaa72b-58e5-4b1e-a063-4fed0ca24262",
+      "id": "48af5e6d-f32f-432a-93e0-fb7a14481e19",
       "name": "actualizar mensaje 1 dia",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "3nRF5ZsAkYzNabuO",
+          "id": "9R4LGTlYGsLvxgS0",
           "name": "Google Sheets account"
         }
       }
@@ -668,14 +669,14 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.6,
       "position": [
-        1520,
-        16
+        784,
+        256
       ],
-      "id": "817213e3-5fa0-43c3-93be-ef790f64cadc",
+      "id": "a3dafa18-54ce-4671-b4eb-130a86068188",
       "name": "actualizar mensaje 3 dias",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "3nRF5ZsAkYzNabuO",
+          "id": "9R4LGTlYGsLvxgS0",
           "name": "Google Sheets account"
         }
       }
@@ -685,7 +686,7 @@
         "sendTo": "={{ $('Obtener datos').item.json.Correo }}",
         "subject": "=Cita en Mascotas Morelia para {{ $('Obtener datos').item.json.Mascota }} {{ new Date($('Obtener datos').item.json.Fecha).toLocaleString('es-ES', { timeZone: 'America/Mexico_City', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}",
         "emailType": "text",
-        "message": "=Estimad@ {{ $('Obtener datos').item.json.Cliente }},\n\nMascotas Morelia te recuerda que la cita de tu mascota {{ $('Obtener datos').item.json.Mascota }} es mañana {{ new Date($('Obtener datos').item.json.Fecha).toLocaleString('es-ES', { timeZone: 'America/Mexico_City', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}.\n\nLa cita es para {{ $('Obtener datos').item.json['Tipo Cita'] }} y el motivo es {{ $('Obtener datos').item.json.Motivo }}.\n\nLa cita será atendida por {{ $('Obtener datos').item.json.Veterinario }} en la clínica {{ $('Obtener datos').item.json.Veterinaria }}.\n\nDatos de tu mascota:\n• Especie: {{ $('Obtener datos').item.json.Especie }}\n• Raza: {{ $('Obtener datos').item.json.Raza }}\n• Sexo: {{ $('Obtener datos').item.json.Sexo }}\n• Peso: {{ $('Obtener datos').item.json.Peso }} kg\n\n\n¡Esperamos verte pronto!",
+        "message": "=Estimad@ {{ $('Obtener datos').item.json.Cliente }},\n\nMascotas Morelia te recuerda que la cita de tu mascota {{ $('Obtener datos').item.json.Mascota }} es mañana {{ new Date($('Obtener datos').item.json.Fecha).toLocaleString('es-ES', { timeZone: 'America/Mexico_City', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}.\n\nLa cita es para {{ $('Obtener datos').item.json['Tipo Cita'] }} y el motivo es {{ $('Obtener datos').item.json.Motivo }}.\n\nLa cita será atendida por {{ $('Obtener datos').item.json.Veterinario }} en la clínica {{ $('Obtener datos').item.json.Veterinaria }}.\n\n📋 Datos de tu mascota:\n• Especie: {{ $('Obtener datos').item.json.Especie }}\n• Raza: {{ $('Obtener datos').item.json.Raza }}\n• Sexo: {{ $('Obtener datos').item.json.Sexo }}\n• Peso: {{ $('Obtener datos').item.json.Peso }} kg\n\n\n¡Esperamos verte pronto!",
         "options": {
           "bccList": "={{ $('Obtener datos').item.json['Correo Veterinario'] }}"
         }
@@ -693,15 +694,15 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1184,
-        -240
+        448,
+        0
       ],
-      "id": "937619a0-d207-42fe-865b-cf208e44dfda",
+      "id": "81984f0e-645d-4a31-82e1-5dac81bc9d58",
       "name": "correo recordatorio dia siguiente",
       "webhookId": "b1e13dbc-762c-472a-8b9b-850121cf1eee",
       "credentials": {
         "gmailOAuth2": {
-          "id": "oMzw6dcsBT2FIzoM",
+          "id": "opqzHkQbrTlEQKCA",
           "name": "Gmail account"
         }
       }
@@ -729,14 +730,14 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1488,
-        240
+        752,
+        480
       ],
-      "id": "136c9a06-b412-4d6d-ab26-4d56f47c037c",
+      "id": "444cff3a-efae-43a1-b7e3-0ff9b290b701",
       "name": "Clear sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "3nRF5ZsAkYzNabuO",
+          "id": "9R4LGTlYGsLvxgS0",
           "name": "Google Sheets account"
         }
       }
@@ -746,7 +747,7 @@
         "sendTo": "={{ $('Obtener datos').item.json.Correo }}",
         "subject": "=Cita en Mascotas Morelia para {{ $('Obtener datos').item.json.Mascota }} {{ new Date($('Obtener datos').item.json.Fecha).toLocaleString('es-ES', { timeZone: 'America/Mexico_City', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}",
         "emailType": "text",
-        "message": "=Estimad@ {{ $('Obtener datos').item.json.Cliente }},\n\nMascotas Morelia te recuerda que la cita de tu mascota {{ $('Obtener datos').item.json.Mascota }} está próxima.\n\nLa cita es para {{ $('Obtener datos').item.json['Tipo Cita'] }} y el motivo es {{ $('Obtener datos').item.json.Motivo }}, programada para el día {{ new Date($('Obtener datos').item.json.Fecha).toLocaleString('es-ES', { timeZone: 'America/Mexico_City', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}.\n\nLa cita será atendida por {{ $('Obtener datos').item.json.Veterinario }} en la clínica {{ $('Obtener datos').item.json.Veterinaria }}.\n\nDatos de tu mascota:\n• Especie: {{ $('Obtener datos').item.json.Especie }}\n• Raza: {{ $('Obtener datos').item.json.Raza }}\n• Sexo: {{ $('Obtener datos').item.json.Sexo }}\n• Peso: {{ $('Obtener datos').item.json.Peso }} kg\n\n\n¡Esperamos verte pronto!",
+        "message": "=Estimad@ {{ $('Obtener datos').item.json.Cliente }},\n\nMascotas Morelia te recuerda que la cita de tu mascota {{ $('Obtener datos').item.json.Mascota }} está próxima.\n\nLa cita es para {{ $('Obtener datos').item.json['Tipo Cita'] }} y el motivo es {{ $('Obtener datos').item.json.Motivo }}, programada para el día {{ new Date($('Obtener datos').item.json.Fecha).toLocaleString('es-ES', { timeZone: 'America/Mexico_City', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}.\n\nLa cita será atendida por {{ $('Obtener datos').item.json.Veterinario }} en la clínica {{ $('Obtener datos').item.json.Veterinaria }}.\n\n📋 Datos de tu mascota:\n• Especie: {{ $('Obtener datos').item.json.Especie }}\n• Raza: {{ $('Obtener datos').item.json.Raza }}\n• Sexo: {{ $('Obtener datos').item.json.Sexo }}\n• Peso: {{ $('Obtener datos').item.json.Peso }} kg\n\n\n¡Esperamos verte pronto!",
         "options": {
           "bccList": "={{ $('Obtener datos').item.json['Correo Veterinario'] }}"
         }
@@ -754,15 +755,15 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1296,
-        32
+        560,
+        272
       ],
-      "id": "dd64ebf3-480f-4437-add2-a8a70ec99751",
+      "id": "4d7b70e7-9ea0-43f7-b734-2b763eeff8f2",
       "name": "Correo recordatorio en 3 dias",
       "webhookId": "b1e13dbc-762c-472a-8b9b-850121cf1eee",
       "credentials": {
         "gmailOAuth2": {
-          "id": "oMzw6dcsBT2FIzoM",
+          "id": "opqzHkQbrTlEQKCA",
           "name": "Gmail account"
         }
       }
@@ -772,7 +773,7 @@
         "sendTo": "={{ $('Obtener datos').item.json.Correo }}",
         "subject": "=Cita en Mascotas Morelia para {{ $('Obtener datos').item.json.Mascota }} {{ new Date($('Obtener datos').item.json.Fecha).toLocaleString('es-ES', { timeZone: 'America/Mexico_City', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}",
         "emailType": "text",
-        "message": "=Estimad@ {{ $('Obtener datos').item.json.Cliente }},\n\nMascotas Morelia te recuerda que la cita de tu mascota {{ $('Obtener datos').item.json.Mascota }} es hoy {{ new Date($('Obtener datos').item.json.Fecha).toLocaleString('es-ES', { timeZone: 'America/Mexico_City', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}.\n\nLa cita es para {{ $('Obtener datos').item.json['Tipo Cita'] }} y el motivo es {{ $('Obtener datos').item.json.Motivo }}.\n\nLa cita será atendida por {{ $('Obtener datos').item.json.Veterinario }} en la clínica {{ $('Obtener datos').item.json.Veterinaria }}.\n\nDatos de tu mascota:\n• Especie: {{ $('Obtener datos').item.json.Especie }}\n• Raza: {{ $('Obtener datos').item.json.Raza }}\n• Sexo: {{ $('Obtener datos').item.json.Sexo }}\n• Peso: {{ $('Obtener datos').item.json.Peso }} kg\n\n\n¡Esperamos verte pronto!",
+        "message": "=Estimad@ {{ $('Obtener datos').item.json.Cliente }},\n\nMascotas Morelia te recuerda que la cita de tu mascota {{ $('Obtener datos').item.json.Mascota }} es hoy {{ new Date($('Obtener datos').item.json.Fecha).toLocaleString('es-ES', { timeZone: 'America/Mexico_City', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}.\n\nLa cita es para {{ $('Obtener datos').item.json['Tipo Cita'] }} y el motivo es {{ $('Obtener datos').item.json.Motivo }}.\n\nLa cita será atendida por {{ $('Obtener datos').item.json.Veterinario }} en la clínica {{ $('Obtener datos').item.json.Veterinaria }}.\n\n📋 Datos de tu mascota:\n• Especie: {{ $('Obtener datos').item.json.Especie }}\n• Raza: {{ $('Obtener datos').item.json.Raza }}\n• Sexo: {{ $('Obtener datos').item.json.Sexo }}\n• Peso: {{ $('Obtener datos').item.json.Peso }} kg\n\n\n¡Esperamos verte pronto!",
         "options": {
           "bccList": "={{ $('Obtener datos').item.json['Correo Veterinario'] }}"
         }
@@ -780,15 +781,15 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1280,
-        240
+        544,
+        480
       ],
-      "id": "0e8bf2b8-05c6-469f-9311-7e89ab332af1",
+      "id": "5430f95d-fd6c-487c-8d7b-29e024e56596",
       "name": "correo recordatorio hoy",
       "webhookId": "b1e13dbc-762c-472a-8b9b-850121cf1eee",
       "credentials": {
         "gmailOAuth2": {
-          "id": "oMzw6dcsBT2FIzoM",
+          "id": "opqzHkQbrTlEQKCA",
           "name": "Gmail account"
         }
       }
@@ -943,11 +944,11 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "ecae567e-2910-409f-8f30-30311f749d6a",
+  "versionId": "62e96689-2a77-4757-839a-b5d94b61d94d",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "bb5b4802a342c7ba50e55216edd01b9f6f5f5420b80da26ca81d9dac80937c07"
+    "instanceId": "a770ccb3a6ffef522de6cf935aa84c834a3757e322f15df858463c95f73967c5"
   },
-  "id": "sjzxZr2UGtCDd6I8",
+  "id": "IsQe6GZd3C2qOYmi",
   "tags": []
 }

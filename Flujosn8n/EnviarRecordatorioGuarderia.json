@@ -6,8 +6,7 @@
         "rule": {
           "interval": [
             {
-              "field": "minutes",
-              "minutesInterval": 2
+              "triggerAtHour": 11
             }
           ]
         }
@@ -15,10 +14,10 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        0,
-        0
+        -736,
+        240
       ],
-      "id": "352cb2de-9de9-4e12-bb9d-f04b983db220",
+      "id": "3fe1a971-e1c9-48d4-9aa8-ee6d7bd035ef",
       "name": "Schedule Trigger"
     },
     {
@@ -42,14 +41,14 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.6,
       "position": [
-        288,
-        0
+        -448,
+        240
       ],
-      "id": "bbe8b818-38f7-496c-829e-c9aecfc9f581",
+      "id": "818f6dc5-5bd4-4abb-8329-a360818d9647",
       "name": "Obtener datos",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "3nRF5ZsAkYzNabuO",
+          "id": "9R4LGTlYGsLvxgS0",
           "name": "Google Sheets account"
         }
       }
@@ -66,10 +65,10 @@
       "type": "n8n-nodes-base.dateTime",
       "typeVersion": 2,
       "position": [
-        736,
-        -240
+        0,
+        0
       ],
-      "id": "fedf34f6-e7cf-4e9d-bbf4-fdcffae5ecb7",
+      "id": "fd89f674-ac49-4ed6-99c7-5f28169851cd",
       "name": "Hoy + 1 dia"
     },
     {
@@ -84,10 +83,10 @@
       "type": "n8n-nodes-base.dateTime",
       "typeVersion": 2,
       "position": [
-        736,
-        32
+        0,
+        272
       ],
-      "id": "147688e2-bb28-43af-8f74-d343e045382a",
+      "id": "dbfb63fd-c647-4523-af50-d8844822dfe8",
       "name": "FechaHoy"
     },
     {
@@ -118,33 +117,33 @@
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.2,
       "position": [
-        944,
-        32
+        208,
+        272
       ],
-      "id": "1c28dfc9-3ded-49d3-8dca-0f0374fca70a",
+      "id": "8debe5e7-6661-43e1-9b30-c196323cc9b5",
       "name": "Citas de hoy",
       "alwaysOutputData": false
     },
     {
       "parameters": {
         "sendTo": "={{ $('Obtener datos').item.json.Correo }}",
-        "subject": "=Salida Guardería Mascotas Morelia de  {{ $('Obtener datos').item.json.Mascota }} {{ $('Fecha Salida').item.json.FechaSalidaFormateada }}",
+        "subject": "=Salida Guardería Mascotas Morelia de {{ $('Obtener datos').item.json.Mascota }} {{ $('Fecha Salida').item.json.FechaSalidaFormateada }}",
         "emailType": "text",
-        "message": "=Estimad@ {{ $('Obtener datos').item.json.Cliente }},\n\nTe informamos que la salida de guardería de tu mascota está programada para mañana {{ $('Fecha Salida').item.json.FechaSalidaFormateada }}.\nTe pedimos pasar por ella en la fecha indicada; de lo contrario, se generarán cargos adicionales.\n\n📋 Datos de tu mascota:\n• Nombre: {{ $('Obtener datos').item.json.Mascota }}\n• Especie: {{ $('Obtener datos').item.json.Especie }}\n• Raza: {{ $('Obtener datos').item.json.Raza }}\n• Sexo: {{ $('Obtener datos').item.json.Sexo }}\n• Peso: {{ $('Obtener datos').item.json.Peso }} kg\n\n💳 Datos de pago:\n• Anticipo: {{ $('Obtener datos').item.json.Anticipo }}\n• Total: {{ $('Obtener datos').item.json['Pago Total'] }}\n\n🏥 Veterinaria:\n{{ $('Obtener datos').item.json.Veterinaria }}\n",
+        "message": "=Estimad@ {{ $('Obtener datos').item.json.Cliente }},\n\nTe informamos que la salida de guardería de tu mascota está programada para mañana {{ $('Fecha Salida').item.json.FechaSalidaFormateada }}.\nTe pedimos pasar por ella en la fecha indicada; de lo contrario, se generarán cargos adicionales.\n\n📋 Datos de tu mascota:\n• Nombre: {{ $('Obtener datos').item.json.Mascota }}\n• Especie: {{ $('Obtener datos').item.json.Especie }}\n• Raza: {{ $('Obtener datos').item.json.Raza }}\n• Sexo: {{ $('Obtener datos').item.json.Sexo }}\n• Peso: {{ $('Obtener datos').item.json.Peso }} kg\n\n💳 Datos de pago:\n• Anticipo: $ {{ $('Obtener datos').item.json.Anticipo }} \n• Total: $ {{ $('Obtener datos').item.json['Pago Total'] }}\n\n🏥 Veterinaria:\n{{ $('Obtener datos').item.json.Veterinaria }}\n",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1184,
-        -240
+        448,
+        0
       ],
-      "id": "31dd0f6a-ba88-4891-92b6-af290d9f5460",
+      "id": "2c30cdf3-8ec6-4ebc-94a1-f65d48603a9c",
       "name": "correo recordatorio dia siguiente",
       "webhookId": "d290cbd4-aa0c-4ea7-b1e4-9aa77ebd2202",
       "credentials": {
         "gmailOAuth2": {
-          "id": "oMzw6dcsBT2FIzoM",
+          "id": "opqzHkQbrTlEQKCA",
           "name": "Gmail account"
         }
       }
@@ -172,14 +171,14 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        1408,
-        32
+        672,
+        272
       ],
-      "id": "09071976-fcfd-4426-baef-a1cd940618fc",
+      "id": "89147271-6e9a-4d95-b919-04d08322314c",
       "name": "Clear sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "3nRF5ZsAkYzNabuO",
+          "id": "9R4LGTlYGsLvxgS0",
           "name": "Google Sheets account"
         }
       }
@@ -196,10 +195,10 @@
       "type": "n8n-nodes-base.dateTime",
       "typeVersion": 2,
       "position": [
-        512,
-        0
+        -224,
+        240
       ],
-      "id": "b796a8b0-2d8c-49ce-9504-18ec06c40cc2",
+      "id": "d067a1d4-a8cf-4c17-bbbf-bccb3f3e3569",
       "name": "Fecha Salida"
     },
     {
@@ -230,33 +229,33 @@
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.2,
       "position": [
-        976,
-        -240
+        240,
+        0
       ],
-      "id": "84d1926c-4f9e-45d2-9749-48159ba124ce",
+      "id": "dae68fd9-0c63-42d4-bd94-54877bef84cb",
       "name": "Salidas dia siguiente",
       "alwaysOutputData": false
     },
     {
       "parameters": {
         "sendTo": "={{ $('Obtener datos').item.json.Correo }}",
-        "subject": "=Salida Guardería Mascotas Morelia de  {{ $('Obtener datos').item.json.Mascota }} {{ $('Fecha Salida').item.json.FechaSalidaFormateada }}",
+        "subject": "=Salida Guardería Mascotas Morelia de {{ $('Obtener datos').item.json.Mascota }} {{ $('Fecha Salida').item.json.FechaSalidaFormateada }}",
         "emailType": "text",
-        "message": "=Estimad@ {{ $('Obtener datos').item.json.Cliente }},\n\nTe informamos que la salida de guardería de tu mascota está programada para hoy {{ $('Fecha Salida').item.json.FechaSalidaFormateada }}.\nTe pedimos pasar por ella en la fecha indicada; de lo contrario, se generarán cargos adicionales.\n\n📋 Datos de tu mascota:\n• Nombre: {{ $('Obtener datos').item.json.Mascota }}\n• Especie: {{ $('Obtener datos').item.json.Especie }}\n• Raza: {{ $('Obtener datos').item.json.Raza }}\n• Sexo: {{ $('Obtener datos').item.json.Sexo }}\n• Peso: {{ $('Obtener datos').item.json.Peso }} kg\n\n💳 Datos de pago:\n• Anticipo: {{ $('Obtener datos').item.json.Anticipo }}\n• Total: {{ $('Obtener datos').item.json['Pago Total'] }}\n\n🏥 Veterinaria:\n{{ $('Obtener datos').item.json.Veterinaria }}\n",
+        "message": "=Estimad@ {{ $('Obtener datos').item.json.Cliente }},\n\nTe informamos que la salida de guardería de tu mascota está programada para hoy {{ $('Fecha Salida').item.json.FechaSalidaFormateada }}.\nTe pedimos pasar por ella en la fecha indicada; de lo contrario, se generarán cargos adicionales.\n\n📋 Datos de tu mascota:\n• Nombre: {{ $('Obtener datos').item.json.Mascota }}\n• Especie: {{ $('Obtener datos').item.json.Especie }}\n• Raza: {{ $('Obtener datos').item.json.Raza }}\n• Sexo: {{ $('Obtener datos').item.json.Sexo }}\n• Peso: {{ $('Obtener datos').item.json.Peso }} kg\n\n💳 Datos de pago:\n• Anticipo: $ {{ $('Obtener datos').item.json.Anticipo }}\n• Total: $ {{ $('Obtener datos').item.json['Pago Total'] }}\n\n🏥 Veterinaria:\n{{ $('Obtener datos').item.json.Veterinaria }}\n",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1184,
-        32
+        448,
+        272
       ],
-      "id": "0f61a4d5-96e5-4e10-b578-d3542e6954ed",
+      "id": "70b297ff-b8ef-4edc-8965-6b49a86793a4",
       "name": "correo recordatorio dia siguiente1",
       "webhookId": "d290cbd4-aa0c-4ea7-b1e4-9aa77ebd2202",
       "credentials": {
         "gmailOAuth2": {
-          "id": "oMzw6dcsBT2FIzoM",
+          "id": "opqzHkQbrTlEQKCA",
           "name": "Gmail account"
         }
       }
@@ -306,11 +305,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "correo recordatorio dia siguiente": {
-      "main": [
-        []
       ]
     },
     "Citas de hoy": {
@@ -367,11 +361,11 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "c20a24a7-93f0-403e-9357-0b66bf12ea25",
+  "versionId": "74d8f3f9-630b-4645-b7d5-6fa1bc513260",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "bb5b4802a342c7ba50e55216edd01b9f6f5f5420b80da26ca81d9dac80937c07"
+    "instanceId": "a770ccb3a6ffef522de6cf935aa84c834a3757e322f15df858463c95f73967c5"
   },
-  "id": "FShI7pAkhOkeWhQD",
+  "id": "NviVtOc8jcMkf2cF",
   "tags": []
 }

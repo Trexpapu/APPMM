@@ -10,10 +10,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -400,
-        16
+        -416,
+        144
       ],
-      "id": "375ebdb6-09ef-46e4-8c40-c861393d6ce6",
+      "id": "2142be76-bf2f-4d96-9cd6-761da19edd3e",
       "name": "Webhook",
       "webhookId": "1a247609-773d-4947-bbac-700d9009959f"
     },
@@ -31,7 +31,7 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{ $('Webhook').item.json.body.sheet }}",
+                    "leftValue": "={{ $json.body.sheet }}",
                     "rightValue": "agenda",
                     "operator": {
                       "type": "string",
@@ -44,6 +44,55 @@
               },
               "renameOutput": true,
               "outputKey": "agenda"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ad382c6b-6e69-4462-bced-184a101663b7",
+                    "leftValue": "={{ $json.body.sheet }}",
+                    "rightValue": "guarderia",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "guarderia"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8320b992-2880-4fbf-ad83-cae1c7be8a87",
+                    "leftValue": "={{ $json.body.sheet }}",
+                    "rightValue": "hospitalizacion",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "hospitalizacion"
             }
           ]
         },
@@ -52,10 +101,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.3,
       "position": [
-        -192,
-        16
+        -208,
+        144
       ],
-      "id": "e5ab9237-d796-456f-84ac-6d0f99d0ef1d",
+      "id": "3d288798-be94-475c-b7dd-73f533d976d7",
       "name": "Switch"
     },
     {
@@ -265,13 +314,375 @@
       "typeVersion": 4.7,
       "position": [
         16,
-        -128
+        -112
       ],
-      "id": "aa4b67fd-dc14-48bd-ae50-31f267f5ea39",
+      "id": "91a55f09-7ccb-4cb3-9265-69e6d5e3d804",
       "name": "Update row in sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "3nRF5ZsAkYzNabuO",
+          "id": "9R4LGTlYGsLvxgS0",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q",
+          "mode": "list",
+          "cachedResultName": "Base de datos Mascotas Morelia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1352081072,
+          "mode": "list",
+          "cachedResultName": "Guarderia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit#gid=1352081072"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('Switch').item.json.body.ID }}",
+            "Mascota": "={{ $('Switch').item.json.body.nombre }}",
+            "Especie": "={{ $('Switch').item.json.body.especie }}",
+            "Raza": "={{ $('Switch').item.json.body.raza }}",
+            "Sexo": "={{ $('Switch').item.json.body.sexo }}",
+            "Peso": "={{ $('Switch').item.json.body.peso }}",
+            "Cliente": "={{ $('Switch').item.json.body.cliente_nombre }}",
+            "Correo": "={{ $('Switch').item.json.body.cliente_email }}",
+            "Veterinaria": "={{ $('Switch').item.json.body.veterinaria }}",
+            "Fecha Salida": "={{ $json.body.fecha_salida }}",
+            "Anticipo": "={{ $json.body.anticipo }}",
+            "Pago Total": "={{ $json.body.pago_total }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mascota",
+              "displayName": "Mascota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Especie",
+              "displayName": "Especie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Raza",
+              "displayName": "Raza",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sexo",
+              "displayName": "Sexo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Peso",
+              "displayName": "Peso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cliente",
+              "displayName": "Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correo",
+              "displayName": "Correo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Veterinaria",
+              "displayName": "Veterinaria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha Salida",
+              "displayName": "Fecha Salida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Anticipo",
+              "displayName": "Anticipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Pago Total",
+              "displayName": "Pago Total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        144,
+        80
+      ],
+      "id": "9bff40fc-8b38-4685-af94-9f61f45eeafd",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9R4LGTlYGsLvxgS0",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q",
+          "mode": "list",
+          "cachedResultName": "Base de datos Mascotas Morelia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2003363825,
+          "mode": "list",
+          "cachedResultName": "Hospitalizacion",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit#gid=2003363825"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('Switch').item.json.body.ID }}",
+            "Mascota": "={{ $('Switch').item.json.body.nombre }}",
+            "Especie": "={{ $('Switch').item.json.body.especie }}",
+            "Raza": "={{ $('Switch').item.json.body.raza }}",
+            "Sexo": "={{ $('Switch').item.json.body.sexo }}",
+            "Peso": "={{ $('Switch').item.json.body.peso }}",
+            "Cliente": "={{ $('Switch').item.json.body.cliente_nombre }}",
+            "Correo": "={{ $('Switch').item.json.body.cliente_email }}",
+            "Veterinaria": "={{ $('Switch').item.json.body.veterinaria }}",
+            "Fecha Salida": "={{ $json.body.fecha_salida }}",
+            "Anticipo": "={{ $json.body.anticipo }}",
+            "Pago Total": "={{ $json.body.pago_total }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mascota",
+              "displayName": "Mascota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Especie",
+              "displayName": "Especie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Raza",
+              "displayName": "Raza",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sexo",
+              "displayName": "Sexo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Peso",
+              "displayName": "Peso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cliente",
+              "displayName": "Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correo",
+              "displayName": "Correo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Veterinaria",
+              "displayName": "Veterinaria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha Salida",
+              "displayName": "Fecha Salida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Anticipo",
+              "displayName": "Anticipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Pago Total",
+              "displayName": "Pago Total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        144,
+        368
+      ],
+      "id": "cbd3086b-46a1-4425-84eb-e15217d8d153",
+      "name": "Update row in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9R4LGTlYGsLvxgS0",
           "name": "Google Sheets account"
         }
       }
@@ -298,6 +709,20 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row in sheet2",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     }
@@ -306,11 +731,11 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "94753f11-bb2f-44a1-bad5-bdf338c00605",
+  "versionId": "69720788-378f-4c2b-b694-563b44e62848",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "bb5b4802a342c7ba50e55216edd01b9f6f5f5420b80da26ca81d9dac80937c07"
+    "instanceId": "a770ccb3a6ffef522de6cf935aa84c834a3757e322f15df858463c95f73967c5"
   },
-  "id": "LLC6P3Pa3KyM4TKH",
+  "id": "gDoj3PYCU5t7Hcf9",
   "tags": []
 }

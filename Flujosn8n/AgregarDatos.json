@@ -10,10 +10,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [
-        -400,
-        16
+        -512,
+        240
       ],
-      "id": "800e48ca-5ed3-45c9-b1f9-544f31ce14d5",
+      "id": "23a95646-3f8d-4d10-9b5c-f755e4acf6c1",
       "name": "Webhook",
       "webhookId": "d60dbd67-c46f-4a67-88f3-76378e9bddb6"
     },
@@ -212,14 +212,14 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.6,
       "position": [
-        112,
-        -224
+        0,
+        0
       ],
-      "id": "ccad8ca9-5a36-4a81-a32e-fe47cfc98bd2",
+      "id": "45c1d52f-790b-4ac3-b842-d3b0afcbfde5",
       "name": "Append row in sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "3nRF5ZsAkYzNabuO",
+          "id": "9R4LGTlYGsLvxgS0",
           "name": "Google Sheets account"
         }
       }
@@ -276,6 +276,31 @@
               },
               "renameOutput": true,
               "outputKey": "guarderia"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8ee0f810-9bec-482c-ad8b-3cf9a6d8a9bd",
+                    "leftValue": "={{ $json.body.sheet }}",
+                    "rightValue": "hospitalizacion",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "hospitalizacion"
             }
           ]
         },
@@ -284,10 +309,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.3,
       "position": [
-        -192,
-        16
+        -304,
+        240
       ],
-      "id": "f1b575b2-e687-4e90-b90e-87f1bdc51ab2",
+      "id": "8babce66-de42-4ad4-9c02-f847d320332b",
       "name": "Switch"
     },
     {
@@ -446,14 +471,182 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.6,
       "position": [
-        96,
-        96
+        48,
+        176
       ],
-      "id": "2cfc7110-5182-455e-9820-f95a276930b9",
+      "id": "724764fe-6095-420d-8216-b36148c24a19",
       "name": "Append row in sheet1",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "3nRF5ZsAkYzNabuO",
+          "id": "9R4LGTlYGsLvxgS0",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q",
+          "mode": "list",
+          "cachedResultName": "Base de datos Mascotas Morelia",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2003363825,
+          "mode": "list",
+          "cachedResultName": "Hospitalizacion",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JETShKdELzU_T-mFFbVTAonig0vJOR4FzxoiiXhkR3Q/edit#gid=2003363825"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Mascota": "={{ $json.body.nombre }}",
+            "Especie": "={{ $json.body.especie }}",
+            "Raza": "={{ $json.body.raza }}",
+            "Sexo": "={{ $json.body.sexo }}",
+            "Peso": "={{ $json.body.peso }}",
+            "Cliente": "={{ $json.body.cliente_nombre }}",
+            "Correo": "={{ $json.body.cliente_email }}",
+            "Veterinaria": "={{ $json.body.veterinaria }}",
+            "ID": "={{ $json.body.ID }}",
+            "Fecha Salida": "={{ $json.body.fecha_salida }}",
+            "Anticipo": "={{ $json.body.anticipo }}",
+            "Pago Total": "={{ $json.body.pago_total }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mascota",
+              "displayName": "Mascota",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Especie",
+              "displayName": "Especie",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Raza",
+              "displayName": "Raza",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sexo",
+              "displayName": "Sexo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Peso",
+              "displayName": "Peso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cliente",
+              "displayName": "Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correo",
+              "displayName": "Correo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Veterinaria",
+              "displayName": "Veterinaria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha Salida",
+              "displayName": "Fecha Salida",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Anticipo",
+              "displayName": "Anticipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Pago Total",
+              "displayName": "Pago Total",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -112,
+        416
+      ],
+      "id": "4b31caf8-7628-429f-b548-cb54040d1e73",
+      "name": "Append row in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9R4LGTlYGsLvxgS0",
           "name": "Google Sheets account"
         }
       }
@@ -487,6 +680,13 @@
             "type": "main",
             "index": 0
           }
+        ],
+        [
+          {
+            "node": "Append row in sheet2",
+            "type": "main",
+            "index": 0
+          }
         ]
       ]
     }
@@ -495,11 +695,11 @@
   "settings": {
     "executionOrder": "v1"
   },
-  "versionId": "f2ff51e9-5df2-4447-af2c-69f8411ee17f",
+  "versionId": "317601a7-195b-4d80-81a4-ccc212c83aa7",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "bb5b4802a342c7ba50e55216edd01b9f6f5f5420b80da26ca81d9dac80937c07"
+    "instanceId": "a770ccb3a6ffef522de6cf935aa84c834a3757e322f15df858463c95f73967c5"
   },
-  "id": "0HBwGr8tttoysIuT",
+  "id": "StJCF85SvLcDuiDH",
   "tags": []
 }

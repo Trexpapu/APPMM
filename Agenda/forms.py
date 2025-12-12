@@ -21,7 +21,7 @@ class SiguientesCitasForm(forms.ModelForm):
                 attrs={'placeholder': 'Selecciona el estado de asistencia'}
             ),
             'clinicaVeterinaria': forms.Select(
-                attrs={'placeholder': 'Selecciona la clínica veterinaria'}
+                attrs={'class': 'form-control'}
             ),
             'veterinario': forms.Select(
                 attrs={'placeholder': 'Selecciona el veterinario responsable'}
@@ -79,7 +79,7 @@ class UpdateSiguienteCitaForm(forms.ModelForm):
                 attrs={'placeholder': 'Selecciona el estado de asistencia'}
             ),
             'clinicaVeterinaria': forms.Select(
-                attrs={'placeholder': 'Selecciona la clínica veterinaria'}
+                attrs={'class': 'form-control'}
             ),
             'veterinario': forms.Select(
                 attrs={'placeholder': 'Selecciona el veterinario responsable'}
