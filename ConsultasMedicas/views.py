@@ -955,14 +955,13 @@ def generar_pdf_receta(datos_form, datos_mascota):
     story.append(Spacer(1, 30))
     
     # Firmas y aclaraciones
-    story.append(Paragraph("INFORMACIÓN", heading_style))
+    story.append(Paragraph("INFORMACIÓN DE CONTACTO", heading_style))
     
-    contacto_text = ""
-    if datos_form['veterinaria'] == "Mascotas Morelia Centro (Samuel Castañon Pte. 73 Centro 60600 Apatzingán, Mich. Número 453-227-1694)":
+   
         # Información de contacto
-        contacto_text = """
-        <b>Información de contacto:</b><br/>
-        • Para dudas o aclaraciones, comunícate con la clínica al número 453-227-1694 o al correo atencionmascotasmorelia@gmail.com.<br/>
+    contacto_text = """
+        <b></b>
+        • Para dudas o aclaraciones, comunícate con la clínica al número 453-227-1694 o al correo mascotasmoreliaapatzingan@gmail.com<br/>
         • En caso de emergencia, acude al hospital veterinario más cercano.<br/>
         """
 
