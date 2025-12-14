@@ -161,13 +161,14 @@ def json_serializer(obj):
     return str(obj) if obj is not None else ""
 
 def enviar_datos(datos_mascota, datos_formulario, url= "http://localhost:5678/webhook/agregar"):
+    defaultEmail = "mascotasmoreliaapatzingan@gmail.com"
     datos = {
         **datos_mascota,
         **datos_formulario
     }
     if datos.get('cliente_email') == "" or datos.get('cliente_email') == None:
-        return
-    # Convertir el diccionario a una cadena JSON manualmente, usando nuestro serializador personalizado
+        datos['cliente_email'] = defaultEmail
+     # Convertir el diccionario a una cadena JSON manualmente, usando nuestro serializador personalizado
     try:
         datos_json = json.dumps(datos, default=json_serializer)
     except TypeError as e:
