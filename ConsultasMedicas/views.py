@@ -455,16 +455,17 @@ def generar_pdf_consulta(request, consulta_id):
     # Información básica
     story.append(Paragraph("INFORMACIÓN GENERAL", heading_style))
     info_data = [
-        ['Mascota:', consulta.mascota.nombre],
-        ['Especie:', consulta.mascota.especie],
-        ['Raza:', consulta.mascota.raza],
+        ['Mascota:', Paragraph(consulta.mascota.nombre, normal_style)],
+        ['Especie:', Paragraph(consulta.mascota.especie, normal_style)],
+        ['Raza:', Paragraph(consulta.mascota.raza, normal_style)],
         ['Sexo:', consulta.mascota.sexo],
-        ['Propietario:', consulta.mascota.cliente.nombre],
+        ['Propietario:', Paragraph(consulta.mascota.cliente.nombre, normal_style)],
         ['Fecha de consulta:', timezone.localtime(consulta.fechaConsulta).strftime('%d/%m/%Y %H:%M')],
-        ['Veterinario:', consulta.veterinario.get_full_name() or consulta.veterinario.username],
-        ['Clínica:', consulta.clinicaVeterinaria],
-        ['Procedimiento:', consulta.procedimiento],
+        ['Veterinario:', Paragraph(consulta.veterinario.get_full_name() or consulta.veterinario.username, normal_style)],
+        ['Clínica:', Paragraph(consulta.clinicaVeterinaria, normal_style)],
+        ['Procedimiento:', Paragraph(consulta.procedimiento, normal_style)],
     ]
+
     
     info_table = Table(info_data, colWidths=[2*inch, 4*inch])
     info_table.setStyle(TableStyle([
@@ -613,7 +614,7 @@ def generar_pdf_consulta(request, consulta_id):
     
     # Observaciones y evolución
     if consulta.observaciones:
-        story.append(Paragraph("OBSERVACIONES", heading_style))
+        story.append(Paragraph("MEDICAMENTOS APLICADOS Y COMENTARIOS", heading_style))
         story.append(Paragraph(consulta.observaciones, normal_style))
         story.append(Spacer(1, 12))
     

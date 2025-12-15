@@ -426,7 +426,7 @@ def generar_pdf_guarderia(request, pk):
     # Información de la mascota
     story.append(Paragraph("INFORMACIÓN DE LA MASCOTA", heading_style))
     info_mascota_data = [
-        ['Nombre:', guarderia.mascota.nombre],
+        ['Nombre:', Paragraph(guarderia.mascota.nombre, normal_style)],
         ['Especie:', guarderia.mascota.especie],
         ['Raza:', guarderia.mascota.raza or 'No especificada'],
         ['Fecha de Nacimiento:', guarderia.mascota.fechaNacimiento.strftime('%d/%m/%Y') if guarderia.mascota.fechaNacimiento else 'No especificada'],
@@ -452,9 +452,9 @@ def generar_pdf_guarderia(request, pk):
     # Información del dueño
     story.append(Paragraph("INFORMACIÓN DEL PROPIETARIO", heading_style))
     info_cliente_data = [
-        ['Nombre:', guarderia.mascota.cliente.nombre],
+        ['Nombre:', Paragraph(guarderia.mascota.cliente.nombre, normal_style)],
         ['Teléfono:', guarderia.mascota.cliente.telefono or 'No especificado'],
-        ['Email:', guarderia.mascota.cliente.email or 'No especificado'],
+        ['Email:', Paragraph(guarderia.mascota.cliente.email, normal_style) or 'No especificado'],
     ]
     
     info_cliente_table = Table(info_cliente_data, colWidths=[2*inch, 4*inch])
@@ -482,7 +482,7 @@ def generar_pdf_guarderia(request, pk):
     fechas_data = [
         ['Fecha de Ingreso:', guarderia.fechaEntrada.strftime('%d/%m/%Y')],
         ['Fecha de Egreso Programada:', guarderia.fechaSalidaProgramada.strftime('%d/%m/%Y') if guarderia.fechaSalidaProgramada else 'No especificada'],
-        ['Clínica Veterinaria:', guarderia.clinicaVeterinaria],
+        ['Clínica Veterinaria:', Paragraph(guarderia.clinicaVeterinaria, normal_style)],
         ['Estado del Servicio:', guarderia.estado],
     ]
     
@@ -556,16 +556,16 @@ def generar_pdf_guarderia(request, pk):
     
     # Incisos
     incisos = [
-        "La mascota será atendida bajo el cuidado y supervisión del personal calificado de Mascotas Morelia.",
-        "El propietario declara que la mascota se encuentra en buen estado de salud al momento del ingreso, salvo lo indicado en el apartado correspondiente.",
-        "En caso de emergencia médica, Mascotas Morelia se reserva el derecho de proporcionar la atención veterinaria necesaria, cuyos costos serán asumidos por el propietario.",
-        "El propietario autoriza a Mascotas Morelia a administrar los tratamientos y medicamentos indicados en este documento.",
+        "Entregar el carnet de la mascota debidamente actualizado.",
+        "Aprobar el tratamiento de ingreso o extemporáneo en caso de ser necesario.",
+        "Liquidar por anticipo el costo presupuestado del servicio.",
+        "Presentar factura o comprobantes de procedencia en caso de animales exóticos o aquellos que así lo requieran.",
+        "Si la estancia de la mascota excede los días previstos, se cobrará un cargo adicional al momento de recogerla.",
         "Mascotas Morelia no se hace responsable por objetos personales (juguetes, cobijas, etc.) que puedan sufrir daño durante la estancia.",
-        "El horario de recolección de mascotas es de 9:00 am a 8:00 pm. Recoger a la mascota fuera de este horario podría generar cargos adicionales.",
-        "El pago del servicio debe ser liquidado en su totalidad al momento de la recolección de la mascota.",
-        "En caso de no recoger a la mascota en la fecha acordada sin previo aviso, se aplicarán cargos por día adicional.",
-        "El propietario se compromete a proporcionar información veraz sobre el estado de salud, comportamiento y necesidades especiales de su mascota."
+        "Mascotas Morelia no se responsabiliza por el fallecimiento de la mascota cuando sea por causas de fuerza mayor o si no se autorizó la intervención correspondiente.",
+        "La mascota únicamente será entregada al propietario o a la persona que presente el contrarrecibo expedido por Mascotas Morelia."
     ]
+
     
     for i, inciso in enumerate(incisos, 1):
         story.append(Paragraph(f"<b>{i}.</b> {inciso}", normal_style))
@@ -878,7 +878,7 @@ def generar_pdf_hospitalizacion(request, pk):
     # Información de la mascota
     story.append(Paragraph("INFORMACIÓN DE LA MASCOTA", heading_style))
     info_mascota_data = [
-        ['Nombre:', hospitalizacion.mascota.nombre],
+        ['Nombre:', Paragraph(hospitalizacion.mascota.nombre, normal_style)],
         ['Especie:', hospitalizacion.mascota.especie],
         ['Raza:', hospitalizacion.mascota.raza or 'No especificada'],
         ['Fecha de Nacimiento:', hospitalizacion.mascota.fechaNacimiento.strftime('%d/%m/%Y') if hospitalizacion.mascota.fechaNacimiento else 'No especificada'],
@@ -904,9 +904,9 @@ def generar_pdf_hospitalizacion(request, pk):
     # Información del dueño
     story.append(Paragraph("INFORMACIÓN DEL PROPIETARIO", heading_style))
     info_cliente_data = [
-        ['Nombre:', hospitalizacion.mascota.cliente.nombre],
+        ['Nombre:', Paragraph(hospitalizacion.mascota.cliente.nombre, normal_style)],
         ['Teléfono:', hospitalizacion.mascota.cliente.telefono or 'No especificado'],
-        ['Email:', hospitalizacion.mascota.cliente.email or 'No especificado'],
+        ['Email:', Paragraph(hospitalizacion.mascota.cliente.email, normal_style) or 'No especificado'],
     ]
     
     info_cliente_table = Table(info_cliente_data, colWidths=[2*inch, 4*inch])
@@ -934,7 +934,7 @@ def generar_pdf_hospitalizacion(request, pk):
     fechas_data = [
         ['Fecha de Ingreso:', hospitalizacion.fechaEntrada.strftime('%d/%m/%Y')],
         ['Fecha de Egreso:', hospitalizacion.fechaSalida.strftime('%d/%m/%Y') if hospitalizacion.fechaSalida else 'No especificada'],
-        ['Clínica Veterinaria:', hospitalizacion.clinicaVeterinaria],
+        ['Clínica Veterinaria:', Paragraph(hospitalizacion.clinicaVeterinaria, normal_style)],
         ['Estado del Paciente:', hospitalizacion.estado],
     ]
     
@@ -1013,18 +1013,12 @@ def generar_pdf_hospitalizacion(request, pk):
     
     # Incisos
     incisos = [
-        "La mascota será atendida bajo el cuidado y supervisión del personal calificado de Mascotas Morelia.",
-        "El propietario declara que la mascota se encuentra en buen estado de salud al momento del ingreso, salvo lo indicado en el apartado correspondiente.",
         "En caso de emergencia médica, Mascotas Morelia se reserva el derecho de proporcionar la atención veterinaria necesaria, cuyos costos serán asumidos por el propietario.",
-        "El propietario autoriza a Mascotas Morelia a administrar los tratamientos y medicamentos indicados en este documento.",
-        "Mascotas Morelia no se hace responsable por objetos personales (juguetes, cobijas, etc.) que puedan sufrir daño durante la estancia.",
-        "El horario de visita es de 9:00 am a 8:00 pm. Visitas fuera de este horario deben ser coordinadas previamente.",
-        "El pago del servicio debe ser liquidado en su totalidad al momento del alta de la mascota.",
-        "En caso de no recoger a la mascota en la fecha acordada sin previo aviso, se aplicarán cargos por día adicional.",
-        "El propietario se compromete a proporcionar información veraz sobre el estado de salud, comportamiento y necesidades especiales de su mascota.",
+        "El pago del servicio deberá liquidarse en su totalidad al momento del alta de la mascota.",
+        "Si la mascota no es recogida en la fecha acordada, se aplicarán cargos por cada día adicional.",
         "El propietario autoriza a Mascotas Morelia a tomar decisiones médicas en caso de emergencia cuando no pueda ser contactado.",
-        "Todas las mascotas deben contar con vacunación al día. En caso contrario, se aplicará un cargo adicional por vacunación de emergencia.",
-        "El propietario es responsable de informar sobre cualquier condición médica preexistente, alergias o medicamentos que requiera la mascota."
+        "El propietario es responsable de informar sobre cualquier condición médica preexistente, alergias o medicamentos que requiera la mascota.",
+        "Mascotas Morelia no se hace responsable por el fallecimiento de la mascota."
     ]
     
     for i, inciso in enumerate(incisos, 1):

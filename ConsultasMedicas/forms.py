@@ -92,7 +92,7 @@ class ConsultaMedicaForm(forms.ModelForm):
             # SECCIÓN 3: EXAMEN FÍSICO GENERAL
             'mucosas': forms.Select(attrs={'class': 'form-control'}),
             'porcentajeHidratacion': forms.TextInput(attrs={
-                'placeholder': 'Ej. 5-7% (ligera deshidratación)',
+                'placeholder': 'Porcentaje %',
                 'class': 'form-control'
             }),
             'temperatura': forms.TextInput(attrs={
@@ -224,7 +224,7 @@ class ConsultaMedicaForm(forms.ModelForm):
             }),
             'observaciones': forms.Textarea(attrs={
                 'rows': 3,
-                'placeholder': 'Observaciones adicionales',
+                'placeholder': 'Medicamentos aplicados y comentarios',
                 'class': 'form-control'
             }),
         }
@@ -275,12 +275,12 @@ class ConsultaMedicaForm(forms.ModelForm):
             'estudiosHechos': '🔬 Estudios Realizados',
             'estudiosRecomendados': '📋 Estudios Recomendados',
             'evolucion': '📊 Evolución',
-            'observaciones': '📝 Observaciones',
+            'observaciones': '📝 Medicamentos Aplicados y Comentarios',
         }
 
         help_texts = {
             'anamnesicos': 'Se incluye el motivo de la consulta y el problema actual del paciente tal como la expresa el propietario, y otra información como Dieta, Enfermedades previas, Cirugías previas, Tratamientos recientes, si Convive con otros animales, Viajes recientes...',
-            'porcentajeHidratacion': '5%: leve, 6-8%: moderada, 10-12%: severa',
+            
             'puntuacionCorporal': 'Escala de 1 a 5, donde 1 es muy delgado y 5 es obeso',
         }
 
@@ -345,7 +345,7 @@ class ConsultaMedicaUpdateForm(forms.ModelForm):
             }),
             'mucosas': forms.Select(attrs={'class': 'form-control'}),
             'porcentajeHidratacion': forms.TextInput(attrs={
-                'placeholder': 'Ej. 5-7% (ligera deshidratación)',
+                'placeholder': 'Porcentaje %',
                 'class': 'form-control'
             }),
             'temperatura': forms.TextInput(attrs={
@@ -466,7 +466,7 @@ class ConsultaMedicaUpdateForm(forms.ModelForm):
             }),
             'observaciones': forms.Textarea(attrs={
                 'rows': 3,
-                'placeholder': 'Observaciones adicionales',
+                'placeholder': 'Medicamentos aplicados y comentarios',
                 'class': 'form-control'
             }),
         }
@@ -503,12 +503,12 @@ class ConsultaMedicaUpdateForm(forms.ModelForm):
             'estudiosHechos': '🔬 Estudios Realizados',
             'estudiosRecomendados': '📋 Estudios Recomendados',
             'evolucion': '📊 Evolución',
-            'observaciones': '📝 Observaciones',
+            'observaciones': '📝 Medicamentos Aplicados y Comentarios',
         }
 
         help_texts = {
             'anamnesicos': 'Se incluye el motivo de la consulta y el problema actual del paciente tal como la expresa el propietario, y otra información como Dieta, Enfermedades previas, Cirugías previas, Tratamientos recientes, si Convive con otros animales, Viajes recientes...',
-            'porcentajeHidratacion': '5%: leve, 6-8%: moderada, 10-12%: severa',
+            
             'puntuacionCorporal': 'Escala de 1 a 5, donde 1 es muy delgado y 5 es obeso',
         }
 

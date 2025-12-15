@@ -680,7 +680,7 @@ def generar_pdf_operacion(request, operacion_id):
     # Información de la mascota
     story.append(Paragraph("INFORMACIÓN DE LA MASCOTA", heading_style))
     info_mascota_data = [
-        ['Nombre:', operacion.mascota.nombre],
+        ['Nombre:', Paragraph(operacion.mascota.nombre, normal_style)],
         ['Especie:', operacion.mascota.especie],
         ['Raza:', operacion.mascota.raza or 'No especificada'],
         ['Fecha de Nacimiento:', operacion.mascota.fechaNacimiento.strftime('%d/%m/%Y') if operacion.mascota.fechaNacimiento else 'No especificada'],
@@ -706,9 +706,9 @@ def generar_pdf_operacion(request, operacion_id):
     # Información del dueño
     story.append(Paragraph("INFORMACIÓN DEL PROPIETARIO", heading_style))
     info_cliente_data = [
-        ['Nombre:', operacion.mascota.cliente.nombre],
+        ['Nombre:', Paragraph(operacion.mascota.cliente.nombre, normal_style)],
         ['Teléfono:', operacion.mascota.cliente.telefono or 'No especificado'],
-        ['Email:', operacion.mascota.cliente.email or 'No especificado'],
+        ['Email:', Paragraph(operacion.mascota.cliente.email, normal_style) or 'No especificado'],
     ]
     
     info_cliente_table = Table(info_cliente_data, colWidths=[2*inch, 4*inch])
@@ -736,8 +736,8 @@ def generar_pdf_operacion(request, operacion_id):
     fechas_data = [
         ['Fecha y Hora de Inicio de la Operación:', fecha_entrada.strftime('%d/%m/%Y %H:%M')],
         ['Fecha y Hora de FIn de la Operación:', fecha_salida.strftime('%d/%m/%Y %H:%M') if operacion.fechaSalida else 'Pendiente'],
-        ['Clínica Veterinaria:', operacion.clinicaVeterinaria],
-        ['Veterinario Responsable:', operacion.veterinario.get_full_name() or operacion.veterinario.username],
+        ['Clínica Veterinaria:', Paragraph(operacion.clinicaVeterinaria, normal_style)],
+        ['Veterinario Responsable:', Paragraph(operacion.veterinario.get_full_name(), normal_style) or Paragraph(operacion.veterinario.username, normal_style)],
     ]
     
     fechas_table = Table(fechas_data, colWidths=[2.5*inch, 3.5*inch])

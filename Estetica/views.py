@@ -378,9 +378,9 @@ def generar_pdf_estetica(request, pk):
     # Información del dueño
     story.append(Paragraph("INFORMACIÓN DEL PROPIETARIO", heading_style))
     info_cliente_data = [
-        ['Nombre:', estetica.mascota.cliente.nombre],
+        ['Nombre:', Paragraph(estetica.mascota.cliente.nombre, normal_style)],
         ['Teléfono:', estetica.mascota.cliente.telefono or 'No especificado'],
-        ['Email:', estetica.mascota.cliente.email or 'No especificado'],
+        ['Email:', Paragraph(estetica.mascota.cliente.email, normal_style) or 'No especificado'],
     ]
     
     info_cliente_table = Table(info_cliente_data, colWidths=[2*inch, 4*inch])
@@ -408,8 +408,8 @@ def generar_pdf_estetica(request, pk):
     fechas_data = [
         ['Fecha de Ingreso:', fecha_ingreso_local.strftime('%d/%m/%Y %H:%M')],
         ['Fecha de Egreso:', fecha_egreso_local.strftime('%d/%m/%Y %H:%M') if fecha_egreso_local else 'No especificada'],
-        ['Clínica Veterinaria:', estetica.clinicaVeterinaria],
-        ['Estilista:', estetica.estilista.get_full_name() or estetica.estilista.username],
+        ['Clínica Veterinaria:', Paragraph(estetica.clinicaVeterinaria, normal_style)],
+        ['Estilista:', Paragraph(estetica.estilista.get_full_name(), normal_style) or Paragraph(estetica.estilista.username, normal_style)],
     ]
     
     fechas_table = Table(fechas_data, colWidths=[2.5*inch, 3.5*inch])
@@ -499,22 +499,11 @@ def generar_pdf_estetica(request, pk):
     
     # Incisos específicos para estética
     incisos = [
-        "La mascota será atendida bajo el cuidado y supervisión del personal calificado de Mascotas Morelia.",
-        "El propietario declara que la mascota se encuentra en buen estado de salud al momento del ingreso, salvo lo indicado en el apartado correspondiente.",
-        "En caso de que la mascota presente algún problema de salud durante el servicio, Mascotas Morelia se reserva el derecho de proporcionar la atención veterinaria necesaria, cuyos costos serán asumidos por el propietario.",
-        "El propietario autoriza a Mascotas Morelia a realizar el corte de pelo, baño y otros servicios de estética según lo acordado.",
-        "Mascotas Morelia no se hace responsable por reacciones alérgicas a productos de estética si el propietario no informó previamente sobre alergias conocidas.",
-        "El horario de visita es de 9:00 am a 8:00 pm. Visitas fuera de este horario deben ser coordinadas previamente.",
-        "El pago del servicio debe ser liquidado en su totalidad al momento del retiro de la mascota.",
-        "En caso de no recoger a la mascota en la fecha acordada sin previo aviso, se aplicarán cargos por día adicional.",
-        "El propietario se compromete a proporcionar información veraz sobre el estado de salud, comportamiento y necesidades especiales de su mascota.",
-        "El propietario autoriza a Mascotas Morelia a tomar decisiones en caso de emergencia cuando no pueda ser contactado.",
-        "Todas las mascotas deben contar con vacunación al día. En caso contrario, se aplicará un cargo adicional por vacunación de emergencia.",
-        "El propietario es responsable de informar sobre cualquier condición médica preexistente, alergias o medicamentos que requiera la mascota.",
-        "Mascotas Morelia se reserva el derecho de negar el servicio si la mascota muestra conductas agresivas que pongan en riesgo al personal.",
-        "El propietario acepta que las fotos tomadas antes y después del servicio podrán ser utilizadas con fines promocionales de la clínica.",
-        "El propietario recoge a su mascota en el horario acordado; de lo contrario, se aplicará un cargo extra por cuidado extendido."
+    "Nuestro servicio incluye baño, limpieza de oídos, corte de uñas, corte de pelo (si se desea) y lavado de dientes (solo si la mascota está acostumbrada).",
+    "Mascotas Morelia no se hace responsable por el fallecimiento de la mascota debido a causas mayores.",
+    "Si la mascota presenta conductas agresivas, no será posible realizar el servicio."
     ]
+
     
     for i, inciso in enumerate(incisos, 1):
         story.append(Paragraph(f"<b>{i}.</b> {inciso}", normal_style))
