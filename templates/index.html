@@ -1,13 +1,113 @@
 {% extends 'base.html' %}
 
-
-
-
 {% block content %}
-<!-- Aquí puedes añadir el contenido específico de la página principal -->
-<section>
-    <h2>Bienvenid@ a Mascotas Morelia</h2>
-    <p>Esta es la página principal. Añade aquí los bloques y contenido que necesites.</p>
-   
+<section class="container">
+    <div class="header-actions" style="margin-bottom: 2rem; text-align: center; justify-content: center;">
+        <h2 style="font-size: 2.2rem; margin-bottom: 0.5rem;"><i class="fa-solid fa-house-chimney-medical" style="color: var(--primary-blue);"></i> Mascotas Morelia</h2>
+        <p style="color: var(--neutral-gray-dark); font-size: 1.1rem; width: 100%;">Panel de Administración Principal</p>
+    </div>
+
+    <div class="dashboard-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; padding: 1rem 0;">
+        
+        <!-- Clientes y Mascotas -->
+        <a href="{% url 'indexCliente' %}" class="dashboard-card" style="text-decoration: none; color: inherit;">
+            <div class="card-icon" style="background: linear-gradient(135deg, #4dd0e1, #00838f);"><i class="fa-solid fa-users"></i></div>
+            <h3>Clientes</h3>
+            <p>Gestionar directorio y contactos</p>
+        </a>
+
+        <a href="{% url 'indexMascota' %}" class="dashboard-card" style="text-decoration: none; color: inherit;">
+            <div class="card-icon" style="background: linear-gradient(135deg, #ffb74d, #f57c00);"><i class="fa-solid fa-paw"></i></div>
+            <h3>Mascotas</h3>
+            <p>Expedientes e historiales</p>
+        </a>
+
+        <!-- Consultas y Médica -->
+        <a href="{% url 'index-consultas' %}" class="dashboard-card" style="text-decoration: none; color: inherit;">
+            <div class="card-icon" style="background: linear-gradient(135deg, #81c784, #388e3c);"><i class="fa-solid fa-user-doctor"></i></div>
+            <h3>Consultas</h3>
+            <p>Diagnósticos y recetas</p>
+        </a>
+
+        <a href="{% url 'index-agenda' %}" class="dashboard-card" style="text-decoration: none; color: inherit;">
+            <div class="card-icon" style="background: linear-gradient(135deg, #ba68c8, #7b1fa2);"><i class="fa-solid fa-calendar-check"></i></div>
+            <h3>Agenda</h3>
+            <p>Programación de citas</p>
+        </a>
+
+        <a href="{% url 'index-procedimientos' %}" class="dashboard-card" style="text-decoration: none; color: inherit;">
+            <div class="card-icon" style="background: linear-gradient(135deg, #ef5350, #c62828);"><i class="fa-solid fa-syringe"></i></div>
+            <h3>Procedimientos</h3>
+            <p>Vacunas y cirugías</p>
+        </a>
+
+        <!-- Especialidades -->
+        <a href="{% url 'index-guarderia-hospitalizacion' %}" class="dashboard-card" style="text-decoration: none; color: inherit;">
+            <div class="card-icon" style="background: linear-gradient(135deg, #64b5f6, #1565c0);"><i class="fa-solid fa-bed-pulse"></i></div>
+            <h3>Hospitalización</h3>
+            <p>Internamientos y guardería</p>
+        </a>
+
+        <a href="{% url 'index-estetica' %}" class="dashboard-card" style="text-decoration: none; color: inherit;">
+            <div class="card-icon" style="background: linear-gradient(135deg, #f06292, #c2185b);"><i class="fa-solid fa-scissors"></i></div>
+            <h3>Estética</h3>
+            <p>Peluquería y baños</p>
+        </a>
+
+    </div>
 </section>
+
+<style>
+    .dashboard-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--card-shadow-hover);
+        border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .card-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        color: white;
+        margin-bottom: 1.2rem;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        transition: transform 0.3s ease;
+    }
+
+    .dashboard-card:hover .card-icon {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .dashboard-card h3 {
+        margin: 0 0 0.5rem 0;
+        color: var(--primary-blue-dark);
+        font-size: 1.3rem;
+    }
+
+    .dashboard-card p {
+        margin: 0;
+        color: var(--neutral-gray-dark);
+        font-size: 0.95rem;
+    }
+</style>
 {% endblock %}

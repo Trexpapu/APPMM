@@ -1,5 +1,267 @@
 {% extends 'base.html' %}
 
+{% block extra_head %}
+<style>
+  /* ====== FORMULARIO MODERNO PREMIUM ====== */
+  .container { padding: 2rem 2.5rem; max-width: 1100px; margin: 0 auto; }
+
+  /* Header de página */
+  .header-actions {
+    background: linear-gradient(135deg, #0d47a1 0%, #00838f 100%);
+    border-radius: 18px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    box-shadow: 0 8px 24px rgba(13, 71, 161, 0.25);
+  }
+  .header-actions h2 {
+    color: #fff;
+    margin: 0;
+    font-size: 1.7rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .header-actions h2 i { opacity: 0.9; }
+
+  /* Secciones de formulario */
+  .form-section {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border: 1px solid #e8edf5;
+    position: relative;
+    overflow: hidden;
+    transition: box-shadow 0.25s ease;
+  }
+  .form-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg, #1e88e5, #00acc1);
+  }
+  .form-section:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.1); }
+
+  .form-section h3 {
+    color: #0d47a1;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #eef1f7;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Grid de campos */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+  .form-group { margin-bottom: 0; }
+  .form-group.full-width { grid-column: 1 / -1; }
+
+  /* Labels */
+  .form-group label, form label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #546e7a;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 0.45rem;
+  }
+
+  /* Inputs, selects, textareas */
+  .form-control, .search-input, .searchable-dropdown, .filtro-input,
+  input[type="text"], input[type="number"], input[type="date"],
+  input[type="datetime-local"], input[type="email"], input[type="tel"],
+  select, textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid #dde3ef;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    color: #263238;
+    background: #f8fafd;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s, transform 0.15s;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .form-control:focus, .search-input:focus, .searchable-dropdown:focus,
+  input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus,
+  input[type="datetime-local"]:focus, input[type="email"]:focus, input[type="tel"]:focus,
+  select:focus, textarea:focus {
+    border-color: #1e88e5;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(30,136,229,0.12);
+    transform: translateY(-1px);
+  }
+  textarea { min-height: 110px; resize: vertical; line-height: 1.6; }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23546e7a' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+  }
+
+  /* Errores */
+  .alert.alert-error {
+    background: #fff5f5;
+    border-left: 4px solid #e53935;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    color: #c62828;
+    margin-bottom: 1.25rem;
+    font-size: 0.9rem;
+  }
+  .field-errors {
+    color: #e53935;
+    font-size: 0.82rem;
+    margin-top: 0.35rem;
+    padding: 0.4rem 0.7rem;
+    background: rgba(229,57,53,0.07);
+    border-radius: 6px;
+    border-left: 3px solid #e53935;
+  }
+  .help-text {
+    color: #78909c;
+    font-size: 0.8rem;
+    margin-top: 0.35rem;
+    display: block;
+  }
+
+  /* Botones de acción */
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+    align-items: center;
+  }
+  .btn-home, .btn-agregar, .btn-regresar,
+  button[type="submit"] {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.6rem;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+  }
+  button[type="submit"] {
+    background: linear-gradient(135deg, #43a047, #66bb6a);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(67,160,71,0.35);
+  }
+  button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(67,160,71,0.45);
+    filter: brightness(1.05);
+  }
+
+  /* Info-grid para paneles de datos de mascota */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
+  .info-item {
+    background: #f4f7fb;
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    border: 1px solid #e4eaf5;
+    border-left: 3px solid #1e88e5;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .info-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.07); }
+  .info-item.full-width { grid-column: 1 / -1; }
+  .info-item strong {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #546e7a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.4rem;
+  }
+  .info-item span, .info-item p { color: #263238; font-size: 0.95rem; margin: 0; }
+  .info-content, .content-box {
+    background: #f8fafd;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e4eaf5;
+    color: #37474f;
+    line-height: 1.6;
+    margin-top: 0.3rem;
+  }
+
+  .info-section { margin-bottom: 1.5rem; }
+  .info-section h4 {
+    color: #0d47a1;
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eef1f7;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Alerts de información */
+  .alert-info {
+    background: linear-gradient(135deg, #e0f7fa, #b2ebf2);
+    border-left: 4px solid #00acc1;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .btn-group { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem; }
+
+  /* Grupo de documentos */
+  .documento-group {
+    background: #f4f7fb;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    border: 1px dashed #b0bec5;
+  }
+
+  /* Responsivo */
+  @media (max-width: 768px) {
+    .container { padding: 1rem; }
+    .form-grid { grid-template-columns: 1fr; }
+    .header-actions { border-radius: 12px; padding: 1rem; }
+    .header-actions h2 { font-size: 1.3rem; }
+    .form-section { padding: 1.25rem; border-radius: 12px; }
+    .action-buttons { flex-direction: column; }
+    .btn-home, .btn-agregar, .btn-regresar, button[type="submit"] { width: 100%; justify-content: center; }
+  }
+</style>
+{% endblock %}
+
+
 {% block title %}Agregar Desparasitante{% endblock %}
 
 {% block content %}
@@ -34,10 +296,10 @@
             
         <div class="action-buttons">
             <button type="submit" class="btn-home" style="back  ground: #28a745; padding: 12px 24px;">
-                💾 Guardar Desparasitante
+                <i class="fa-solid fa-floppy-disk"></i> Guardar Desparasitante
             </button>
             <a href="{% url 'index_desparasitantes' %}" class="btn-home" style="background: #6c757d; padding: 12px 24px;">
-                ❌ Cancelar
+                <i class="fa-solid fa-xmark"></i> Cancelar
             </a>
         </div>
 

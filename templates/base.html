@@ -1,31 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     {% load static %}
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Mascotas Morelia{% endblock %}</title>
-    <!-- Global stylesheet for the site (static/styles/main.css) -->
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Global stylesheet -->
     <link rel="stylesheet" href="{% static 'styles/main.css' %}">
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <!-- Navbar included directly in base (can be overridden via block 'header') -->
     <header class="navbar">
-        <div class="brand">
-            <h1>{% block header %}Sistema para clínica veterinaria{% endblock %}</h1>
-        </div>
-        <nav>
-            <a href="{% url 'login' %}" class="btn-home">Sesión</a>
-            <a href="/admin/login/" class="btn-home">Admin</a>
-            <a href="{% url 'index' %}" class="btn-home">Inicio</a>
-            <a href="{% url 'indexCliente' %}" class="btn-home">Clientes</a>
-            <a href="{% url 'indexMascota' %}" class="btn-home">Mascotas</a>
-            <a href="{% url 'index-consultas' %}" class="btn-home">Consultas</a>
-            <a href="{% url 'index-agenda' %}" class="btn-home">Agenda</a>
-            <a href="{% url 'index-procedimientos' %}" class="btn-home">Procedimientos</a>
-            <a href="{% url 'index-guarderia-hospitalizacion' %}" class="btn-home">Guardería y Hospitalización</a>
-            <a href="{% url 'index-estetica' %}" class="btn-home">Estética</a>
+        <!-- Brand -->
+        <a href="{% url 'index' %}" class="nav-brand">
+            <div class="nav-brand-icon">
+                <i class="fa-solid fa-paw"></i>
+            </div>
+            <div class="nav-brand-text">
+                <span class="nav-brand-name">{% block header %}Mascotas Morelia{% endblock %}</span>
+                <span class="nav-brand-sub">Sistema Veterinario</span>
+            </div>
+        </a>
+
+        <!-- Hamburger Button (mobile) -->
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <!-- Navigation Links -->
+        <nav id="nav-menu" class="nav-menu">
+            <a href="{% url 'index' %}" class="nav-link">
+                <i class="fa-solid fa-house"></i>
+                <span>Inicio</span>
+            </a>
+            <a href="{% url 'indexCliente' %}" class="nav-link">
+                <i class="fa-solid fa-users"></i>
+                <span>Clientes</span>
+            </a>
+            <a href="{% url 'indexMascota' %}" class="nav-link">
+                <i class="fa-solid fa-dog"></i>
+                <span>Mascotas</span>
+            </a>
+            <a href="{% url 'index-consultas' %}" class="nav-link">
+                <i class="fa-solid fa-stethoscope"></i>
+                <span>Consultas</span>
+            </a>
+            <a href="{% url 'index-agenda' %}" class="nav-link">
+                <i class="fa-regular fa-calendar-days"></i>
+                <span>Agenda</span>
+            </a>
+            <a href="{% url 'index-procedimientos' %}" class="nav-link">
+                <i class="fa-solid fa-syringe"></i>
+                <span>Procedimientos</span>
+            </a>
+            <a href="{% url 'index-guarderia-hospitalizacion' %}" class="nav-link">
+                <i class="fa-solid fa-bed-pulse"></i>
+                <span>Estancia</span>
+            </a>
+            <a href="{% url 'index-estetica' %}" class="nav-link">
+                <i class="fa-solid fa-scissors"></i>
+                <span>Estética</span>
+            </a>
+
+            <!-- User actions (right side) -->
+            <div class="nav-divider"></div>
+            <a href="{% url 'login' %}" class="nav-link nav-link-user">
+                <i class="fa-solid fa-user"></i>
+                <span>Sesión</span>
+            </a>
+            <a href="/admin/login/" class="nav-link nav-link-admin">
+                <i class="fa-solid fa-lock"></i>
+                <span>Admin</span>
+            </a>
         </nav>
     </header>
 
@@ -34,5 +86,42 @@
     </main>
 
     {% block extra_scripts %}{% endblock %}
+
+    <script>
+        // Mobile Menu Toggle
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            const navMenu = document.getElementById('nav-menu');
+
+            if (menuBtn && navMenu) {
+                menuBtn.addEventListener('click', () => {
+                    navMenu.classList.toggle('active');
+                    const icon = menuBtn.querySelector('i');
+                    if (navMenu.classList.contains('active')) {
+                        icon.classList.replace('fa-bars', 'fa-xmark');
+                    } else {
+                        icon.classList.replace('fa-xmark', 'fa-bars');
+                    }
+                });
+
+                // Close menu on outside click
+                document.addEventListener('click', (e) => {
+                    if (!menuBtn.contains(e.target) && !navMenu.contains(e.target)) {
+                        navMenu.classList.remove('active');
+                        const icon = menuBtn.querySelector('i');
+                        icon.classList.replace('fa-xmark', 'fa-bars');
+                    }
+                });
+
+                // Highlight active link
+                const currentPath = window.location.pathname;
+                navMenu.querySelectorAll('.nav-link').forEach(link => {
+                    if (link.getAttribute('href') !== '/' && currentPath.startsWith(link.getAttribute('href'))) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

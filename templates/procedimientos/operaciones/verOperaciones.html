@@ -1,13 +1,285 @@
 {% extends 'base.html' %}
 
+{% block extra_head %}
+<style>
+  /* ====== DETALLE / VER - DISEÑO PREMIUM ====== */
+  .container { padding: 2rem 2.5rem; max-width: 1100px; margin: 0 auto; }
+
+  /* Header */
+  .header-actions {
+    background: linear-gradient(135deg, #0d47a1 0%, #00838f 100%);
+    border-radius: 18px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    box-shadow: 0 8px 24px rgba(13, 71, 161, 0.25);
+  }
+  .header-actions h2 {
+    color: #fff;
+    margin: 0;
+    font-size: 1.7rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .header-actions .action-buttons { margin: 0; }
+
+  /* Tarjetas de sección */
+  .form-section {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border: 1px solid #e8edf5;
+    position: relative;
+    overflow: hidden;
+  }
+  .form-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg, #1e88e5, #00acc1);
+  }
+  .form-section h3 {
+    color: #0d47a1;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0 0 1.25rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #eef1f7;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .form-section h3 i { color: #1e88e5; }
+
+  /* Grid de info */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1rem;
+  }
+  .info-grid.compact { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+  .info-item {
+    background: #f4f7fb;
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    border: 1px solid #e4eaf5;
+    border-left: 3px solid #1e88e5;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .info-item:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(30,136,229,0.1); }
+  .info-item.full-width { grid-column: 1 / -1; }
+  .info-item strong {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #546e7a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+  }
+  .info-item p, .info-item span { color: #263238; font-size: 0.97rem; margin: 0; line-height: 1.5; }
+
+  /* Contenido de texto largo */
+  .content-box, .info-content, .description-content,
+  .health-content, .complications-content {
+    background: #f4f7fb;
+    border-radius: 10px;
+    padding: 0.9rem 1.1rem;
+    border: 1px solid #dde3ef;
+    color: #37474f;
+    line-height: 1.7;
+    min-height: 40px;
+    margin-top: 0.3rem;
+  }
+
+  /* Información de sección con sub-títulos */
+  .info-section { margin-bottom: 1.75rem; }
+  .info-section:last-child { margin-bottom: 0; }
+  .info-section h4 {
+    color: #0d47a1;
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.85rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e8edf5;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .badge-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+  .badge-danger  { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+  .badge-info    { background: #e0f7fa; color: #00838f; border: 1px solid #80deea; }
+  .badge-warning { background: #fff8e1; color: #f57f17; border: 1px solid #ffe082; }
+
+  /* Botones de acción */
+  .action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 1.5rem;
+  }
+  .action-buttons.compact { margin-top: 0; justify-content: center; }
+  .btn-home, .btn-agregar, .btn-regresar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.65rem 1.4rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+    color: #fff;
+  }
+  .btn-home:hover, .btn-agregar:hover, .btn-regresar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+    filter: brightness(1.07);
+  }
+
+  /* Tabla */
+  .custom-table-container {
+    border-radius: 14px;
+    overflow-x: auto;
+    overflow-y: visible;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+    border: 1px solid #e8edf5;
+    margin-top: 1rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  .custom-table { width: 100%; border-collapse: collapse; }
+  .custom-table thead th {
+    background: linear-gradient(135deg, #1e88e5, #00acc1);
+    color: #fff;
+    padding: 1rem 1.25rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .custom-table tbody td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #f0f4fa;
+    color: #37474f;
+    font-size: 0.93rem;
+    vertical-align: middle;
+  }
+  .custom-table tbody tr:last-child td { border-bottom: none; }
+  .custom-table tbody tr:hover { background: #f4f8ff; }
+  .custom-table tbody tr:nth-child(even) { background: #f9fbff; }
+  .custom-table tbody tr:nth-child(even):hover { background: #f0f5ff; }
+
+  /* No-data */
+  .no-data {
+    text-align: center;
+    color: #90a4ae;
+    padding: 2.5rem;
+    font-style: italic;
+    background: #f4f7fb;
+    border-radius: 12px;
+    border: 2px dashed #dde3ef;
+    margin: 1rem 0;
+  }
+
+  /* Documentos */
+  .documentos-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .documento-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: #f4f7fb;
+    border-radius: 12px;
+    border: 1px solid #dde3ef;
+    border-left: 4px solid #1e88e5;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .documento-info strong { display: block; color: #263238; font-size: 0.95rem; }
+  .documento-info small { color: #78909c; font-size: 0.8rem; }
+
+  /* Fotos */
+  .photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+  }
+  .photo-container {
+    background: #f4f7fb;
+    border-radius: 14px;
+    padding: 1.25rem;
+    text-align: center;
+    border: 1px solid #e4eaf5;
+  }
+  .photo-container h4 { color: #0d47a1; margin: 0 0 1rem 0; font-size: 1rem; }
+  .operation-photo {
+    max-width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    border: 2px solid #fff;
+  }
+  .no-photo {
+    padding: 2rem;
+    color: #90a4ae;
+    background: #eceff1;
+    border-radius: 10px;
+    border: 2px dashed #b0bec5;
+  }
+
+  /* Responsivo */
+  @media (max-width: 768px) {
+    .container { padding: 1rem; }
+    .header-actions { border-radius: 12px; padding: 1rem; flex-direction: column; }
+    .header-actions h2 { font-size: 1.3rem; }
+    .form-section { padding: 1.25rem; border-radius: 12px; }
+    .info-grid, .form-grid { grid-template-columns: 1fr; }
+    .action-buttons { flex-direction: column; }
+    .btn-home, .btn-agregar, .btn-regresar { width: 100%; justify-content: center; }
+    .custom-table-container { overflow-x: auto; }
+    .documento-item { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+{% endblock %}
+
+
 {% block title %}Historial de Operaciones{% endblock %}
 
 {% block content %}
 <section class="container">
     <div class="header-actions">
-        <h2>📋 Historial de Operaciones</h2>
+        <h2><i class="fa-solid fa-clipboard-list"></i> Historial de Operaciones</h2>
         <a href="{% url 'crear_operacion' %}" class="btn-home btn-agregar">
-            ➕ Nueva Operación
+            <i class="fa-solid fa-plus"></i> Nueva Operación
         </a>
     </div>
 
@@ -17,14 +289,14 @@
             <div class="filtros-grid">
                 <!-- Filtro por Cliente -->
                 <div class="filtro-group">
-                    <label for="q_cliente" class="filtro-label">👤 Cliente</label>
+                    <label for="q_cliente" class="filtro-label"><i class="fa-solid fa-user"></i> Cliente</label>
                     <div class="filtro-input-container">
                         <input type="text" id="q_cliente" name="q_cliente" 
                                value="{{ query_cliente }}" placeholder="Nombre, email o teléfono" class="filtro-input">
                         {% if query_cliente %}
                         <button type="button" class="filtro-clear" 
                                 onclick="document.getElementById('q_cliente').value = ''; this.form.submit();">
-                            ❌
+                            <i class="fa-solid fa-xmark"></i>
                         </button>
                         {% endif %}
                     </div>
@@ -39,7 +311,7 @@
                         {% if query_mascota %}
                         <button type="button" class="filtro-clear" 
                                 onclick="document.getElementById('q_mascota').value = ''; this.form.submit();">
-                            ❌
+                            <i class="fa-solid fa-xmark"></i>
                         </button>
                         {% endif %}
                     </div>
@@ -47,14 +319,14 @@
 
                 <!-- Filtro por Operación -->
                 <div class="filtro-group">
-                    <label for="q_operacion" class="filtro-label">🩺 Operación</label>
+                    <label for="q_operacion" class="filtro-label"><i class="fa-solid fa-stethoscope"></i> Operación</label>
                     <div class="filtro-input-container">
                         <input type="text" id="q_operacion" name="q_operacion" 
                                value="{{ query_operacion }}" placeholder="Tipo de operación" class="filtro-input">
                         {% if query_operacion %}
                         <button type="button" class="filtro-clear" 
                                 onclick="document.getElementById('q_operacion').value = ''; this.form.submit();">
-                            ❌
+                            <i class="fa-solid fa-xmark"></i>
                         </button>
                         {% endif %}
                     </div>
@@ -75,7 +347,7 @@
                         {% if query_veterinario %}
                         <button type="button" class="filtro-clear" 
                                 onclick="document.getElementById('q_veterinario').value = ''; this.form.submit();">
-                            ❌
+                            <i class="fa-solid fa-xmark"></i>
                         </button>
                         {% endif %}
                     </div>
@@ -96,7 +368,7 @@
                         {% if query_veterinaria %}
                         <button type="button" class="filtro-clear" 
                                 onclick="document.getElementById('q_veterinaria').value = ''; this.form.submit();">
-                            ❌
+                            <i class="fa-solid fa-xmark"></i>
                         </button>
                         {% endif %}
                     </div>
@@ -104,14 +376,14 @@
 
                 <!-- Filtro por Fecha de Entrada -->
                 <div class="filtro-group">
-                    <label for="q_fecha_entrada" class="filtro-label">📅 Fecha Inicio de la Operación</label>
+                    <label for="q_fecha_entrada" class="filtro-label"><i class="fa-regular fa-calendar"></i> Fecha Inicio de la Operación</label>
                     <div class="filtro-input-container">
                         <input type="date" id="q_fecha_entrada" name="q_fecha_entrada" 
                                value="{{ query_fecha_entrada }}" class="filtro-input">
                         {% if query_fecha_entrada %}
                         <button type="button" class="filtro-clear" 
                                 onclick="document.getElementById('q_fecha_entrada').value = ''; this.form.submit();">
-                            ❌
+                            <i class="fa-solid fa-xmark"></i>
                         </button>
                         {% endif %}
                     </div>
@@ -119,8 +391,8 @@
 
                 <!-- Botones de acción -->
                 <div class="filtro-actions">
-                    <button type="submit" class="btn-home filtro-submit">🔍 Buscar</button>
-                    <a href="{% url 'historial_operaciones' %}" class="btn-home filtro-reset">🗑️ Limpiar</a>
+                    <button type="submit" class="btn-home filtro-submit"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+                    <a href="{% url 'historial_operaciones' %}" class="btn-home filtro-reset"><i class="fa-solid fa-trash"></i> Limpiar</a>
                 </div>
             </div>
         </form>
@@ -128,7 +400,7 @@
 
     <!-- Información de resultados -->
     <div class="results-info">
-        <p>📊 Total de operaciones: <strong>{{ operaciones|length }}</strong></p>
+        <p><i class="fa-solid fa-chart-bar"></i> Total de operaciones: <strong>{{ operaciones|length }}</strong></p>
     </div>
 
     <!-- Tabla de operaciones -->
@@ -136,14 +408,14 @@
         <table class="custom-table">
             <thead>
                 <tr>
-                    <th>👤 Cliente</th>
+                    <th><i class="fa-solid fa-user"></i> Cliente</th>
                     <th>🐕 Mascota</th>
-                    <th>🩺 Operación</th>
-                    <th>📅 Fecha Inicio de operación</th>
-                    <th>📅 Fecha Salida de operación</th>
+                    <th><i class="fa-solid fa-stethoscope"></i> Operación</th>
+                    <th><i class="fa-regular fa-calendar"></i> Fecha Inicio de operación</th>
+                    <th><i class="fa-regular fa-calendar"></i> Fecha Salida de operación</th>
                     <th>👨‍⚕️ Veterinario</th>
                     <th>🏥 Clínica</th>
-                    <th>⚡ Acciones</th>
+                    <th><i class="fa-solid fa-bolt"></i> Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -153,8 +425,8 @@
                         <div class="client-info">
                             <strong>{{ operacion.mascota.cliente.nombre }}</strong>
                             <div class="client-details">
-                                <small>📞 {{ operacion.mascota.cliente.telefono|default:"Sin teléfono" }}</small>
-                                <small>📧 {{ operacion.mascota.cliente.email|default:"Sin email" }}</small>
+                                <small><i class="fa-solid fa-phone"></i> {{ operacion.mascota.cliente.telefono|default:"Sin teléfono" }}</small>
+                                <small><i class="fa-solid fa-envelope"></i> {{ operacion.mascota.cliente.email|default:"Sin email" }}</small>
                             </div>
                         </div>
                     </td>
@@ -187,18 +459,18 @@
                             <a href="{% url 'detalle_operacion' operacion.pk %}" 
                                class="btn-home" style="background: #17a2b8; padding: 5px 10px;"
                                title="Ver detalles">
-                                👁️
+                                <i class="fa-solid fa-eye"></i>
                             </a>
                             <a href="{% url 'editar_operacion' operacion.pk %}" 
                                class="btn-home" style="background: #ffc107; color: black; padding: 5px 10px;"
                                title="Editar operación">
-                                ✏️
+                                <i class="fa-solid fa-pen"></i>
                             </a>
                             <a href="{% url 'eliminar_operacion' operacion.pk %}" 
                                class="btn-home" style="background: #dc3545; padding: 5px 10px;"
                                onclick="return confirm('¿Estás seguro de que quieres eliminar la operación de {{ operacion.mascota.nombre }}?');"
                                title="Eliminar operación">
-                                🗑️
+                                <i class="fa-solid fa-trash"></i>
                             </a>
                         </div>
                     </td>
@@ -207,9 +479,9 @@
                 <tr>
                     <td colspan="8" class="no-data">
                         {% if request.GET %}
-                            🔍 No se encontraron operaciones que coincidan con los filtros aplicados.
+                            <i class="fa-solid fa-magnifying-glass"></i> No se encontraron operaciones que coincidan con los filtros aplicados.
                         {% else %}
-                            📝 No hay operaciones registradas. 
+                            <i class="fa-solid fa-file-pen"></i> No hay operaciones registradas. 
                         {% endif %}
                     </td>
                 </tr>

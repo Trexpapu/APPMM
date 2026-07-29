@@ -1,5 +1,277 @@
 {% extends 'base.html' %}
 
+{% block extra_head %}
+<style>
+  /* ====== DETALLE / VER - DISEÑO PREMIUM ====== */
+  .container { padding: 2rem 2.5rem; max-width: 1100px; margin: 0 auto; }
+
+  /* Header */
+  .header-actions {
+    background: linear-gradient(135deg, #0d47a1 0%, #00838f 100%);
+    border-radius: 18px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    box-shadow: 0 8px 24px rgba(13, 71, 161, 0.25);
+  }
+  .header-actions h2 {
+    color: #fff;
+    margin: 0;
+    font-size: 1.7rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .header-actions .action-buttons { margin: 0; }
+
+  /* Tarjetas de sección */
+  .form-section {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    border: 1px solid #e8edf5;
+    position: relative;
+    overflow: hidden;
+  }
+  .form-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg, #1e88e5, #00acc1);
+  }
+  .form-section h3 {
+    color: #0d47a1;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0 0 1.25rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #eef1f7;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .form-section h3 i { color: #1e88e5; }
+
+  /* Grid de info */
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1rem;
+  }
+  .info-grid.compact { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+  .info-item {
+    background: #f4f7fb;
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    border: 1px solid #e4eaf5;
+    border-left: 3px solid #1e88e5;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .info-item:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(30,136,229,0.1); }
+  .info-item.full-width { grid-column: 1 / -1; }
+  .info-item strong {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #546e7a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+  }
+  .info-item p, .info-item span { color: #263238; font-size: 0.97rem; margin: 0; line-height: 1.5; }
+
+  /* Contenido de texto largo */
+  .content-box, .info-content, .description-content,
+  .health-content, .complications-content {
+    background: #f4f7fb;
+    border-radius: 10px;
+    padding: 0.9rem 1.1rem;
+    border: 1px solid #dde3ef;
+    color: #37474f;
+    line-height: 1.7;
+    min-height: 40px;
+    margin-top: 0.3rem;
+  }
+
+  /* Información de sección con sub-títulos */
+  .info-section { margin-bottom: 1.75rem; }
+  .info-section:last-child { margin-bottom: 0; }
+  .info-section h4 {
+    color: #0d47a1;
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0 0 0.85rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e8edf5;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  /* Badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .badge-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+  .badge-danger  { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+  .badge-info    { background: #e0f7fa; color: #00838f; border: 1px solid #80deea; }
+  .badge-warning { background: #fff8e1; color: #f57f17; border: 1px solid #ffe082; }
+
+  /* Botones de acción */
+  .action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 1.5rem;
+  }
+  .action-buttons.compact { margin-top: 0; justify-content: center; }
+  .btn-home, .btn-agregar, .btn-regresar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.65rem 1.4rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+    color: #fff;
+  }
+  .btn-home:hover, .btn-agregar:hover, .btn-regresar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+    filter: brightness(1.07);
+  }
+
+  /* Tabla */
+  .custom-table-container {
+    border-radius: 14px;
+    overflow-x: auto;
+    overflow-y: visible;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+    border: 1px solid #e8edf5;
+    margin-top: 1rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  .custom-table { width: 100%; border-collapse: collapse; }
+  .custom-table thead th {
+    background: linear-gradient(135deg, #1e88e5, #00acc1);
+    color: #fff;
+    padding: 1rem 1.25rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .custom-table tbody td {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #f0f4fa;
+    color: #37474f;
+    font-size: 0.93rem;
+    vertical-align: middle;
+  }
+  .custom-table tbody tr:last-child td { border-bottom: none; }
+  .custom-table tbody tr:hover { background: #f4f8ff; }
+  .custom-table tbody tr:nth-child(even) { background: #f9fbff; }
+  .custom-table tbody tr:nth-child(even):hover { background: #f0f5ff; }
+
+  /* No-data */
+  .no-data {
+    text-align: center;
+    color: #90a4ae;
+    padding: 2.5rem;
+    font-style: italic;
+    background: #f4f7fb;
+    border-radius: 12px;
+    border: 2px dashed #dde3ef;
+    margin: 1rem 0;
+  }
+
+  /* Documentos */
+  .documentos-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .documento-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: #f4f7fb;
+    border-radius: 12px;
+    border: 1px solid #dde3ef;
+    border-left: 4px solid #1e88e5;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .documento-info strong { display: block; color: #263238; font-size: 0.95rem; }
+  .documento-info small { color: #78909c; font-size: 0.8rem; }
+
+  /* Fotos */
+  .photos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 0.5rem;
+  }
+  .photo-container {
+    background: #f4f7fb;
+    border-radius: 14px;
+    padding: 1.25rem;
+    text-align: center;
+    border: 1px solid #e4eaf5;
+  }
+  .photo-container h4 { color: #0d47a1; margin: 0 0 1rem 0; font-size: 1rem; }
+  .operation-photo {
+    max-width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    border: 2px solid #fff;
+  }
+  .no-photo {
+    padding: 2rem;
+    color: #90a4ae;
+    background: #eceff1;
+    border-radius: 10px;
+    border: 2px dashed #b0bec5;
+  }
+
+  /* Responsivo */
+  @media (max-width: 768px) {
+    .container { padding: 1rem; }
+    .header-actions { border-radius: 12px; padding: 1rem; flex-direction: column; }
+    .header-actions h2 { font-size: 1.3rem; }
+    .form-section { padding: 1.25rem; border-radius: 12px; }
+    .info-grid, .form-grid { grid-template-columns: 1fr; }
+    .action-buttons { flex-direction: column; }
+    .btn-home, .btn-agregar, .btn-regresar { width: 100%; justify-content: center; }
+    .custom-table-container { overflow-x: auto; }
+    .documento-item { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+{% endblock %}
+
+
 {% load static %}
 
 {% block title %}🐕 {{ mascota.nombre }} - Mascotas Morelia{% endblock %}
@@ -22,7 +294,7 @@
 
         <div class="info-grid">
             <div class="info-item">
-                <strong>👤 Dueño:</strong>
+                <strong><i class="fa-solid fa-user"></i> Dueño:</strong>
                 <p>
                     <a href="{% url 'detalle_cliente' mascota.cliente.id %}" style="color: var(--btn-bg); text-decoration: none;">
                         {{ mascota.cliente.nombre }}
@@ -38,7 +310,7 @@
                 <p>{{ mascota.raza|default:"No especificada" }}</p>
             </div>
             <div class="info-item">
-                <strong>📅 Fecha de Nacimiento:</strong>
+                <strong><i class="fa-regular fa-calendar"></i> Fecha de Nacimiento:</strong>
                 <p>{{ mascota.fechaNacimiento }}</p>
             </div>
             <div class="info-item">
@@ -68,9 +340,9 @@
                 <strong>❤️ Estado:</strong>
                 <p>
                     {% if mascota.vive %}
-                        <span class="badge badge-success">✅ Viva</span>
+                        <span class="badge badge-success"><i class="fa-solid fa-check"></i> Viva</span>
                     {% else %}
-                        <span class="badge badge-danger">❌ Fallecida</span>
+                        <span class="badge badge-danger"><i class="fa-solid fa-xmark"></i> Fallecida</span>
                     {% endif %}
                 </p>
             </div>
@@ -82,19 +354,19 @@
         <h3 style="color: var(--brand-bg); margin-bottom: 20px;">💊 Información Médica</h3>
         <div class="info-grid">
             <div class="info-item full-width">
-                <strong>💉 Vacunas:</strong>
+                <strong><i class="fa-solid fa-syringe"></i> Vacunas:</strong>
                 <div class="content-box">
                     {{ mascota.vacunas|default:"No se han registrado vacunas."|linebreaks }}
                 </div>
             </div>
             <div class="info-item full-width">
-                <strong>⚠️ Alergias:</strong>
+                <strong><i class="fa-solid fa-triangle-exclamation"></i> Alergias:</strong>
                 <div class="content-box">
                     {{ mascota.alergias|default:"No se han registrado alergias."|linebreaks }}
                 </div>
             </div>
             <div class="info-item full-width">
-                <strong>📅 Fecha de la última desparasitación aplicada:</strong>
+                <strong><i class="fa-regular fa-calendar"></i> Fecha de la última desparasitación aplicada:</strong>
                 <div class="content-box">
                     {{ mascota.ultimaDesparasitacion|default:"No se ha desparasitado." }}
                 </div>
@@ -110,18 +382,18 @@
 
     <!-- Información de Contacto del Dueño -->
     <div class="form-section">
-        <h3 style="color: var(--brand-bg); margin-bottom: 20px;">📞 Información de Contacto del Dueño</h3>
+        <h3 style="color: var(--brand-bg); margin-bottom: 20px;"><i class="fa-solid fa-phone"></i> Información de Contacto del Dueño</h3>
         <div class="info-grid compact">
             <div class="info-item">
-                <strong>📧 Email:</strong>
+                <strong><i class="fa-solid fa-envelope"></i> Email:</strong>
                 <p>{{ mascota.cliente.email|default:"No especificado" }}</p>
             </div>
             <div class="info-item">
-                <strong>📞 Teléfono:</strong>
+                <strong><i class="fa-solid fa-phone"></i> Teléfono:</strong>
                 <p>{{ mascota.cliente.telefono|default:"No especificado" }}</p>
             </div>
             <div class="info-item full-width">
-                <strong>🏠 Dirección:</strong>
+                <strong><i class="fa-solid fa-house"></i> Dirección:</strong>
                 <p>{{ mascota.cliente.direccion|default:"No especificada"|linebreaks }}</p>
             </div>
         </div>
@@ -129,16 +401,16 @@
 
     <!-- Acciones Rápidas -->
     <div class="form-section">
-        <h3 style="color: var(--brand-bg); margin-bottom: 20px;">⚡ Acciones Rápidas</h3>
+        <h3 style="color: var(--brand-bg); margin-bottom: 20px;"><i class="fa-solid fa-bolt"></i> Acciones Rápidas</h3>
         <div class="action-buttons" style="justify-content: center;">
             <a href="{% url 'editar_mascota' mascota.id %}" class="btn-home" style="background: #ffc107; color: black;">
-                ✏️ Editar Mascota
+                <i class="fa-solid fa-pen"></i> Editar Mascota
             </a>
             <a href="{% url 'borrar_mascota' mascota.id %}" 
                class="btn-home" 
                style="background: #dc3545;" 
                onclick="return confirm('¿Estás seguro de que quieres eliminar a {{ mascota.nombre }}?');">
-                🗑️ Eliminar
+                <i class="fa-solid fa-trash"></i> Eliminar
             </a>
         </div>
     </div>

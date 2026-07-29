@@ -4,13 +4,13 @@
 
 {% block content %}
 <section class="container index-cliente">
-    <h2>💉 Gestión de Procedimientos</h2>
+    <h2><i class="fa-solid fa-syringe"></i> Gestión de Procedimientos</h2>
     <div class="options">
         <a href="{% url 'historial_operaciones' %}" class="btn-home">🏥 Ver Historial de Operaciones</a>
         <a href="{% url 'crear_operacion' %}" class="btn-home">🩸 Nueva Operación</a>
         
         <a href="{% url 'historial_vacunaciones' %}" class="btn-home">🗃️ Historial de Vacunaciones</a>
-        <a href="{% url 'nueva_vacunacion' %}" class="btn-home">💉 Nueva Vacunación</a>
+        <a href="{% url 'nueva_vacunacion' %}" class="btn-home"><i class="fa-solid fa-syringe"></i> Nueva Vacunación</a>
         
 
         
@@ -19,7 +19,7 @@
 
         <a href="{% url 'index_vacunas' %}" class="btn-home">🗂️ Gestión de Vacunas</a>
         
-        <a href="{% url 'index_desparasitantes' %}" class="btn-home">📊 Gestión de Desparasitantes</a>
+        <a href="{% url 'index_desparasitantes' %}" class="btn-home"><i class="fa-solid fa-chart-bar"></i> Gestión de Desparasitantes</a>
     </div>
 </section>
 {% endblock %}

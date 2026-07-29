@@ -4,13 +4,13 @@
 
 {% block content %}
 <section class="container index-cliente">
-    <h2>🏠 Gestión de Guardería y Hospitalización</h2>
+    <h2><i class="fa-solid fa-house"></i> Gestión de Guardería y Hospitalización</h2>
     <div class="options">
         
-        <a href="{% url 'historial-guarderia' %}" class="btn-home">📋 Historial de Guardería</a>
-        <a href="{% url 'servicio_guarderia_crear' %}" class="btn-home">🏠 Nuevo Servicio de Guardería</a>
+        <a href="{% url 'historial-guarderia' %}" class="btn-home"><i class="fa-solid fa-clipboard-list"></i> Historial de Guardería</a>
+        <a href="{% url 'servicio_guarderia_crear' %}" class="btn-home"><i class="fa-solid fa-house"></i> Nuevo Servicio de Guardería</a>
 
-        <a href="{% url 'historial-hospitalizacion' %}" class="btn-home">📋 Historial de Hospitalización</a>
+        <a href="{% url 'historial-hospitalizacion' %}" class="btn-home"><i class="fa-solid fa-clipboard-list"></i> Historial de Hospitalización</a>
         <a href="{% url 'servicio_hospitalizacion_crear' %}" class="btn-home">🏥 Nuevo Servicio de Hospitalización</a>
     </div>
 </section>

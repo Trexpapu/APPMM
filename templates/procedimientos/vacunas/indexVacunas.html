@@ -4,11 +4,11 @@
 
 {% block content %}
 <section class="container index-cliente">
-    <h2>💉 Gestión de Vacunas</h2>
+    <h2><i class="fa-solid fa-syringe"></i> Gestión de Vacunas</h2>
     <div class="options">
         
-        <a href="{% url 'lista_vacunas' %}" class="btn-home">📋 Ver Vacunas</a>
-        <a href="{% url 'agregar_vacuna' %}" class="btn-home">💉 Nueva Vacuna</a>
+        <a href="{% url 'lista_vacunas' %}" class="btn-home"><i class="fa-solid fa-clipboard-list"></i> Ver Vacunas</a>
+        <a href="{% url 'agregar_vacuna' %}" class="btn-home"><i class="fa-solid fa-syringe"></i> Nueva Vacuna</a>
     </div>
 </section>
 {% endblock %}

@@ -4,11 +4,11 @@
 
 {% block content %}
 <section class="container index-cliente">
-    <h2>📅 Gestión de Citas</h2>
+    <h2><i class="fa-regular fa-calendar"></i> Gestión de Citas</h2>
     <div class="options">
         
-        <a href="{% url 'ver-proximas-citas' %}" class="btn-home">🔭 Ver Próximas Citas</a>
-        <a href="{% url 'agendar-cita' %}" class="btn-home">📅 Agendar Cita</a>
+        <a href="{% url 'ver-proximas-citas' %}" class="btn-home"><i class="fa-solid fa-eye"></i> Ver Próximas Citas</a>
+        <a href="{% url 'agendar-cita' %}" class="btn-home"><i class="fa-regular fa-calendar"></i> Agendar Cita</a>
     </div>
 </section>
 {% endblock %}
