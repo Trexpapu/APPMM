@@ -1,1 +1,37 @@
 media/consultas/
+
+# Python / Django
+__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite3
+*.sqlite3-journal
+
+# Entornos virtuales
+venv/
+env/
+.env
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Static y Media
+staticfiles/
+media/
+# (Si deseas conservar la carpeta media pero ignorar su contenido descomenta lo siguiente y elimina la línea de arriba)
+# media/*
+# !media/.keep
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Logs
+*.log
+
+# IDEs y SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

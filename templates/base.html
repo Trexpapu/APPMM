@@ -70,6 +70,18 @@
 
             <!-- User actions (right side) -->
             <div class="nav-divider"></div>
+            {% if request.user.is_authenticated %}
+            <span class="nav-user-label" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.9rem; color: #fff; font-size: 0.85rem; font-weight: 600; font-family: 'Inter', sans-serif; white-space: nowrap;">
+                <i class="fa-solid fa-circle-user" style="color: #69f0ae; font-size: 1rem;"></i>
+                <span>{{ request.user.get_full_name|default:request.user.username }}</span>
+            </span>
+            {% endif %}
+            {% if request.user.is_authenticated and request.user.is_superuser %}
+            <a href="{% url 'ver_usuarios' %}" class="nav-link nav-link-admin">
+                <i class="fa-solid fa-users-gear"></i>
+                <span>Usuarios</span>
+            </a>
+            {% endif %}
             <a href="{% url 'login' %}" class="nav-link nav-link-user">
                 <i class="fa-solid fa-user"></i>
                 <span>Sesión</span>

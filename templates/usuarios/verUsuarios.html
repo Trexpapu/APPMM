@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Ver Usuarios - Mascotas Morelia{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="header-actions">
+        <h2><i class="fa-solid fa-users-gear"></i> Gestión de Usuarios</h2>
+        <a href="{% url 'agregar_usuario' %}" class="btn-home btn-agregar">
+            <i class="fa-solid fa-plus"></i> Nuevo Usuario
+        </a>
+    </div>
+
+    <div class="custom-table-container">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th><i class="fa-solid fa-user"></i> Nombre</th>
+                    <th><i class="fa-solid fa-envelope"></i> Correo</th>
+                    <th><i class="fa-solid fa-shield-halved"></i> Rol</th>
+                    <th><i class="fa-solid fa-bolt"></i> Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios %}
+                <tr>
+                    <td><strong>{{ usuario.get_full_name|default:usuario.username }}</strong></td>
+                    <td>{{ usuario.email }}</td>
+                    <td>
+                        {% if usuario.is_superuser %}
+                        <span class="status-active" style="padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; border: 1px solid var(--primary-green);">Super Usuario</span>
+                        {% else %}
+                        <span class="status-pending" style="padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; border: 1px solid #ffb300;">Usuario</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-buttons compact">
+                            <a href="{% url 'editar_usuario' usuario.id %}" 
+                               class="btn-home" 
+                               style="background: #ffc107; color: black; padding: 5px 10px;"
+                               title="Editar usuario">
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+                            {% if request.user.id != usuario.id %}
+                            <a href="{% url 'borrar_usuario' usuario.id %}" 
+                               class="btn-home" 
+                               style="background: #dc3545; padding: 5px 10px;" 
+                               onclick="return confirm('¿Estás seguro de que quieres eliminar a {{ usuario.first_name|default:usuario.email }}?');"
+                               title="Eliminar usuario">
+                                <i class="fa-solid fa-trash"></i>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="no-data">
+                        <i class="fa-solid fa-users-slash"></i> No hay usuarios registrados.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

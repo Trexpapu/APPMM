@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Agregar Usuario - Mascotas Morelia{% endblock %}
+
+{% block content %}
+<section class="container">
+    <div class="form-section">
+        <h2 style="color: var(--primary-blue-dark); margin-bottom: 2rem;">
+            <i class="fa-solid fa-user-plus"></i> Agregar Nuevo Usuario
+        </h2>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="form-group {% if field.name == 'is_superuser' %}full-width{% endif %}">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                    <small class="help-text">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                    <div class="field-errors">
+                        {% for error in field.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="form-actions" style="margin-top: 2rem; display: flex; gap: 1rem;">
+                <button type="submit" class="btn-home btn-agregar">
+                    <i class="fa-solid fa-floppy-disk"></i> Guardar Usuario
+                </button>
+                <a href="{% url 'ver_usuarios' %}" class="btn-home btn-regresar">
+                    <i class="fa-solid fa-arrow-left"></i> Regresar
+                </a>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

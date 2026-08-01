@@ -3,7 +3,6 @@ from django.urls import path
 
 
 urlpatterns = [
-    path('index/', views.index, name='index'),
     path('index-cliente/', views.indexClientes, name='indexCliente'),
     path('index-mascota/', views.indexMascotas, name='indexMascota'),
     path('ver-clientes/', views.ver_clientes, name='ver_clientes'),
@@ -20,5 +19,5 @@ urlpatterns = [
 
 
 
-    path('', views.user_login, name='login'),
+    # path('', views.user_login, name='login'), # Moved to Usuarios
 ]

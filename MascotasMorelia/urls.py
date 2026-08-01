@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Rutas de tus apps
+    path('', include('Usuarios.urls')),
     path('', include('ClientesMascotas.urls')),
     path('consultas/', include('ConsultasMedicas.urls')),
     path('agenda/', include('Agenda.urls')),

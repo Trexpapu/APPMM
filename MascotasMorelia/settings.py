@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'Agenda',
     'GuarderiaHospitalizacion',
     'Estetica',
+    'Usuarios',
 ]
 
 MIDDLEWARE = [
@@ -82,11 +83,11 @@ WSGI_APPLICATION = 'MascotasMorelia.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'mascotasmorelia',
-        'USER': 'postgres',
-        'PASSWORD': 'aPERRITOMAN12',
-        'HOST': 'localhost',     # o el host real en producción
-        'PORT': '5432',          # puerto por defecto de postgres
+        'NAME': os.environ.get('DB_NAME', 'mascotasmorelia'),
+        'USER': os.environ.get('DB_USER', 'postgres'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'aPERRITOMAN12'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
 }
 
